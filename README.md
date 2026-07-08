@@ -1,5 +1,7 @@
 # Datunwen · 大同语
 
+**English** · [简体中文](README.zh-CN.md)
+
 **Datunwen (大同语) — an engineered constructed language that carries grammar on a pitch channel and writes in a featural block script, aiming for Latin-grade explicitness on a Chinese-size syllable budget; ships as self-contained interactive HTML: design book, English course, trilingual dictionary, and neural audio demos.**
 
 > 大同语是一门工程化设计的人造语言：语法信息由音高信道承载（词类不写进词典，由整词音高轮廓即时指派），文字是「韩文拼形 × 汉字形声」的二维方块，输入端是纯 ASCII。本仓库包含完整的中文设计书、英语入门课程、三语词典与神经语音参考音——全部为零依赖的单文件交互式 HTML，浏览器直接打开即用。
