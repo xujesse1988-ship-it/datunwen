@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="大同语（Datunwen）中文入门课程。八节短课，带你走进这门把语法架在音高上的人造语言；每个词都可点击、都会发声。">
+<title>大同语 · 入门课程</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+button { font: inherit; }
+
+/* ============ Design tokens: paper & ink (light) / rubbing (dark) ============ */
+:root {
+  --paper: #FAF9F6;
+  --panel: #F1EFE8;
+  --panel2: #EBE9E1;
+  --ink: #1F2328;
+  --ink-2: #5B6068;
+  --ink-3: #8B8F96;
+  --hairline: #E0DED6;
+  --hairline2: #D2CFC5;
+  --zhu: #BE3E2C;          /* cinnabar = semantic channel */
+  --zhu-soft: #BE3E2C1f;
+  --dian: #35558F;         /* indigo = phonetic channel */
+  --dian-soft: #35558F17;
+  --good: #3E7A4E;
+  --glyph-frame: #C9C6BB;
+  --shadow: 0 1px 2px rgba(31,35,40,.05), 0 8px 28px -12px rgba(31,35,40,.14);
+  --serif: Georgia, "Times New Roman", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  --sans: -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #17191D; --panel: #1E2126; --panel2: #23262C;
+    --ink: #E8E6E1; --ink-2: #A6AAB2; --ink-3: #7A7E86;
+    --hairline: #2C2F35; --hairline2: #383C43;
+    --zhu: #E06A52; --zhu-soft: #E06A5226;
+    --dian: #5E90EE; --dian-soft: #5E90EE1f;
+    --good: #6FBF82; --glyph-frame: #43474F;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -12px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="light"] {
+  --paper: #FAF9F6; --panel: #F1EFE8; --panel2: #EBE9E1;
+  --ink: #1F2328; --ink-2: #5B6068; --ink-3: #8B8F96;
+  --hairline: #E0DED6; --hairline2: #D2CFC5;
+  --zhu: #BE3E2C; --zhu-soft: #BE3E2C1f;
+  --dian: #35558F; --dian-soft: #35558F17;
+  --good: #3E7A4E; --glyph-frame: #C9C6BB;
+  --shadow: 0 1px 2px rgba(31,35,40,.05), 0 8px 28px -12px rgba(31,35,40,.14);
+}
+:root[data-theme="dark"] {
+  --paper: #17191D; --panel: #1E2126; --panel2: #23262C;
+  --ink: #E8E6E1; --ink-2: #A6AAB2; --ink-3: #7A7E86;
+  --hairline: #2C2F35; --hairline2: #383C43;
+  --zhu: #E06A52; --zhu-soft: #E06A5226;
+  --dian: #5E90EE; --dian-soft: #5E90EE1f;
+  --good: #6FBF82; --glyph-frame: #43474F;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -12px rgba(0,0,0,.5);
+}
+
+/* ============ Base ============ */
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--serif); font-size: 17px; line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px 120px; }
+p { margin: 0 0 1em; max-width: 72ch; }
+a { color: var(--dian); text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 700; }
+em { font-style: normal; border-bottom: 2px solid var(--zhu-soft); }
+::selection { background: var(--dian-soft); }
+ul.plain { padding-left: 22px; }
+ul.plain li { margin: 6px 0; }
+
+/* ============ Top bar ============ */
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--sans); font-size: 13px;
+}
+.topnav .in {
+  max-width: 1060px; margin: 0 auto; padding: 10px 28px;
+  display: flex; gap: 16px; align-items: center; overflow-x: auto; white-space: nowrap;
+}
+.topnav .name { font-family: var(--serif); font-weight: 700; font-size: 15px; margin-right: 6px; }
+.topnav .name .seal { color: var(--zhu); }
+.topnav a { color: var(--ink-2); }
+.topnav a:hover { color: var(--ink); text-decoration: none; }
+
+/* ============ Hero ============ */
+header.hero { padding: 64px 0 20px; }
+.hero .kicker {
+  font-family: var(--sans); font-size: 12.5px; letter-spacing: .22em;
+  color: var(--ink-2); text-transform: uppercase; margin-bottom: 22px;
+}
+.hero .kicker .seal {
+  display: inline-block; border: 1.5px solid var(--zhu); color: var(--zhu);
+  padding: 2px 8px; margin-right: 12px; letter-spacing: .3em; font-weight: 600;
+}
+#heroGlyphs { margin: 8px 0 4px; }
+#heroGlyphs svg { max-width: 100%; height: auto; }
+.hero h1 {
+  font-size: clamp(30px, 4.6vw, 44px); line-height: 1.25; margin: 18px 0 10px;
+  font-weight: 700; text-wrap: balance; letter-spacing: .01em;
+}
+.hero .sub { font-size: 18.5px; color: var(--ink-2); max-width: 62ch; }
+.hero .hint {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+  font-family: var(--sans); font-size: 13px; color: var(--dian);
+  background: var(--dian-soft); border-radius: 100px; padding: 6px 14px;
+}
+
+/* Axiom cards */
+.axioms { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 28px 0 8px; }
+.axiom {
+  background: var(--panel); border: 1px solid var(--hairline);
+  border-radius: 14px; padding: 18px 20px 14px;
+}
+.axiom .no { font-family: var(--sans); font-size: 11.5px; letter-spacing: .18em; color: var(--zhu); font-weight: 700; }
+.axiom h3 { margin: 6px 0 6px; font-size: 17.5px; }
+.axiom p { font-size: 14.5px; line-height: 1.75; color: var(--ink-2); margin: 0; }
+
+/* ============ Sections / lessons ============ */
+section { margin-top: 84px; scroll-margin-top: 70px; }
+.sechead { display: flex; align-items: baseline; gap: 16px; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 8px; }
+.sechead .num {
+  font-family: var(--serif); color: var(--zhu); font-weight: 700; font-size: 14px;
+  border: 1.5px solid var(--zhu); padding: 3px 9px; letter-spacing: .1em; white-space: nowrap;
+}
+.sechead h2 { font-size: clamp(24px, 3vw, 30px); margin: 0; font-weight: 700; text-wrap: balance; }
+.sechead .en { margin-left: auto; font-family: Georgia, serif; font-style: italic; font-size: 13.5px; color: var(--ink-3); }
+.lede { font-size: 18px; color: var(--ink-2); margin: 18px 0 26px; max-width: 68ch; }
+h3.sub { font-size: 20px; margin: 44px 0 12px; }
+h3.sub .tag { font-family: var(--sans); font-size: 11px; letter-spacing: .15em; color: var(--dian); background: var(--dian-soft); padding: 3px 8px; border-radius: 4px; vertical-align: 3px; margin-left: 10px; }
+h4 { font-size: 16.5px; margin: 26px 0 8px; }
+
+/* ============ Tables ============ */
+.tblwrap { overflow-x: auto; margin: 16px 0 22px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 14px; }
+th {
+  text-align: left; font-size: 11.5px; letter-spacing: .12em; color: var(--ink-2);
+  font-weight: 600; padding: 10px 14px; border-bottom: 1.5px solid var(--hairline2);
+  white-space: nowrap; background: var(--panel2);
+}
+td { padding: 9px 14px; border-bottom: 1px solid var(--hairline); vertical-align: top; line-height: 1.65; }
+tr:last-child td { border-bottom: none; }
+td.rom, span.rom { font-family: var(--mono); font-weight: 600; color: var(--dian); white-space: nowrap; }
+td.ipa { font-family: var(--mono); color: var(--ink-2); white-space: nowrap; }
+td.void { color: var(--hairline2); text-align: center; }
+.tblwrap.int td, .tblwrap.int th { white-space: normal; min-width: 76px; }
+.tblwrap.int th[scope="row"] { white-space: nowrap; }
+
+/* ============ Word blocks (clickable, speaking) ============ */
+.dw {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; border-radius: 10px; padding: 6px 7px 4px; margin: 1px;
+  transition: background .15s; vertical-align: middle; border: 1px solid transparent;
+}
+.dw:hover, .dw:focus-visible { background: var(--dian-soft); border-color: var(--hairline); outline: none; }
+.dw.playing { background: var(--dian-soft); border-color: var(--dian); }
+.dw .r { font-family: var(--mono); font-size: 12.5px; color: var(--dian); font-weight: 600; }
+.dw .g { font-family: var(--sans); font-size: 11.5px; color: var(--ink-2); }
+.glyphline {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px;
+  padding: 20px 16px 14px; background: var(--panel); border: 1px solid var(--hairline);
+  border-radius: 14px; margin: 14px 0;
+}
+.glyphline.big { padding: 26px 20px 18px; }
+.sentbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 12px 0 6px; font-family: var(--sans); }
+.sentbar .cap { font-size: 13px; color: var(--ink-2); }
+button.play {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--paper); background: var(--dian); border: none; border-radius: 100px;
+  padding: 7px 16px; display: inline-flex; align-items: center; gap: 7px;
+  transition: transform .12s, opacity .15s;
+}
+button.play:hover { opacity: .9; }
+button.play:active { transform: scale(.97); }
+button.play:focus-visible { outline: 2px solid var(--zhu); outline-offset: 2px; }
+button.play.ghost { background: transparent; color: var(--dian); border: 1.5px solid var(--dian); }
+.roman-line { font-family: var(--mono); font-size: 15.5px; margin: 10px 0 2px; color: var(--ink); overflow-x: auto; }
+.roman-line .q { color: var(--zhu); }
+
+/* ============ Panels & notes ============ */
+.notecard {
+  background: var(--panel); border: 1px solid var(--hairline); border-left: 3px solid var(--zhu);
+  border-radius: 10px; padding: 14px 18px; margin: 18px 0; font-size: 15px;
+}
+.notecard.blue { border-left-color: var(--dian); }
+.notecard .t { font-family: var(--sans); font-size: 12px; letter-spacing: .14em; font-weight: 700; color: var(--zhu); display: block; margin-bottom: 4px; }
+.notecard.blue .t { color: var(--dian); }
+.notecard p { margin: 0 0 6px; } .notecard p:last-child { margin: 0; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin: 16px 0; }
+.figcap { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); margin: 6px 2px 0; line-height: 1.6; }
+figure { margin: 22px 0; }
+
+/* Word-building cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+.card {
+  background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px;
+  padding: 14px 14px 12px; text-align: center;
+}
+.card .glyph { display: flex; justify-content: center; }
+.card .rom { font-family: var(--mono); font-weight: 700; color: var(--dian); font-size: 15px; }
+.card .mean { font-size: 15px; margin: 2px 0; }
+.card .ety { font-family: var(--sans); font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+.card.derived { border-top: 3px solid var(--zhu); }
+.foldarrow { text-align: center; font-size: 20px; color: var(--zhu); margin: 4px 0; font-family: var(--sans); }
+
+/* Sandbox (IME) */
+.ime {
+  background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px;
+  padding: 18px; margin: 18px 0; box-shadow: var(--shadow);
+}
+.ime label { font-family: var(--sans); font-size: 12px; letter-spacing: .12em; color: var(--ink-2); display: block; margin-bottom: 8px; }
+.ime input {
+  width: 100%; box-sizing: border-box; font-family: var(--mono); font-size: 16px;
+  padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--hairline2);
+  background: var(--paper); color: var(--ink);
+}
+.ime input:focus { outline: none; border-color: var(--dian); }
+.ime .out { min-height: 120px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px; padding-top: 14px; }
+.ime .err { color: var(--zhu); font-family: var(--sans); font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chips button {
+  font-family: var(--mono); font-size: 12.5px; cursor: pointer; color: var(--ink-2);
+  background: var(--paper); border: 1px solid var(--hairline2); border-radius: 100px; padding: 4px 12px;
+}
+.chips button:hover { color: var(--dian); border-color: var(--dian); }
+
+/* Pitch contour mini-diagrams */
+.contgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+.contcell { background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px 14px; }
+.contcell svg { display: block; width: 100%; height: 54px; }
+.contcell .nm { font-family: var(--sans); font-size: 13.5px; font-weight: 700; }
+.contcell .nm .rom { font-family: var(--mono); color: var(--dian); }
+.contcell .ds { font-family: var(--sans); font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+
+/* Audio figures */
+.audiogrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 16px 0; }
+.audiof { margin: 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 16px 12px; }
+.audiof figcaption { font-family: var(--sans); font-size: 13.5px; margin-bottom: 10px; line-height: 1.6; }
+.audiof figcaption .rm { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--dian); margin-top: 3px; }
+.audiof audio { width: 100%; height: 38px; }
+
+/* Exercises */
+.exercise {
+  background: var(--panel); border: 1px solid var(--hairline); border-left: 3px solid var(--good);
+  border-radius: 12px; padding: 16px 20px 12px; margin: 32px 0 10px;
+}
+.exercise .xt { font-family: var(--sans); font-size: 12px; letter-spacing: .14em; font-weight: 700; color: var(--good); display: block; margin-bottom: 6px; }
+.exercise ol { margin: 0; padding-left: 22px; font-size: 15.5px; }
+.exercise li { margin: 10px 0 16px; }
+.exercise details { margin-top: 6px; font-family: var(--sans); font-size: 14px; }
+.exercise summary { cursor: pointer; color: var(--dian); font-weight: 600; width: max-content; border-radius: 6px; padding: 2px 8px; }
+.exercise summary:hover { background: var(--dian-soft); }
+.exercise .ans { border-left: 2px solid var(--good); margin-top: 6px; padding: 6px 12px; background: var(--paper); border-radius: 0 8px 8px 0; line-height: 1.7; }
+
+kbd {
+  font-family: var(--mono); font-size: .85em; background: var(--panel2);
+  border: 1px solid var(--hairline2); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px;
+}
+.footer { margin-top: 100px; border-top: 1px solid var(--hairline); padding-top: 22px; font-family: var(--sans); font-size: 13px; color: var(--ink-3); line-height: 1.8; }
+.footer .seal { color: var(--zhu); border: 1.5px solid var(--zhu); display: inline-block; padding: 1px 7px; margin-right: 8px; letter-spacing: .2em; }
+
+/* ============ Glyph engine ============ */
+button.dw { appearance: none; -webkit-appearance: none; background: transparent; font: inherit; color: inherit; }
+.gly { display: block; }
+.gly .st { stroke: currentColor; stroke-width: 4.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gly .fl { fill: currentColor; stroke: none; }
+.gly .roof { stroke: var(--dian); stroke-width: 5.4; fill: none; stroke-linecap: round; }
+.gly .frame { stroke: var(--glyph-frame); stroke-width: 2; fill: none; }
+.gly .cls { stroke: var(--zhu); stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gly .fl2 { fill: var(--zhu); stroke: none; }
+.gly .nameline { stroke: var(--zhu); stroke-width: 3; fill: none; stroke-dasharray: 1.5 6.5; stroke-linecap: round; }
+.gap { display: inline-block; width: 20px; }
+.anwrap { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; margin: 14px 0; }
+.anlegend { list-style: none; margin: 0; padding: 0; font-family: var(--sans); font-size: 14px; max-width: 520px; flex: 1; min-width: 280px; }
+.anlegend li { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--hairline); line-height: 1.65; }
+.anlegend li:last-child { border-bottom: none; }
+.anlegend .sw { flex: none; width: 14px; height: 14px; border-radius: 4px; margin-top: 5px; }
+.anlegend b { font-weight: 700; }
+.anlegend .d { color: var(--ink-2); }
+
+/* Syllable demo buttons */
+.phb { font-family: var(--mono); cursor: pointer; background: var(--paper); border: 1px solid var(--hairline2); border-radius: 8px; padding: 4px 10px; font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.phb small { display: block; font-weight: 400; font-size: 10.5px; color: var(--ink-3); font-family: var(--sans); }
+.phb:hover { border-color: var(--dian); color: var(--dian); }
+.phb:focus-visible { outline: 2px solid var(--dian); outline-offset: 1px; }
+
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .wrap { padding: 0 18px 90px; }
+  header.hero { padding: 40px 0 16px; }
+  .sechead { flex-wrap: wrap; } .sechead .en { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+@keyframes drawin { to { stroke-dashoffset: 0; } }
+.drawable path, .drawable line, .drawable circle { stroke-dasharray: 260; stroke-dashoffset: 260; animation: drawin 1.1s ease forwards; }
+@media (prefers-reduced-motion: reduce) { .drawable path, .drawable line, .drawable circle { stroke-dasharray: none; stroke-dashoffset: 0; } }
+</style>
+</head>
+<body>
+
+<nav class="topnav"><div class="in">
+  <span class="name"><span class="seal">大同语</span> datunwen</span>
+  <a href="#l0">0 · 欢迎</a><a href="#l1">1 · 语音</a><a href="#l2">2 · 音高</a><a href="#l3">3 · 造句</a><a href="#l4">4 · 时间</a><a href="#l5">5 · 构词</a><a href="#l6">6 · 文字</a><a href="#l7">7 · 结业</a><a href="#appx">附录</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker"><span class="seal" title="大同语 dàtóngyǔ —「大同之语」，语言名称的汉语词源">大同语</span> DATUNWEN · 一门写给中文使用者的入门课</div>
+  <div id="heroGlyphs" aria-label="用大同语方块文字写出的「datunwen」一词"></div>
+  <h1>大同语 · 入门课程</h1>
+  <p class="sub">一门<strong>用声音的旋律来做语法</strong>的人造语言。八节短课。不需要语言学学位——只要你能听出<em>「你看见那只猫。」</em>和<em>「你看见那只猫？」</em>的区别，你就已经具备了这门语言所要求的全部能力。</p>
+  <span class="hint">◉ 本页每一个蓝色词块都可点击——点一下，浏览器就会把它读出来（无需下载、无需联网）。</span>
+</header>
+
+<!-- ============================================================ LESSON 0 -->
+<section id="l0">
+  <div class="sechead"><span class="num">第 0 课</span><h2>欢迎</h2><span class="en">Orientation</span></div>
+  <p class="lede">大同语（「万有之语」）是一门工程化设计的世界语：十六个几乎人人都发得出的辅音、几百个会自我解释的词根，以及一项标志性发明——语法由音高承载。本页是一套完整的入门课；这门语言的整套设计哲学，就在下面这三张卡片里。</p>
+
+  <div class="axioms">
+    <div class="axiom"><span class="no">公理 Ⅰ</span><h3>两条信道，一张嘴</h3>
+      <p>你的舌与唇拼出<em>词</em>；与此同时，喉咙控制的声音高低——几乎独立地——为每个词标注它在句中的<em>身份</em>。语法跑在一条平行信道上，因此没有一个音节浪费在它身上。</p></div>
+    <div class="axiom"><span class="no">公理 Ⅱ</span><h3>只为意外付费</h3>
+      <p>在默认语序里，什么都不标——零词尾、零虚词。只有当你为强调而<em>调换</em>语序时，才会在恰好需要的位置冒出一个单音节标记。语法像信息一样计价。</p></div>
+    <div class="axiom"><span class="no">公理 Ⅲ</span><h3>一词一屋顶</h3>
+      <p>一个词，在耳中是一条音高旋律，在纸上是一组盖着屋顶的方块，在语法里是一个单位。你听到的、看到的、解析的，是同一个对象的三个投影。</p></div>
+  </div>
+
+  <h3 class="sub">怎么用这个页面</h3>
+  <ul class="plain">
+    <li><strong>点击任意词块</strong>——就是下面那些带蓝色字母的小图。浏览器会实时合成这个词，并配上正确的音高轮廓。</li>
+    <li><strong>▶ 按钮</strong>逐词播放整句。</li>
+    <li><strong>音频播放器</strong>里是录音室级的神经语音。它们从与本文件同放的 <span class="rom">audio/</span> 文件夹加载——请把两者放在一起。</li>
+    <li><strong>练习</strong>在每课末尾。答案藏在「显示答案」后面——先猜再看！</li>
+  </ul>
+
+  <figure>
+    <div class="glyphline" data-sent="datunwen"></div>
+    <figcaption class="figcap">你的第一个词——这门语言的自名：<span class="rom">da</span>「大」+ <span class="rom">tun</span>「同」+ <span class="rom">wen</span>「文」。（词源说明：三个词根分别取自汉语 大 dà、同 tóng、文 wén。）点它一下。</figcaption>
+  </figure>
+
+  <div class="exercise">
+    <span class="xt">练习 0 · 热身</span>
+    <ol>
+      <li>依据公理 Ⅰ，大同语里承载语法的是什么——额外的音节，还是你声音的旋律？
+        <details><summary>显示答案</summary><div class="ans">旋律（音高）。词在嘴里造出，语法由喉咙在一条平行信道上「唱」出来，所以语法花费零音节。</div></details></li>
+      <li>判断对错：每个大同语词，你都必须背它是名词、动词还是形容词。
+        <details><summary>显示答案</summary><div class="ans">错。词类根本不存进词典——你说这个词时用的音高轮廓，会实时指派它的词性。（第 2 课专讲这个。）</div></details></li>
+      <li>点上面的 <span class="rom">datunwen</span>。你听到几个音节，各是什么意思？
+        <details><summary>显示答案</summary><div class="ans">三个：<span class="rom">da</span>「大」+ <span class="rom">tun</span>「同」+ <span class="rom">wen</span>「文」——「大同之语」。</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 1 -->
+<section id="l1">
+  <div class="sechead"><span class="num">第 1 课</span><h2>语音——你早已全部拥有</h2><span class="en">Phonology</span></div>
+  <p class="lede">十六个辅音、五个元音、四个双元音——每一个都因「几乎地球上每种语言都有它」而入选，且都用一个「看字知音」的字母来拼写。这里没有一个音是中文使用者发不出来的。</p>
+
+  <h3 class="sub">1.1 十六个辅音<span class="tag">点击发音</span></h3>
+  <p>下面每个按钮都把辅音配在元音 <span class="rom">a</span>（「啊」）上播放。列告诉你这个音在口腔的<em>哪个部位</em>发出；行告诉你<em>怎么</em>发。</p>
+  <div class="tblwrap"><table>
+    <tr><th>方法 \ 部位</th><th>双唇</th><th>舌尖</th><th>舌面</th><th>舌根 · 喉</th></tr>
+    <tr><td><strong>强塞音</strong><br><small>送气（普通话式）<em>或</em>纯清音——两者都对</small></td>
+      <td><button class="phb" data-syl="pa">p<small>如「怕」pà</small></button></td>
+      <td><button class="phb" data-syl="ta">t<small>如「他」tā</small></button></td>
+      <td class="void">—</td>
+      <td><button class="phb" data-syl="ka">k<small>如「卡」kǎ</small></button></td></tr>
+    <tr><td><strong>弱塞音</strong><br><small>浊音（西/法语式）<em>或</em>不送气——两者都对</small></td>
+      <td><button class="phb" data-syl="ba">b<small>如「爸」bà</small></button></td>
+      <td><button class="phb" data-syl="da">d<small>如「大」dà</small></button></td>
+      <td class="void">—</td>
+      <td><button class="phb" data-syl="ga">g<small>如「哥」gē</small></button></td></tr>
+    <tr><td><strong>鼻音</strong></td>
+      <td><button class="phb" data-syl="ma">m<small>如「妈」mā</small></button></td>
+      <td><button class="phb" data-syl="na">n<small>如「那」nà</small></button></td>
+      <td class="void">—</td><td class="void">—</td></tr>
+    <tr><td><strong>擦音</strong></td>
+      <td><button class="phb" data-syl="fa">f<small>如「发」fā</small></button></td>
+      <td><button class="phb" data-syl="sa">s<small>［s］，如英语 sun</small></button></td>
+      <td><button class="phb" data-syl="xa">x<small>＝拼音 sh，如「是」shì</small></button></td>
+      <td><button class="phb" data-syl="ha">h<small>如「哈」hā</small></button></td></tr>
+    <tr><td><strong>塞擦音</strong></td>
+      <td class="void">—</td><td class="void">—</td>
+      <td><button class="phb" data-syl="ca">c<small>＝拼音 ch，如「吃」chī</small></button></td>
+      <td class="void">—</td></tr>
+    <tr><td><strong>流音</strong><br><small>一个音，两种拼写</small></td>
+      <td class="void">—</td>
+      <td><button class="phb" data-syl="ra">r<small>如「惹」rě</small></button> <button class="phb" data-syl="la">l<small>如「辣」là</small></button></td>
+      <td class="void">—</td><td class="void">—</td></tr>
+    <tr><td><strong>半元音</strong></td>
+      <td><button class="phb" data-syl="wa">w<small>如「娃」wā</small></button></td>
+      <td class="void">—</td>
+      <td><button class="phb" data-syl="ya">y<small>如「呀」ya</small></button></td>
+      <td class="void">—</td></tr>
+  </table></div>
+  <p class="figcap">当心两个拼写陷阱：大同语的 <span class="rom">x</span> 永远是「sh」（拼音 sh，如「是」），绝不是拼音的 x；<span class="rom">c</span> 永远是「ch」（拼音 ch，如「吃」），绝不是拼音的 c，也不是 k 或 s。</p>
+
+  <div class="duo">
+    <div class="notecard blue"><span class="t">友好的对子 · p/b · t/d · k/g</span>
+      <p><span class="rom">p</span> 和 <span class="rom">b</span> 怎么区分？<strong>由你决定。</strong>可以按普通话的方式用送气区分（p 送气、b 不送气——正是拼音 p/b 的差别），也可以按西/法语的方式用清浊区分。大同语两者都收。这些对子的设计，让世界上几乎任何口音都能落在正确的一侧。</p></div>
+    <div class="notecard blue"><span class="t">一个流音，两个字母 · r / l</span>
+      <p>字母 <span class="rom">r</span> 和 <span class="rom">l</span> 拼的是<strong>同一个音</strong>。读成英语 r、读成 l、或读成西班牙语的弹舌，都对；而且从没有两个词靠 r 与 l 来区分。每个词的<em>拼写</em>是固定的（永远写 <span class="rom">ren</span>，绝不写「len」），但你的<em>发音</em>是自由的。对 n/l 或 r/l 不分的方言使用者，可以松一口气了。</p></div>
+  </div>
+
+  <h3 class="sub">1.2 五个元音，四个双元音<span class="tag">点击发音</span></h3>
+  <p>纯净的、西班牙语式的元音——没有英语那种滑动漂移。双元音按钮框在 <span class="rom">h</span> 上，好让你听它们骑在一个音节上。</p>
+  <div class="tblwrap"><table>
+    <tr><th>元音</th><th>读作</th><th>双元音</th><th>读作</th></tr>
+    <tr><td><button class="phb" data-syl="a">a</button></td><td>「啊」，如 sp<strong>a</strong></td>
+        <td><button class="phb" data-syl="hai">hai</button></td><td><span class="rom">ai</span> ＝「爱」，如英语 h<strong>igh</strong></td></tr>
+    <tr><td><button class="phb" data-syl="e">e</button></td><td>如英语 b<strong>e</strong>t（拼音 ê／「欸」），短促不滑</td>
+        <td><button class="phb" data-syl="hau">hau</button></td><td><span class="rom">au</span> ＝「凹」，如英语 h<strong>ow</strong></td></tr>
+    <tr><td><button class="phb" data-syl="i">i</button></td><td>「衣」，如 sk<strong>i</strong> 的 ee</td>
+        <td><button class="phb" data-syl="hei">hei</button></td><td><span class="rom">ei</span> ＝「诶」，如英语 d<strong>ay</strong></td></tr>
+    <tr><td><button class="phb" data-syl="o">o</button></td><td>纯「哦」，如西班牙语 n<strong>o</strong></td>
+        <td><button class="phb" data-syl="hou">hou</button></td><td><span class="rom">ou</span> ＝「欧」，如英语 l<strong>ow</strong></td></tr>
+    <tr><td><button class="phb" data-syl="u">u</button></td><td>「乌」，如 fl<strong>u</strong> 的 oo</td>
+        <td class="void">—</td><td class="void">—</td></tr>
+  </table></div>
+
+  <h3 class="sub">1.3 唯一可能的韵尾：-n</h3>
+  <p>一个音节可以用 <span class="rom">-n</span> 收尾——也仅此一种。读成「n」、读成「ng」、或干脆把元音鼻化（像把「ing」读得含糊那样）：三者都算同一个东西。试试：
+    <button class="phb" data-syl="kan">kan</button>
+    <button class="phb" data-syl="tun">tun</button>
+    <button class="phb" data-syl="mun">mun</button>
+  </p>
+
+  <div class="notecard"><span class="t">整个音系，一行说完</span>
+    <p>一个音节 ＝ <strong>一个辅音 + 一个元音（+ 可选的 -n）</strong>。就这些。没有辅音丛——永远没有「str-」，没有「-mp」。16 辅音 × 9 种元音 × 2（有无 -n）＝ <strong>288 个可能音节</strong>。</p>
+    <p>一个脚注：每个<em>实词</em>都以辅音开头。只有小小的语法助词可以是裸元音（<span class="rom">e</span>、<span class="rom">i</span>、<span class="rom">o</span>、<span class="rom">u</span>、<span class="rom">a</span>……）——这恰好让它们一眼就能被认出是语法。</p></div>
+
+  <div class="exercise">
+    <span class="xt">练习 1 · 语音检查</span>
+    <ol>
+      <li>下列哪些是合法的大同语音节？<span class="rom">kai · sta · mun · blan · pou</span>
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">kai</span>、<span class="rom">mun</span>、<span class="rom">pou</span> 合法（辅音 + 元音/双元音 + 可选 -n）。<span class="rom">sta</span> 和 <span class="rom">blan</span> 不可能——它们以辅音丛开头，而大同语禁止辅音丛。</div></details></li>
+      <li>一个西班牙人把 <span class="rom">da</span> 读成完全浊化、不送气的 d；一个美国人把 <span class="rom">ta</span> 送气很重、把 <span class="rom">ra</span> 读成美式 r。谁读错了？
+        <details><summary>显示答案</summary><div class="ans">都没错。强/弱对子既接受送气也接受清浊作为区分手段，而 r/l 是一个音位、发音自由。两种口音都是 100% 正确的大同语。</div></details></li>
+      <li>唯一能给音节收尾的辅音是哪个？可以有几种读法？
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">-n</span>——可读作 [n]、[ŋ]、或把元音纯鼻化。三者等价。</div></details></li>
+      <li>算一算：大同语有多少个不同音节，从何而来？
+        <details><summary>显示答案</summary><div class="ans">288 ＝ 16 辅音 × 9 元音核（5 元音 + 4 双元音）× 2（有无 -n 韵尾）。</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 2 -->
+<section id="l2">
+  <div class="sechead"><span class="num">第 2 课</span><h2>音高的把戏——旋律就是语法</h2><span class="en">The Signature Invention</span></div>
+  <p class="lede">大声念这两句话：<em>「你看见那只猫。」</em>——声音下沉。<em>「你看见那只猫？」</em>——声音上扬。同样的字；只是旋律变了，意思就变了。中文把这条旋律信道花在语气上。大同语把它花在语法上。</p>
+
+  <p>整个系统就在这里。每个实词都用<strong>一条铺满整词的音高轮廓</strong>说出，而这条轮廓宣告该词在句中的身份——名词位、动词位、还是修饰位。词典里根本不存词类；是<em>你</em>，用声音，实时指派它们：</p>
+
+  <div class="contgrid">
+    <div class="contcell"><svg viewBox="0 0 200 54" aria-hidden="true"><path d="M20,16 L180,16" stroke="var(--dian)" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+      <div class="nm">高平 · <span class="rom">事物</span> <span class="rom">（拼写：不加标记）</span></div>
+      <div class="ds">这个词被当作<strong>事物</strong>用——主语或宾语，名词位。像平平地列举条目。<br><button class="play ghost" data-say="ka" style="margin-top:6px">▶ ka「知识」</button></div></div>
+    <div class="contcell"><svg viewBox="0 0 200 54" aria-hidden="true"><path d="M20,10 C90,10 130,40 180,44" stroke="var(--dian)" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+      <div class="nm">下降 · <span class="rom">动词</span> <span class="rom">（拼写：加 -q）</span></div>
+      <div class="ds">这个词就是<strong>陈述本身</strong>——分句的动词。它是陈述句句末那种「落定」的旋律：<em>「好了。」</em><br><button class="play ghost" data-say="kaq" style="margin-top:6px">▶ kaq「知道」</button></div></div>
+    <div class="contcell"><svg viewBox="0 0 200 54" aria-hidden="true"><path d="M20,44 C90,40 130,10 180,10" stroke="var(--dian)" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+      <div class="nm">上升 · <span class="rom">修饰语</span> <span class="rom">（拼写：加 -z）</span></div>
+      <div class="ds">这个词<strong>修饰后面来的东西</strong>——形容词或副词位。上升＝「还没说完，后面还有」，正是句子中途续接的那种上扬。<br><button class="play ghost" data-say="kaz" style="margin-top:6px">▶ kaz「认知的／有认知地」</button></div></div>
+    <div class="contcell"><svg viewBox="0 0 200 54" aria-hidden="true"><path d="M20,44 L180,44" stroke="var(--dian)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="2 7"/></svg>
+      <div class="nm">低平 · <span class="rom">助词</span> <span class="rom">（23 个的封闭集）</span></div>
+      <div class="ds">23 个小小的语法词——格标记、连词、时间锚——全都低、短、轻，像轻读的「的」「和」「在」。<br><button class="play ghost" data-say="lo" style="margin-top:6px">▶ lo「在／于」</button></div></div>
+  </div>
+
+  <figure>
+    <div class="glyphline" data-sent="ka kaq kaz"></div>
+    <figcaption class="figcap">一个词根，三种姿态——同样的口部动作，三种不同身份。在文字里（第 6 课）这条轮廓就是词上方的<strong>屋顶</strong>：平、降、升。点击每个方块。</figcaption>
+  </figure>
+
+  <div class="duo">
+    <div class="notecard"><span class="t">哑字母 q 与 z</span>
+      <p>在拼写里，词尾的 <span class="rom">q</span> 表示「这个词用下降轮廓说」，<span class="rom">z</span> 表示「上升」。它们<strong>从不作为辅音发音</strong>——<span class="rom">kaq</span> 是「ka」配下降的嗓音，不是「kak」；<span class="rom">kaz</span> 是「ka」上扬，不是「kazz」。把它们想成一个恰好蹲在词内部的问号或句号。</p></div>
+    <div class="notecard blue"><span class="t">不必背——真的不必</span>
+      <p>这不像普通话——那里每个字都背负一个必须永远记住的、任意的<strong>字调</strong>（妈／麻／马／骂）。大同语里，音高承载的词典信息<strong>为零</strong>——它只是三条语法规则，套在任何词上。它更接近普通话在字调之上的那层「句调」（问句整体上扬），而不是字调本身。想想「啊」：平平的「啊——」、恍然的「啊！」、疑问的「啊？」——同一个音，三种语气。大同语只是把这件你早已会做的事，定成了语法。</p></div>
+  </div>
+
+  <h3 class="sub">在真人嗓音上听一听</h3>
+  <p>页面上的点击用的是规则式合成。下面这些参考录音，是把音高语法<em>强加</em>在一个神经语音上——证明这些轮廓是可以覆盖到任何嗓音上的独立一层。（它们从本文件旁的 <span class="rom">audio/</span> 文件夹加载。）</p>
+  <div class="audiogrid">
+    <figure class="audiof"><figcaption><span class="rom">ka</span> 三连——平、降、升。就从这段录音测得：平 287→273&nbsp;Hz，降 318→183&nbsp;Hz，升 199→314&nbsp;Hz。语法确实就在声波里。<span class="rm">ka · kaq · kaz</span></figcaption>
+      <audio controls preload="none" src="audio/ka-trio.mp3"></audio></figure>
+    <figure class="audiof"><figcaption>这门语言念出自己的名字。平轮廓——这里它被当作普通名词用。<span class="rm">datunwen</span></figcaption>
+      <audio controls preload="none" src="audio/datunwen-name.mp3"></audio></figure>
+  </div>
+
+  <div class="exercise">
+    <span class="xt">练习 2 · 轮廓</span>
+    <ol>
+      <li>词根 <span class="rom">kan</span> 意为「看」。写出表示<em>看见</em>（分句的动词）的形式，并描述它的旋律。
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">kanq</span>——整词用下降轮廓说出。（q 本身不发音。）</div></details></li>
+      <li>词根 <span class="rom">mau</span> 意为「猫」。写出表示<em>猫的／像猫的</em>、修饰下一个词的形式。
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">mauz</span>——上升轮廓＝修饰姿态。</div></details></li>
+      <li>你听到一个词，音高从高降到低。还没查词，你已经知道关于这句话的什么？
+        <details><summary>显示答案</summary><div class="ans">那个词是谓语——分句的动词。你还没查任何词，就已经定位了句子的主干。</div></details></li>
+      <li><span class="rom">kaq</span> 怎么读——「kak」，还是别的？
+        <details><summary>显示答案</summary><div class="ans">别的：[ka] 配下降音高。词尾的 q 和 z 是哑的轮廓字母，绝不是辅音。</div></details></li>
+      <li>一个词被低、平、短、不重读地说出。它是哪类词，大约有多少个？
+        <details><summary>显示答案</summary><div class="ans">语法助词——封闭类。它们恰好有 23 个（完整表在附录）。</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 3 -->
+<section id="l3">
+  <div class="sechead"><span class="num">第 3 课</span><h2>你的第一批句子</h2><span class="en">Syntax I</span></div>
+  <p class="lede">你已掌握音和旋律。这真的就是你需要的全部——来看一个真句子。</p>
+
+  <figure>
+    <div class="glyphline big" data-sent="mau canq le pei"></div>
+    <div class="roman-line">mau can<span class="q">q</span> le pei.</div>
+    <div class="sentbar"><button class="play" data-say="mau canq le pei">▶ 播放整句</button><span class="cap">「猫吃了鱼。」——点单个方块可分别听每个词。</span></div>
+  </figure>
+
+  <p>像母语者那样读：<span class="rom">mau</span>「猫」骑平调（它是事物——主语）。<span class="rom">canq</span> 下降（它是动词：「吃」）。<span class="rom">le</span> 是个低低的小助词，意为「已完成」（第 4 课会讲——现在它让「吃」这件事完成了：「吃了」）。<span class="rom">pei</span>「鱼」又骑平调（事物——宾语）。</p>
+
+  <div class="notecard blue"><span class="t">规则 R2 · 默认语序</span>
+    <p><strong>主 – 谓 – 宾</strong>，和中文一样。而且每个修饰语都在被修饰者<em>之前</em>，像中文「<em>大</em>猫」。保持这个语序——依规则 R3——你什么都不用标：没有词尾、没有格标记，零。</p></div>
+
+  <h3 class="sub">3.1 提问——助词 <span class="rom">u</span></h3>
+  <p>要问一个是非问句，把低助词 <span class="rom">u</span> 放在句末——一个说出来的问号。（顺便认识代词：<span class="rom">mi</span>「我」、<span class="rom">yu</span>「你」、<span class="rom">ta</span>「他/她/它」——以及指示词 <span class="rom">to</span>「那」。代词是普通实词：它们和其他词一样带轮廓。）</p>
+  <figure>
+    <div class="glyphline" data-sent="yu kanq le to mau u"></div>
+    <div class="roman-line">yu kan<span class="q">q</span> le to mau u?</div>
+    <div class="sentbar"><button class="play" data-say="yu kanq le to mau u">▶ 播放</button><span class="cap">「你看见那只猫了吗？」</span></div>
+  </figure>
+
+  <h3 class="sub">3.2 否定——助词 <span class="rom">bu</span></h3>
+  <p>否定是动词前的 <span class="rom">bu</span>「不」。（词源说明：取自汉语 不 bù。）</p>
+  <figure>
+    <div class="glyphline" data-sent="mi bu kanq to mau"></div>
+    <div class="roman-line">mi bu kan<span class="q">q</span> to mau.</div>
+    <div class="sentbar"><button class="play" data-say="mi bu kanq to mau">▶ 播放</button><span class="cap">「我看不见那只猫」——在过去锚点下也可作「没看见」（第 4 课）。</span></div>
+  </figure>
+
+  <h3 class="sub">3.3 调换语序——付一个音节</h3>
+  <p>想把鱼提到句首，像中文<em>「那条鱼——猫把它吃了。」</em>？可以。但鱼现在离开了它的默认位置，于是——规则 R3——它要带一个标记：<span class="rom">wo</span>，「这个是受事（被动作的对象）」。</p>
+  <figure>
+    <div class="glyphline" data-sent="pei wo, mau canq le"></div>
+    <div class="roman-line">pei wo, mau can<span class="q">q</span> le.</div>
+    <div class="sentbar"><button class="play" data-say="pei wo, mau canq le">▶ 播放</button><span class="cap">「那条鱼——猫把它吃了。」一个便宜的音节，买来彻底的清晰。</span></div>
+  </figure>
+  <p>这样的标记恰好三个，<em>仅</em>在语序偏离时使用：<span class="rom">ga</span> ＝ 施事（施动者）、<span class="rom">wo</span> ＝ 受事（被动者）、<span class="rom">ni</span> ＝ 给/向（受者或目标）。（词源说明：借自日语 が·を·に。）在默认 SVO 语序里它们从不出现——这就是公理 Ⅱ 的实践。</p>
+
+  <h3 class="sub">3.4 操练</h3>
+  <figure>
+    <div class="glyphline" data-sent="ta kanq mau"></div>
+    <div class="sentbar"><button class="play" data-say="ta kanq mau">▶ 播放</button><span class="cap">「他看见一只猫。」——不标时间：一个平实的、时间中性的陈述。</span></div>
+  </figure>
+  <figure>
+    <div class="glyphline" data-sent="mau bu canq mau"></div>
+    <div class="sentbar"><button class="play" data-say="mau bu canq mau">▶ 播放</button><span class="cap">「猫不吃猫。」——一个永恒真理，而且（第 4 课剧透）合法地可以完全不带时态。</span></div>
+  </figure>
+
+  <div class="exercise">
+    <span class="xt">练习 3 · 第一批句子</span>
+    <ol>
+      <li>译成中文：<span class="rom">ta canq le pei</span>
+        <details><summary>显示答案</summary><div class="ans">「他/她/它吃了鱼。」（<span class="rom">le</span> ＝ 已完成。）</div></details></li>
+      <li>把 <span class="rom">mau canq le pei</span> 变成问句「猫把鱼吃了吗？」
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">mau canq le pei u?</span>——只在句末加低疑问助词 <span class="rom">u</span>。</div></details></li>
+      <li>说「我不吃鱼。」（作为关于你自己的一般事实）
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">mi bu canq pei.</span>——<span class="rom">bu</span> 在动词前；一般真理不需时间锚。</div></details></li>
+      <li>在 <span class="rom">pei wo, mau canq le</span> 里，<span class="rom">wo</span> 为什么出现——而 <span class="rom">mau canq le pei</span> 里为什么一个标记都没有？
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">pei</span> 被提出了它默认的宾语位，所以必须标为受事（<span class="rom">wo</span>）。在默认 SVO 语序里，位置本身已说清谁对谁做了什么，所以规则 R3 分文不收。</div></details></li>
+      <li>在 <span class="rom">yu kanq le to mau u</span> 里哪个词是动词，是哪<em>两个</em>独立信号告诉你的？
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">kanq</span>。信号一：它的下降音高轮廓（那个 -q）。信号二：它的位置——默认 S-V-O 语序里的第二位。</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 4 -->
+<section id="l4">
+  <div class="sechead"><span class="num">第 4 课</span><h2>时间旅行——场景只设一次</h2><span class="en">Tense &amp; Aspect</span></div>
+  <p class="lede">英语给每个动词都盖上时态戳：<em>saw、ate、will see、will eat</em>……中文虽不变动词，却常反复用「了、昨天、要」来重标时间。大同语两者都嫌啰嗦。你只把场景设定<strong>一次</strong>——像小说开头的「很久很久以前」——此后每句话都活在那里，直到你另作声明。</p>
+
+  <p>三个<strong>时间锚</strong>都是低助词：<span class="rom">tan</span> ＝ 过去、<span class="rom">nau</span> ＝ 现在、<span class="rom">fu</span> ＝ 将来。（词源说明：参法语 <em>antan</em>「去岁」、英语 <em>now</em>／拉丁 <em>nunc</em>、拉丁 <em>futūrus</em>。）在一段话开头丢下一个，它就产生<em>辖域</em>：约束此后每个分句，直到你重新锚定。可选地，两个<strong>体助词</strong>紧跟动词之后：<span class="rom">le</span> ＝ 已完成（词源说明：汉语 了）、<span class="rom">xu</span> ＝ 仍在进行（汉语 续 xù「继续」）。</p>
+
+  <figure>
+    <div class="glyphline big" data-sent="an tandi, mi kanq le to mau"></div>
+    <div class="roman-line">an tandi, mi kan<span class="q">q</span> le to mau.</div>
+    <div class="sentbar"><button class="play" data-say="an tandi, mi kanq le to mau">▶ 播放</button><span class="cap">「昨天，我看见了那只猫。」——完全显式的正式版本。</span></div>
+  </figure>
+  <p>两个新部件：<span class="rom">an</span> 是「于（某时）」助词，<span class="rom">tandi</span>「昨天」是一个化石化的复合词——<span class="rom">tan</span> 过去 + <span class="rom">di</span> 日 ＝「过去之日」。所以开头字面说「于过去日」——而这个短语本身<em>就是</em>此后一切的锚。</p>
+
+  <h3 class="sub">4.1 显式度旋钮——三档合法语域</h3>
+  <p>正式场合把一切说全；朋友之间，语境已承载了大半。下面三行全都合语法、意思相同——大同语里的显式度是一个旋钮，不是宿命：</p>
+  <div class="tblwrap"><table>
+    <tr><th>语域</th><th>「昨天我看见了那只猫。」</th><th>被压缩了什么</th></tr>
+    <tr><td><strong>正式</strong>（法律、科学）</td><td class="rom">an tandi, mi kanq le to mau.</td><td>锚、体、指示词全部显式</td></tr>
+    <tr><td><strong>日常</strong></td><td class="rom">tandi mi kanq to mau.</td><td>句首的时间词本身就充当锚（<span class="rom">an</span> 省略）；<span class="rom">le</span> 由过去锚蕴含</td></tr>
+    <tr><td><strong>朋友之间</strong></td><td class="rom">tandi mi kanq mau.</td><td>语境提供是<em>哪只</em>猫；真值不变</td></tr>
+  </table></div>
+  <figure>
+    <div class="glyphline" data-sent="tandi mi kanq to mau"></div>
+    <div class="sentbar"><button class="play" data-say="tandi mi kanq to mau">▶ 播放日常版本</button></div>
+  </figure>
+
+  <h3 class="sub">4.2 将来、此刻、与搭便车</h3>
+  <figure>
+    <div class="glyphline" data-sent="fu mi kanq yu"></div>
+    <div class="roman-line">fu mi kan<span class="q">q</span> yu.</div>
+    <div class="sentbar"><button class="play" data-say="fu mi kanq yu">▶ 播放</button><span class="cap">「我会见到你。」——<span class="rom">fu</span> 锚定将来；动词本身从不变形。</span></div>
+  </figure>
+  <figure>
+    <div class="glyphline" data-sent="nau mau canq xu pei"></div>
+    <div class="roman-line">nau mau can<span class="q">q</span> xu pei.</div>
+    <div class="sentbar"><button class="play" data-say="nau mau canq xu pei">▶ 播放</button><span class="cap">「猫正在吃鱼，就在此刻。」——<span class="rom">nau</span> 锚定现在；动词后的 <span class="rom">xu</span> ＝ 仍在进行。</span></div>
+  </figure>
+  <p>而回报是——<strong>锚会被继承</strong>。一个锚，两个分句，第二个动词分文不付（<span class="rom">i</span> ＝「与」，一个低助词）：</p>
+  <figure>
+    <div class="glyphline" data-sent="an tandi, mi kanq le to mau, i to mau canq le pei"></div>
+    <div class="roman-line">an tandi, mi kan<span class="q">q</span> le to mau, i to mau can<span class="q">q</span> le pei.</div>
+    <div class="sentbar"><button class="play" data-say="an tandi, mi kanq le to mau, i to mau canq le pei">▶ 播放</button><span class="cap">「昨天我看见那只猫，那只猫吃了一条鱼。」再讲十句关于昨天的事——十个动词全都不加标记。</span></div>
+  </figure>
+
+  <div class="notecard"><span class="t">无时态是合法的</span>
+    <p>定义、自然律、谚语——在<em>所有</em>时刻都为真的陈述——完全不带锚：<span class="rom">mau canq pei</span>「猫吃鱼」。那份沉默不是偷懒；它是<em>准确</em>的选择，规则 R4 明文许可。记住这一点，第 7 课的《世界人权宣言》会用到。</p></div>
+
+  <div class="exercise">
+    <span class="xt">练习 4 · 时间</span>
+    <ol>
+      <li>说「我会见到你。」
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">fu mi kanq yu.</span>——将来锚在前，然后是平实 SVO。</div></details></li>
+      <li><span class="rom">mau canq pei</span> 和 <span class="rom">nau mau canq xu pei</span> 意思差在哪？
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">mau canq pei</span> 是无时态/泛指：「猫吃鱼」。<span class="rom">nau mau canq xu pei</span> 锚在现在、带持续 <span class="rom">xu</span>：「猫正在吃鱼，就在此刻」。</div></details></li>
+      <li>判断对错：用 <span class="rom">tan</span> 开了个故事之后，你必须在每个动词前重复 <span class="rom">tan</span>。
+        <details><summary>显示答案</summary><div class="ans">错——这正是要点。一个锚辖及此后一切，直到你设新锚。英语在每个动词上重标时态；大同语每个场景只付一次。</div></details></li>
+      <li>给出两种说法——一正式、一随意——来说「昨天你看见了那条鱼。」
+        <details><summary>显示答案</summary><div class="ans">正式：<span class="rom">an tandi, yu kanq le pei.</span> 随意：<span class="rom">tandi yu kanq pei.</span>（句首时间词＝锚；<span class="rom">le</span> 蕴含。）</div></details></li>
+      <li><span class="rom">le</span> 到底给动词加了什么，它坐在哪？
+        <details><summary>显示答案</summary><div class="ans">它把动作标为已完成（完成体），紧跟动词之后：<span class="rom">canq le</span>「吃了／已吃」。词源说明：借自汉语 了。</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 5 -->
+<section id="l5">
+  <div class="sechead"><span class="num">第 5 课</span><h2>构词——会自我解释的词根</h2><span class="en">Morphology</span></div>
+  <p class="lede">完整设计约有 250 个单音节词根，加上一条唯一的折叠规则——这就生成了整个开放词汇。没有需要死记硬背的东西：每个抽象大词都能就地拆开、当场读懂。这是给你的入门词根集。</p>
+
+  <h3 class="sub">5.1 十二个词根<span class="tag">点击发音</span></h3>
+  <div class="cards">
+    <div class="card" data-word="ka" data-mean="知道" data-ety="词源：知——拉丁 cognōscere 的 k"></div>
+    <div class="card" data-word="su" data-mean="自己" data-ety="词源：己——拉丁反身词 suī"></div>
+    <div class="card" data-word="lin" data-mean="连·关系" data-ety="词源：连 lián——英语 link：双重命中"></div>
+    <div class="card" data-word="mo" data-mean="物·物质" data-ety="词源：物——拉丁 mōlēs／māteria"></div>
+    <div class="card" data-word="ten" data-mean="时间" data-ety="词源：时——拉丁 tempus"></div>
+    <div class="card" data-word="din" data-mean="价值" data-ety="词源：值——拉丁 dignus「值得」"></div>
+    <div class="card" data-word="kau" data-mean="原因" data-ety="词源：因——拉丁 causa"></div>
+    <div class="card" data-word="wi" data-mean="生命" data-ety="词源：生——拉丁 vīta，法语 vie"></div>
+    <div class="card" data-word="xin" data-mean="新·始" data-ety="词源：新 xīn"></div>
+    <div class="card" data-word="tun" data-mean="同·共" data-ety="词源：同 tóng"></div>
+    <div class="card" data-word="sei" data-mean="存在·是" data-ety="词源：在——德语 sein，汉语 是 shì"></div>
+    <div class="card" data-word="tai" data-mean="状态" data-ety="词源：态 tài"></div>
+  </div>
+
+  <h3 class="sub">5.2 折叠规则：中心在右</h3>
+  <p>复合词是 <strong>[修饰语 + 中心]</strong>——右边的词根命名「是哪一类东西」，左边的词根把它缩小限定。中文早就这样运作：<em>书店</em>是店，<em>鲇鱼</em>（catfish）是鱼。折叠一次：</p>
+  <div class="foldarrow">su「自」＋ ka「知」↓ 折叠</div>
+  <div class="cards">
+    <div class="card derived" data-word="suka" data-mean="意识" data-ety="自-知——正是拉丁 con-scientia 的精确解剖"></div>
+    <div class="card derived" data-word="linka" data-mean="逻辑·理性" data-ety="连-知——希腊 logos，「把关系聚拢起来」"></div>
+    <div class="card derived" data-word="moka" data-mean="物理·科学" data-ety="物-知——希腊 physikē 逐根重生"></div>
+    <div class="card derived" data-word="tenlin" data-mean="历史" data-ety="时-连——时间，被串成故事"></div>
+    <div class="card derived" data-word="sulin" data-mean="社会" data-ety="自-连——诸自我，相连；参拉丁 socius「同伴」"></div>
+    <div class="card derived" data-word="xinwi" data-mean="出生" data-ety="新-生——生命在它开端处"></div>
+    <div class="card derived" data-word="tunseitai" data-mean="叠加态" data-ety="［同-在］-态——一个深度 2 的折叠；第 7 课会遇到"></div>
+  </div>
+  <p>折叠是递归的——一个复合词可以再折进更大的复合词，像上面的 <span class="rom">tunseitai</span>：[<span class="rom">tun</span>+<span class="rom">sei</span>「共存」] + <span class="rom">tai</span>「态」＝「共同存在的状态」。一个不用懂物理就能解码的物理术语。</p>
+
+  <div class="notecard"><span class="t">su- 家族——三个词里的一套哲学</span>
+    <p><span class="rom">sukau</span> <strong>自由</strong> ＝ 自 + 因：以自身为因者（斯宾诺莎的 <em>causa sui</em>——也逐字对应汉语 自由，「由自」）。<span class="rom">sudin</span> <strong>尊严</strong> ＝ 自 + 值：因存在而有、非因授予的价值。<span class="rom">sulindin</span> <strong>权利</strong> ＝ [自 + 连] + 值：在人与人之网中被承认的价值——权利只在共同体中存在。第 7 课把这三个词放进同一句名言。</p></div>
+  <div class="cards">
+    <div class="card derived" data-word="sukau" data-mean="自由" data-ety="自-因 · causa sui"></div>
+    <div class="card derived" data-word="sudin" data-mean="尊严" data-ety="自-值 · suī + dignus"></div>
+    <div class="card derived" data-word="sulindin" data-mean="权利" data-ety="［自-连］-值 · 深度 2 折叠"></div>
+  </div>
+
+  <h3 class="sub">5.3 一词三姿——对复合词依然成立</h3>
+  <p>轮廓骑在<em>整个</em>词上，不论它多长。永远没有派生后缀：</p>
+  <figure>
+    <div class="glyphline" data-sent="suka sukaq sukaz"></div>
+    <figcaption class="figcap"><span class="rom">suka</span>「意识」（平，事物）→ <span class="rom">sukaq</span>「意识到」（降，动词）→ <span class="rom">sukaz</span>「有意识地」（升，修饰语）。</figcaption>
+  </figure>
+
+  <h3 class="sub">5.4 粘接短语：<span class="rom">e</span> 与 <span class="rom">ye</span></h3>
+  <p>两个低助词把修饰语接到后面的名词上——而因为有<em>两个</em>，一个经典的歧义就此消亡：</p>
+  <ul class="plain">
+    <li><span class="rom">e</span> 接一个<strong>名词短语</strong>——中文的「的」。（词源说明：汉语 的 de，日语 の no。）</li>
+    <li><span class="rom">ye</span> 接一整个<strong>从句</strong>——中文的「……的（那个）」、英语 <em>that…</em>／<em>who…</em>。（词源说明：文言 者 zhě。）</li>
+  </ul>
+  <div class="duo">
+    <figure style="margin:0">
+      <div class="glyphline" data-sent="mau e pei"></div>
+      <div class="sentbar"><span class="cap"><span class="rom">mau e pei</span> ＝「猫的鱼」</span></div>
+    </figure>
+    <figure style="margin:0">
+      <div class="glyphline" data-sent="pei e mau"></div>
+      <div class="sentbar"><span class="cap"><span class="rom">pei e mau</span> ＝「鱼的猫」（奇怪的猫，清晰的语法）</span></div>
+    </figure>
+  </div>
+  <p>现在看那个著名的对子。英语 <em>「I saw the man with the telescope」</em> 永远说不清望远镜是谁的。大同语连这个歧义都写不出来：</p>
+  <div class="duo">
+    <figure style="margin:0">
+      <div class="glyphline" data-sent="canq le pei ye mau"></div>
+      <div class="sentbar"><button class="play ghost" data-say="canq le pei ye mau">▶ 播放</button><span class="cap"><span class="rom">ye</span> 接从句「吃了鱼」→ <strong>「那只吃了鱼的猫」</strong></span></div>
+    </figure>
+    <figure style="margin:0">
+      <div class="glyphline" data-sent="canq le pei e mau"></div>
+      <div class="sentbar"><button class="play ghost" data-say="canq le pei e mau">▶ 播放</button><span class="cap"><span class="rom">e</span> 只能接名词短语，所以必是「鱼的猫」→ <strong>「（某人）吃了鱼的猫」</strong></span></div>
+    </figure>
+  </div>
+  <p>一个字母之差，两句截然不同。而且你想嵌多深都行：<span class="rom">mi kanq le canq le pei ye mau</span>——「我看见了那只吃了鱼的猫。」</p>
+
+  <div class="exercise">
+    <span class="xt">练习 5 · 构词</span>
+    <ol>
+      <li>用 <span class="rom">ten</span>「时」和 <span class="rom">lin</span>「连」造出「历史」。
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">tenlin</span>——修饰在前、中心在后：「时之连」。（<span class="rom">linten</span> 会变成某种属于「连」的时间！）</div></details></li>
+      <li><span class="rom">sulindin</span>「权利」的<em>中心</em>是哪一个词根——因此这个词说权利根本上是哪类东西？
+        <details><summary>显示答案</summary><div class="ans">最右的词根 <span class="rom">din</span>「值」。权利是一种价值——具体说是［自-连］-值：从诸自我之间的关联中产生的价值。</div></details></li>
+      <li>都译出来：<span class="rom">mau e pei</span> 和 <span class="rom">pei e mau</span>。
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">mau e pei</span> ＝「猫的鱼」；<span class="rom">pei e mau</span> ＝「鱼的猫」。<span class="rom">X e Y</span> 永远读作「X 的 Y」——修饰在中心前，和这门语言里的一切一样。</div></details></li>
+      <li>解码这对：<span class="rom">canq le pei ye mau</span> 对 <span class="rom">canq le pei e mau</span>。
+        <details><summary>显示答案</summary><div class="ans">用 <span class="rom">ye</span>：「那只<em>吃了鱼的</em>猫」（一个从句挂在猫上）。用 <span class="rom">e</span>：「吃了<em>鱼的猫</em>」（只有名词短语能挂在 <span class="rom">e</span> 上，于是某人吃了那只倒霉的猫）。</div></details></li>
+      <li>别往回翻：<span class="rom">su</span> ＝ 自，<span class="rom">ka</span> ＝ 知。<span class="rom">suka</span> 是什么，哪个古典词有一模一样的解剖？
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">suka</span> ＝ 意识，「自-知」——和拉丁 <em>con-scientia</em> 是同样的两块。</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 6 -->
+<section id="l6">
+  <div class="sechead"><span class="num">第 6 课</span><h2>读文字</h2><span class="en">The Block Writing</span></div>
+  <p class="lede">你这一路读的一直是大同语文字。每个方块是一个音节，由特征笔画拼成——想象韩文谚文的方块，杂交上汉字的偏旁——而一组方块上方的屋顶，就是音高轮廓本身。这是整个系统的钥匙，就画在单词 <span class="rom">kanq</span>「看见」上。</p>
+
+  <div id="anatomy"></div>
+
+  <h3 class="sub">6.1 屋顶就是语法</h3>
+  <p>同一个方块，三种屋顶——文字把旋律显示出来：</p>
+  <figure>
+    <div class="glyphline" data-sent="kan kanq kanz"></div>
+    <figcaption class="figcap"><span class="rom">kan</span>「视觉」（平屋顶）· <span class="rom">kanq</span>「看见」（降屋顶）· <span class="rom">kanz</span>「视觉的」（升屋顶）。助词<em>不</em>带屋顶、还会缩小——在上面任意一行句子里找找它们。</figcaption>
+  </figure>
+
+  <h3 class="sub">6.2 几何，一口气说完</h3>
+  <p><strong>左格</strong>：起首辅音——一个基础形状表示它在<em>哪里</em>发音，小记号（点、顶横、斜线）表示<em>怎么</em>发。<strong>右上</strong>：元音；双元音加一条尾巴。<strong>右下横条</strong>：韵尾 <span class="rom">-n</span>，唯一的收尾。在复合词内部，修饰方块缩小、中心方块填满框——这个词的家谱，画在纸上：</p>
+  <figure>
+    <div class="glyphline" data-sent="suka sulindin datunwen"></div>
+    <figcaption class="figcap">每个词一个屋顶，不论几块：<span class="rom">suka</span>（2 块）、<span class="rom">sulindin</span>（3 块）、<span class="rom">datunwen</span>（3 块）。小方块作修饰；最后那个满尺寸的方块是中心。</figcaption>
+  </figure>
+
+  <h3 class="sub">6.3 沉默的偏旁</h3>
+  <p>方块左下角那个红色小记号是<strong>分类符</strong>——一个语义标签，取自完整设计里约 40 个类（「心」「兽」「言」「物」……）。它<em>从不发音</em>：渲染器根据词典自动加上，纯粹作为给眼睛的视觉冗余。这是被工程化了的汉字偏旁。比较：</p>
+  <figure>
+    <div class="glyphline" data-sent="mau ka wen mo"></div>
+    <figcaption class="figcap">四个词，四个沉默的偏旁：<span class="rom">mau</span>（兽——爪与须）、<span class="rom">ka</span>（心——一缕）、<span class="rom">wen</span>（言——横纹）、<span class="rom">mo</span>（物——一个实心方）。外来专名则在方块下得到一条红色虚点的<em>名线</em>——第 7 课「薛定谔」下面你会看到它。</figcaption>
+  </figure>
+
+  <div class="notecard"><span class="t">关于那个灰框</span>
+    <p>每个方块周围那圈细灰方框<strong>不是文字的一部分</strong>。它是学习者的格子——像儿童写字本上的田字格——在本课里保留着，好让你看清每个音节的边界。熟练的文本会去掉它。没有任何结构依赖它。</p></div>
+
+  <div class="exercise">
+    <span class="xt">练习 6 · 阅读</span>
+    <ol>
+      <li>翻回任意一行句子：<em>不读一个字母</em>，你怎么认出动词？
+        <details><summary>显示答案</summary><div class="ans">找那组屋顶从左向右下降的方块群。一个下降的屋顶＝分句的谓语。</div></details></li>
+      <li>方块左下的红色小记号告诉你什么，它怎么读？
+        <details><summary>显示答案</summary><div class="ans">它是分类符——一个沉默的语义标签（约 40 类，如兽、心、言）。它根本不发音；只为阅读的眼睛而存在。</div></details></li>
+      <li>方块右下的一条横杠是什么意思？
+        <details><summary>显示答案</summary><div class="ans">这个音节以 <span class="rom">-n</span> 收尾——这门语言允许的唯一韵尾。</div></details></li>
+      <li>在 <span class="rom">sulindin</span> 里，为什么前两个方块比第三个小？
+        <details><summary>显示答案</summary><div class="ans">小方块是修饰语，满尺寸的末块是中心：[su + lin] 修饰 din「值」。这个排布字面画出了词的树——而上方那一个屋顶说「这一切是一个词」。</div></details></li>
+      <li>灰色方框是发音的、结构的，还是都不是？
+        <details><summary>显示答案</summary><div class="ans">都不是——它是教学的脚手架，一张学习者格子。熟练的书写会略去它。</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 7 -->
+<section id="l7">
+  <div class="sechead"><span class="num">第 7 课</span><h2>结业——两句名言</h2><span class="en">Stress Tests</span></div>
+  <p class="lede">一句来自量子力学，一句来自人权法：一门入门课能收尾在的最难的两样东西——而你现在两句都能读了。下面的一切都由你已经拥有的部件搭成。</p>
+
+  <h3 class="sub">7.1 薛定谔的猫</h3>
+  <figure>
+    <div class="glyphline big" data-sent="en Xedinga e mau cuq lo mun io wi e tunseitai"></div>
+    <div class="roman-line">en Xedinga e mau cu<span class="q">q</span> lo mun io wi e tunseitai.</div>
+    <div class="sentbar"><button class="play" data-say="en Xedinga e mau cuq lo mun io wi e tunseitai">▶ 播放整句</button><span class="cap">「薛定谔的猫处于死与生的叠加态。」——16 个音节，正式语域。</span></div>
+  </figure>
+  <div class="tblwrap int"><table>
+    <tr><th scope="row">词</th><td class="rom">en</td><td class="rom">Xedinga</td><td class="rom">e</td><td class="rom">mau</td><td class="rom">cuq</td><td class="rom">lo</td><td class="rom">mun</td><td class="rom">io</td><td class="rom">wi</td><td class="rom">e</td><td class="rom">tunseitai</td></tr>
+    <tr><th scope="row">旋律</th><td>低</td><td>平</td><td>低</td><td>平</td><td><strong>降</strong></td><td>低</td><td>平</td><td>低</td><td>平</td><td>低</td><td>平</td></tr>
+    <tr><th scope="row">意义</th><td>专名标记</td><td>薛定谔</td><td>的</td><td>猫</td><td>位于</td><td>在</td><td>死</td><td>⊕ 既-又</td><td>生</td><td>的</td><td>叠加态</td></tr>
+    <tr><th scope="row">作用</th><td>「后面是外来专名」</td><td>折进音系的名字</td><td>把名字接到……</td><td>……主语</td><td>动词——唯一的降屋顶</td><td>开启「在哪里」</td><td>选项一</td><td>把两个选项合抱在一起</td><td>选项二</td><td>把［死⊕生］接到……</td><td>……中心名词</td></tr>
+  </table></div>
+  <div class="duo">
+    <div class="notecard"><span class="t">io——经典逻辑遗忘的连词</span>
+      <p>纯 <span class="rom">i</span>「与」会声称猫既死<em>又</em>活——一个矛盾。纯 <span class="rom">o</span>「或」会声称它非死<em>即</em>活——正是量子力学所否认的。<span class="rom">io</span>，两者的透明融合，把两个选项<em>作为一个合抱的整体</em>来断言，不单独评判任何一个。普通人用它说「半睡 io 半醒」；物理学家用它说希尔伯特空间。一个谦卑的助词，仅凭语法就堵住了两种误读。</p></div>
+    <div class="notecard blue"><span class="t">你的耳朵早已抓到的另外两件事</span>
+      <p><span class="rom">Xedinga</span> 是「薛定谔」折进 288 音节（sh→<span class="rom">x</span>，ö→<span class="rom">e</span>，ng 拆成 <span class="rom">n·g</span>），由专名标记 <span class="rom">en</span> 引入，文字里方块下带一条虚点名线。还有：全句<em>唯一</em>的下降轮廓落在 <span class="rom">cuq</span> 上——不管主语长到哪里，你的耳朵都能瞬间锁定动词。</p></div>
+  </div>
+  <div class="audiogrid">
+    <figure class="audiof"><figcaption>神经参考音——把音高语法强加在自然嗓音上（来自 <span class="rom">audio/</span> 文件夹）。<span class="rm">en Xedinga e mau cuq lo mun io wi e tunseitai.</span></figcaption>
+      <audio controls preload="none" src="audio/schrodinger-cat.mp3"></audio></figure>
+    <figure class="audiof"><figcaption>对照——同样的词，用普通文本转语音的韵律，在施加音高语法<em>之前</em>。听听消失了什么：词类旋律。<span class="rm">「自然韵律」版本</span></figcaption>
+      <audio controls preload="none" src="audio/schrodinger-cat-natural.mp3"></audio></figure>
+  </div>
+  <p>街头版——真值相同，脚手架交还给语境。名词 <span class="rom">tunseitai</span> 仅凭轮廓变成动词（<span class="rom">a</span> 是话题停顿助词，「至于……」）：</p>
+  <figure>
+    <div class="glyphline" data-sent="Xedinga-mau a, mun io wi e tunseitaiq"></div>
+    <div class="roman-line">Xedinga-mau a, mun io wi e tunseitai<span class="q">q</span>.</div>
+    <div class="sentbar"><button class="play ghost" data-say="Xedinga-mau a, mun io wi e tunseitaiq">▶ 播放街头版</button><span class="cap">「薛定谔的猫？在死-⊕-生的叠加里。」——<span class="rom">tunseitaiq</span>，下降：「处于叠加」。</span></div>
+  </figure>
+
+  <h3 class="sub">7.2 《世界人权宣言》第一条</h3>
+  <p><em>「人人生而自由，在尊严和权利上一律平等。」</em></p>
+  <figure>
+    <div class="glyphline big" data-sent="mei ren an xinwi sukauq, i lo sudin i sulindin pinq"></div>
+    <div class="roman-line">mei ren an xinwi sukau<span class="q">q</span>, i lo sudin i sulindin pin<span class="q">q</span>.</div>
+    <div class="sentbar"><button class="play" data-say="mei ren an xinwi sukauq, i lo sudin i sulindin pinq">▶ 播放整句</button><span class="cap">16 个音节——每一个量词、谓语、附接都完全显式。</span></div>
+  </figure>
+  <div class="tblwrap int"><table>
+    <tr><th scope="row">词</th><td class="rom">mei</td><td class="rom">ren</td><td class="rom">an</td><td class="rom">xinwi</td><td class="rom">sukauq</td><td class="rom">i</td><td class="rom">lo</td><td class="rom">sudin</td><td class="rom">i</td><td class="rom">sulindin</td><td class="rom">pinq</td></tr>
+    <tr><th scope="row">旋律</th><td>低</td><td>平</td><td>低</td><td>平</td><td><strong>降</strong></td><td>低</td><td>低</td><td>平</td><td>低</td><td>平</td><td><strong>降</strong></td></tr>
+    <tr><th scope="row">意义</th><td>每 ∀</td><td>人</td><td>于（时）</td><td>出生</td><td>自由（是）</td><td>与</td><td>在</td><td>尊严</td><td>与</td><td>权利</td><td>平等（是）</td></tr>
+    <tr><th scope="row">作用</th><td>真量词，非修辞</td><td>主语</td><td>开启「何时」</td><td>新-生：出生的时刻</td><td>谓语一：以自身为因</td><td>连接两个分句</td><td>开启范围</td><td>自-值</td><td>连接两个名词</td><td>［自-连］-值</td><td>谓语二：彼此相平</td></tr>
+  </table></div>
+  <div class="duo">
+    <div class="notecard"><span class="t">精确的沉默</span>
+      <p>全句没有任何时间锚——而这是对的。这是一个泛指的、规范性的陈述，在所有时刻都为真；规则 R4 合法地让它不带标记。英语被迫写「<em>are born</em>」（生而）；大同语的无时态恰好说出宣言所指的意思。你的耳朵找到两个下降屋顶——<span class="rom">sukauq</span>、<span class="rom">pinq</span>——就知道有两个谓语；两个 <span class="rom">i</span> 在不同层级粘接（分句+分句、名词+名词），由韵律边界替你分好。</p></div>
+    <div class="notecard blue"><span class="t">藏在构词里的论证</span>
+      <p>三个关键词共享词根 <span class="rom">su</span>「自」：自由 ＝ <em>自-因</em>，尊严 ＝ <em>自-值</em>，权利 ＝ <em>自-连-值</em>。这一条的哲学——自由源于自我、尊严属于自我、权利是自我之间被承认的尊严——就保存在构词本身里。读这三个词，<em>就是</em>在读那段论证。</p></div>
+  </div>
+  <div class="audiogrid">
+    <figure class="audiof"><figcaption>神经参考音——施加了音高语法（来自 <span class="rom">audio/</span>）。<span class="rm">mei ren an xinwi sukauq, i lo sudin i sulindin pinq.</span></figcaption>
+      <audio controls preload="none" src="audio/udhr-article1.mp3"></audio></figure>
+    <figure class="audiof"><figcaption>对照——自然韵律，无音高语法。<span class="rm">「自然韵律」版本</span></figcaption>
+      <audio controls preload="none" src="audio/udhr-article1-natural.mp3"></audio></figure>
+  </div>
+
+  <div class="notecard"><span class="t">你做到了</span>
+    <p>你的工具箱：288 个你早已会发的音节 · 三条音高规则 · 修饰在前的 SVO · 锚只设一次 · 一条折叠规则 · <span class="rom">e</span>/<span class="rom">ye</span> · 23 个助词 · 二十几个词根。完整的参考——全套助词逻辑、信息密度的算术、设计取舍——都在配套设计书 <span class="rom">datunwen.html</span> 里。</p></div>
+
+  <div class="exercise">
+    <span class="xt">练习 7 · 结业</span>
+    <ol>
+      <li>在薛定谔句里，说出动词，以及找到它的两条独立途径。
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">cuq</span>「位于」。用耳：全句唯一的下降轮廓。用眼：唯一的降屋顶（拼写上，唯一的 -q）。</div></details></li>
+      <li>这句为什么用 <span class="rom">io</span> 而不是 <span class="rom">i</span> 或 <span class="rom">o</span>？
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">i</span> 会断言「既死又活」（矛盾）；<span class="rom">o</span> 会断言「非死即活，二者其一」（量子力学所否认）。<span class="rom">io</span> ⊕ 把两个选项作为一个共持的整体来断言——叠加，直接来自语法。</div></details></li>
+      <li>在人权宣言句里，哪两个词是谓语，你的耳朵怎么知道？
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">sukauq</span>「自由（是）」和 <span class="rom">pinq</span>「平等（是）」——两个下降轮廓（两个 -q）。</div></details></li>
+      <li>为什么 <span class="rom">en</span> 站在 <span class="rom">Xedinga</span> 前面，这个名字在文字里得到什么视觉标记？
+        <details><summary>显示答案</summary><div class="ans"><span class="rom">en</span> 是专名标记：它宣告后面的方块是一个按音拼写的外来名。文字里这个名字的方块下带一条红色虚点名线。</div></details></li>
+      <li>人权宣言句为什么可以完全不带时态——加上 <span class="rom">tan</span> 会错误地暗示什么？
+        <details><summary>显示答案</summary><div class="ans">它是一个无时态的规范性陈述，规则 R4 许可对「在所有时刻为真」的陈述零锚定。加上 <span class="rom">tan</span> 会把它锚到过去——仿佛人们过去才生而自由平等。</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ APPENDIX -->
+<section id="appx">
+  <div class="sechead"><span class="num">附录</span><h2>参考与沙盒</h2><span class="en">Look It Up, Try It Out</span></div>
+  <p class="lede">本课教的一切，四张表——每一条都可点击——外加一个把你输入的任何东西都渲染并读出的沙盒。</p>
+
+  <h3 class="sub">A.1 五条规则，一张卡</h3>
+  <div class="tblwrap"><table>
+    <tr><th>规则</th><th>名称</th><th>一句话版本</th></tr>
+    <tr><td><strong>R1</strong></td><td>轮廓律</td><td>每个实词一条音高轮廓，指派它的身份：平＝事物，降＝动词，升＝修饰语；助词低。</td></tr>
+    <tr><td><strong>R2</strong></td><td>默认语序</td><td>主–谓–宾；每个修饰语在其中心之前。</td></tr>
+    <tr><td><strong>R3</strong></td><td>偏离付费</td><td>默认语序＝零标记。一旦重排，被移动的部件带上 <span class="rom">ga</span>/<span class="rom">wo</span>/<span class="rom">ni</span>。</td></tr>
+    <tr><td><strong>R4</strong></td><td>锚定律</td><td>时间只设一次（<span class="rom">tan</span>/<span class="rom">nau</span>/<span class="rom">fu</span>）；它辖及全场直到重新锚定。体 <span class="rom">le</span>/<span class="rom">xu</span> 在动词后。无时态的真理合法地不加标记。</td></tr>
+    <tr><td><strong>R5</strong></td><td>算子律</td><td>逻辑词是精确的：<span class="rom">i</span> ∧ · <span class="rom">o</span> ∨ · <span class="rom">io</span> ⊕ · <span class="rom">bu</span> ¬ · <span class="rom">mei</span> ∀ · <span class="rom">un</span> ∃；附接分为 <span class="rom">e</span>（名词短语）与 <span class="rom">ye</span>（从句）。</td></tr>
+  </table></div>
+
+  <h3 class="sub">A.2 实词词根<span class="tag">点击任一条</span></h3>
+  <div class="tblwrap"><table>
+    <tr><th>词</th><th>意义</th><th>沉默偏旁</th><th>注</th></tr>
+    <tr><td data-dw="ka" data-nog></td><td>知道</td><td>心</td><td>词源：知 · 拉丁 cognōscere</td></tr>
+    <tr><td data-dw="mo" data-nog></td><td>物·物质</td><td>物</td><td>词源：物 · 拉丁 mōlēs／māteria</td></tr>
+    <tr><td data-dw="ten" data-nog></td><td>时间</td><td>时</td><td>词源：时 · 拉丁 tempus</td></tr>
+    <tr><td data-dw="lin" data-nog></td><td>连·关系</td><td>—</td><td>词源：连 lián · 英语 link</td></tr>
+    <tr><td data-dw="su" data-nog></td><td>自己</td><td>心</td><td>词源：己 · 拉丁 suī</td></tr>
+    <tr><td data-dw="wi" data-nog></td><td>生命</td><td>生</td><td>词源：生 · 拉丁 vīta</td></tr>
+    <tr><td data-dw="mun" data-nog></td><td>死亡</td><td>生</td><td>词源：死 · 拉丁 mortuus，殁 mò</td></tr>
+    <tr><td data-dw="mau" data-nog></td><td>猫</td><td>兽</td><td>词源：猫 māo · 拟声「喵」· 泰语 maew</td></tr>
+    <tr><td data-dw="kau" data-nog></td><td>原因</td><td>—</td><td>词源：因 · 拉丁 causa</td></tr>
+    <tr><td data-dw="xin" data-nog></td><td>新·始</td><td>时</td><td>词源：新 xīn</td></tr>
+    <tr><td data-dw="tun" data-nog></td><td>同·共</td><td>社</td><td>词源：同 tóng</td></tr>
+    <tr><td data-dw="sei" data-nog></td><td>存在·是</td><td>—</td><td>词源：在 · 德语 sein，汉语 是</td></tr>
+    <tr><td data-dw="tai" data-nog></td><td>状态</td><td>—</td><td>词源：态 tài</td></tr>
+    <tr><td data-dw="din" data-nog></td><td>价值</td><td>心</td><td>词源：值 · 拉丁 dignus</td></tr>
+    <tr><td data-dw="pin" data-nog></td><td>平等·齐平</td><td>—</td><td>词源：平 píng · 拉丁 plānus</td></tr>
+    <tr><td data-dw="da" data-nog></td><td>大</td><td>—</td><td>词源：大 dà</td></tr>
+    <tr><td data-dw="ren" data-nog></td><td>人</td><td>社</td><td>词源：人 rén</td></tr>
+    <tr><td data-dw="wen" data-nog></td><td>语言·文字</td><td>言</td><td>词源：文 wén</td></tr>
+    <tr><td data-dw="cu" data-nog></td><td>位于</td><td>—</td><td>词源：处 chù</td></tr>
+    <tr><td data-dw="kan" data-nog></td><td>看·视</td><td>心</td><td>词源：看 kàn</td></tr>
+    <tr><td data-dw="can" data-nog></td><td>吃</td><td>生</td><td>词源：食</td></tr>
+    <tr><td data-dw="pei" data-nog></td><td>鱼</td><td>兽</td><td>词源：鱼</td></tr>
+    <tr><td data-dw="di" data-nog></td><td>日·天</td><td>时</td><td>词源：日 · 参拉丁 diēs</td></tr>
+  </table></div>
+  <h4>代词与指示词——它们是实词，同样带轮廓</h4>
+  <div class="tblwrap"><table>
+    <tr><th>词</th><th>意义</th><th>注</th></tr>
+    <tr><td data-dw="mi" data-nog></td><td>我</td><td>词源：拉丁 mē</td></tr>
+    <tr><td data-dw="yu" data-nog></td><td>你</td><td>词源：英语 you</td></tr>
+    <tr><td data-dw="ta" data-nog></td><td>他 / 她 / 它</td><td>词源：汉语 他 tā</td></tr>
+    <tr><td data-dw="to" data-nog></td><td>那（指示）</td><td>词源：斯拉夫语 to · 英语 that</td></tr>
+  </table></div>
+
+  <h3 class="sub">A.3 本课出现的复合词</h3>
+  <div class="tblwrap"><table>
+    <tr><th>词</th><th>折叠</th><th>意义</th></tr>
+    <tr><td data-dw="suka" data-nog></td><td>自 + 知</td><td>意识</td></tr>
+    <tr><td data-dw="linka" data-nog></td><td>连 + 知</td><td>逻辑·理性</td></tr>
+    <tr><td data-dw="moka" data-nog></td><td>物 + 知</td><td>物理·科学</td></tr>
+    <tr><td data-dw="tenlin" data-nog></td><td>时 + 连</td><td>历史</td></tr>
+    <tr><td data-dw="sulin" data-nog></td><td>自 + 连</td><td>社会</td></tr>
+    <tr><td data-dw="sudin" data-nog></td><td>自 + 值</td><td>尊严</td></tr>
+    <tr><td data-dw="sulindin" data-nog></td><td>［自 + 连］+ 值</td><td>权利</td></tr>
+    <tr><td data-dw="sukau" data-nog></td><td>自 + 因</td><td>自由</td></tr>
+    <tr><td data-dw="xinwi" data-nog></td><td>新 + 生</td><td>出生</td></tr>
+    <tr><td data-dw="tunseitai" data-nog></td><td>［同 + 在］+ 态</td><td>叠加态</td></tr>
+    <tr><td data-dw="tandi" data-nog></td><td>过去 + 日</td><td>昨天（已词化）</td></tr>
+    <tr><td data-dw="datunwen" data-nog></td><td>大 + 同 + 文</td><td>大同语，这门语言的自名</td></tr>
+  </table></div>
+
+  <h3 class="sub">A.4 全部 23 个助词——整个封闭类</h3>
+  <div class="tblwrap"><table>
+    <tr><th>词</th><th>作用</th><th>助记来源（词源说明）</th></tr>
+    <tr><td data-dw="e" data-nog></td><td>把名词短语接成修饰语——「的」</td><td>的 de · の no</td></tr>
+    <tr><td data-dw="ye" data-nog></td><td>把从句接成修饰语——「……的（人/物）」</td><td>文言 者 zhě</td></tr>
+    <tr><td data-dw="i" data-nog></td><td>与 ∧</td><td>西班牙语 y · 俄语 и</td></tr>
+    <tr><td data-dw="o" data-nog></td><td>或 ∨</td><td>西班牙语 o · 拉丁 aut</td></tr>
+    <tr><td data-dw="io" data-nog></td><td>叠加式「既-又」⊕</td><td>i + o 的透明融合</td></tr>
+    <tr><td data-dw="bu" data-nog></td><td>非 ¬</td><td>不 bù</td></tr>
+    <tr><td data-dw="mei" data-nog></td><td>每 ∀（置于名词前）</td><td>每 měi</td></tr>
+    <tr><td data-dw="un" data-nog></td><td>某 ∃ · 不定</td><td>拉丁 ūnus</td></tr>
+    <tr><td data-dw="a" data-nog></td><td>话题停顿——「至于……」</td><td>啊 a</td></tr>
+    <tr><td data-dw="u" data-nog></td><td>是非问句，句末</td><td>先验设计</td></tr>
+    <tr><td data-dw="an" data-nog></td><td>于（某时）·「当……时」</td><td>先验设计</td></tr>
+    <tr><td data-dw="lo" data-nog></td><td>在／于（处所或范围）</td><td>拉丁 locus</td></tr>
+    <tr><td data-dw="de" data-nog></td><td>自（来源）</td><td>拉丁 dē</td></tr>
+    <tr><td data-dw="en" data-nog></td><td>专名标记（置于外来名之前）</td><td>name 的 n- · nōmen · 名</td></tr>
+    <tr><td data-dw="ga" data-nog></td><td>施事标记（仅当语序偏离时）</td><td>日语 が ga</td></tr>
+    <tr><td data-dw="wo" data-nog></td><td>受事标记（仅当语序偏离时）</td><td>日语 を wo</td></tr>
+    <tr><td data-dw="ni" data-nog></td><td>与格——给／向（受者、目标）</td><td>日语 に ni</td></tr>
+    <tr><td data-dw="nen" data-nog></td><td>能（能力／可能）</td><td>能 néng</td></tr>
+    <tr><td data-dw="tan" data-nog></td><td>过去锚点</td><td>法语 antan「去岁」</td></tr>
+    <tr><td data-dw="nau" data-nog></td><td>现在锚点</td><td>now · 拉丁 nunc</td></tr>
+    <tr><td data-dw="fu" data-nog></td><td>将来锚点</td><td>拉丁 futūrus</td></tr>
+    <tr><td data-dw="le" data-nog></td><td>完成体——已完成（动词后）</td><td>了 le</td></tr>
+    <tr><td data-dw="xu" data-nog></td><td>持续体——仍在进行（动词后）</td><td>续 xù「继续」</td></tr>
+  </table></div>
+
+  <h3 class="sub">A.5 沙盒——随便打<span class="tag">实时渲染 + 发音</span></h3>
+  <div class="ime">
+    <label for="imeIn">输入罗马化的大同语（动词加 -q 取下降，修饰语加 -z 取上升；首字母大写视为专名；连字符连接专名复合）</label>
+    <input id="imeIn" type="text" spellcheck="false" autocomplete="off"
+      value="mei ren an xinwi sukauq" aria-describedby="imeNote">
+    <div class="out" id="imeOut" aria-live="polite"></div>
+    <div class="chips" id="imeChips">
+      <button data-fill="mei ren an xinwi sukauq">人权</button>
+      <button data-fill="en Xedinga e mau cuq lo mun io wi e tunseitai">薛定谔的猫</button>
+      <button data-fill="mau canq le pei">猫吃了鱼</button>
+      <button data-fill="suka sukaq sukaz">一词三姿</button>
+      <button data-fill="datunwen">自名</button>
+    </div>
+    <p class="figcap" id="imeNote">任何符合音系的输入都会渲染并发音——点它画出的方块。本课出现过的词显示词义；其他合法但未收录的词逐块渲染、不给词义；不可能的串（辅音丛、游离字母）会被标 ✗。</p>
+  </div>
+</section>
+
+<div class="footer">
+  <span class="seal">大同语</span> 大同语 · 入门课程——设计书 <span class="rom">datunwen.html</span> 的配套读本，本页的词库、字形引擎与共振峰合成器都由它驱动。<br>
+  词块点击在你的浏览器里实时合成（Klatt 式共振峰合成）。▶ 音频播放器里是神经参考录音（Piper × WORLD，施加了音高语法），需要与本文件同放的 <span class="rom">audio/</span> 文件夹。其余一切都自足于单文件。
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+'use strict';
+const qs = s => document.querySelector(s), qsa = s => [...document.querySelectorAll(s)];
+
+/*PURE-START*/
+/* ============ Lexicon ============ */
+const ONS = ['p','b','t','d','k','g','m','n','f','s','x','h','c','r','l','w','y'];
+const LEX = {
+  ka:{g:'知',c:'mind'}, mo:{g:'物',c:'matter'}, ten:{g:'时',c:'time'}, lin:{g:'连',c:null},
+  su:{g:'自',c:'mind'}, wi:{g:'生',c:'life'}, mun:{g:'死',c:'life'}, mau:{g:'猫',c:'animal'},
+  kau:{g:'因',c:null}, xin:{g:'新',c:'time'}, tun:{g:'同',c:'social'}, sei:{g:'在',c:null},
+  tai:{g:'态',c:null}, din:{g:'值',c:'mind'}, pin:{g:'平',c:null}, da:{g:'大',c:null},
+  ren:{g:'人',c:'social'}, wen:{g:'文',c:'speech'}, cu:{g:'处',c:null}, kan:{g:'看',c:'mind'},
+  can:{g:'食',c:'life'}, pei:{g:'鱼',c:'animal'}, di:{g:'日',c:'time'}, to:{g:'那',c:null},
+  mi:{g:'我',c:null}, yu:{g:'你',c:null}, ta:{g:'他/她/它',c:null}
+};
+const COMP = {
+  suka:['su','ka'], linka:['lin','ka'], moka:['mo','ka'], tenlin:['ten','lin'],
+  sulin:['su','lin'], sudin:['su','din'], sulindin:['su','lin','din'], sukau:['su','kau'],
+  xinwi:['xin','wi'], tunseitai:['tun','sei','tai'], datunwen:['da','tun','wen'], tandi:['tan','di']
+};
+const PART = {
+  e:'的', i:'与 ∧', o:'或 ∨', io:'既-又 ⊕', a:'话题', u:'吗？', bu:'非 ¬',
+  mei:'每 ∀', un:'某 ∃', an:'于（时）', en:'（专名：）', lo:'在/于', de:'自',
+  ga:'施事', wo:'受事', ni:'给/向', ye:'……者（从句）',
+  nau:'现在', tan:'过去', fu:'将来', le:'了', xu:'持续', nen:'能'
+};
+const WG = {
+  ka:'知识', kaq:'知道（动）', kaz:'认知的（修饰）',
+  kan:'视觉', kanq:'看见（动）', kanz:'视觉的（修饰）',
+  can:'进食', canq:'吃（动）',
+  mau:'猫', mauq:'是猫（动）', mauz:'猫般的（修饰）',
+  pei:'鱼', ren:'人', mun:'死亡', wi:'生命', di:'日',
+  to:'那', mi:'我', yu:'你', ta:'他/她/它',
+  tandi:'昨天', cu:'处所', cuq:'位于（动）',
+  sei:'存在', seiq:'存在（动）',
+  tunseitai:'叠加态', tunseitaiq:'处于叠加（动）',
+  Xedinga:'薛定谔', 'Xedinga-mau':'薛定谔的猫',
+  xinwi:'出生', sukau:'自由', sukauq:'自由（动）',
+  sudin:'尊严', sulindin:'权利', pin:'平等', pinq:'平等（动）',
+  suka:'意识', sukaq:'意识到（动）', sukaz:'有意识地（修饰）',
+  linka:'逻辑', moka:'物理', tenlin:'历史', sulin:'社会',
+  datunwen:'大同语', da:'大', wen:'语言', xin:'新', tun:'共同',
+  su:'自己', lin:'关联', mo:'物质', ten:'时间', din:'价值', kau:'原因', tai:'状态'
+};
+
+/* ============ Syllabification & word parsing ============ */
+const SYL_RE = new RegExp('^(' + ONS.join('|') + ')?(ai|au|ei|ou|[aeiou])(n)?$');
+function sylParse(s, needOnset) {
+  const m = SYL_RE.exec(s);
+  if (!m) return null;
+  if (needOnset && !m[1]) return null;
+  return { on: m[1] || '', nuc: m[2], coda: m[3] || '' };
+}
+function syllabify(s, needOnset = true) {
+  if (!s.length) return [];
+  for (let L = Math.min(4, s.length); L >= 1; L--) {
+    const head = sylParse(s.slice(0, L), needOnset);
+    if (head) {
+      const rest = syllabify(s.slice(L), needOnset);
+      if (rest) return [head, ...rest];
+    }
+  }
+  return null;
+}
+function parseWord(raw) {
+  const w = { raw, contour: 'ref', units: [], particle: false };
+  let tok = raw;
+  if (PART[tok] !== undefined) {
+    w.particle = true; w.contour = 'low';
+    const syls = syllabify(tok, false);
+    if (!syls) return null;
+    syls.forEach(s => w.units.push({ syl: s, cls: null, name: false }));
+    return w;
+  }
+  const m = /^(.+?)([qz])$/.exec(tok);
+  if (m) { tok = m[1]; w.contour = m[2] === 'q' ? 'pred' : 'attr'; }
+  for (const seg of tok.split('-')) {
+    if (!seg) return null;
+    if (/^[A-Z]/.test(seg)) {
+      const syls = syllabify(seg.toLowerCase());
+      if (!syls) return null;
+      syls.forEach(s => w.units.push({ syl: s, cls: null, name: true }));
+    } else {
+      const morphs = COMP[seg] ? COMP[seg] : (LEX[seg] ? [seg] : null);
+      if (morphs) {
+        for (const mo of morphs) {
+          const syls = syllabify(mo, PART[mo] === undefined);
+          if (!syls) return null;
+          syls.forEach((s, i) => w.units.push({ syl: s, cls: i === 0 ? ((LEX[mo] || {}).c || null) : null, name: false }));
+        }
+      } else {
+        const syls = syllabify(seg);
+        if (!syls) return null;
+        syls.forEach(s => w.units.push({ syl: s, cls: null, name: false }));
+      }
+    }
+  }
+  return w.units.length ? w : null;
+}
+function gloss(raw) {
+  if (WG[raw]) return WG[raw];
+  if (PART[raw] !== undefined) return PART[raw];
+  const m = /^(.+?)([qz])$/.exec(raw);
+  const base = m ? m[1] : raw;
+  const suf = m ? (m[2] === 'q' ? ' (v.)' : ' (mod)') : '';
+  const morphs = COMP[base] || (LEX[base] ? [base] : null);
+  if (morphs) return morphs.map(x => LEX[x] ? LEX[x].g : (PART[x] || '?')).join('·') + suf;
+  return /^[A-Z]/.test(raw) ? '专名' : '—';
+}
+/*PURE-END*/
+
+/* ============ Glyph components (featural geometry) ============ */
+const ST = d => `<path class="st" d="${d}"/>`;
+const FL = (x, y, r = 3.4) => `<circle class="fl" cx="${x}" cy="${y}" r="${r}"/>`;
+const CIRC = '<circle class="st" cx="29" cy="66" r="13"/>';
+const VL = ST('M29,40 V92'), ANG = ST('M16,40 H42 V92'), TBAR = ST('M16,40 H42'), SLASH = ST('M40,46 L18,88');
+const ONSET_P = {
+  p: CIRC, b: CIRC + FL(29, 66), m: CIRC + TBAR, f: CIRC + SLASH,
+  w: '<circle class="st" cx="28" cy="74" r="9"/>' + ST('M34,67 C38,58 42,50 43,42'),
+  t: VL, d: VL + FL(37, 66), n: VL + TBAR, s: VL + SLASH,
+  r: ST('M29,40 V76 C29,88 38,92 44,84'),
+  c: VL + SLASH + ST('M21,40 H37'),
+  l: ST('M29,40 V76 C29,88 38,92 44,84'),
+  k: ANG, g: ANG + FL(29, 72), h: ANG + ST('M38,52 L18,88'),
+  x: ST('M42,42 C16,48 16,84 42,90') + ST('M38,52 L20,84'),
+  y: ST('M39,60 C27,62 27,80 39,82') + ST('M39,56 C41,50 43,45 44,40')
+};
+const NUC_P = {
+  a: ST('M52,58 H84'),
+  e: ST('M52,58 H78') + ST('M78,58 V69'),
+  i: ST('M68,40 V74'),
+  o: '<circle class="st" cx="68" cy="57" r="13"/>',
+  u: ST('M52,44 C52,74 84,74 84,44'),
+  ai: ST('M52,58 H78') + ST('M83,38 V50'),
+  au: ST('M52,58 H76') + ST('M78,40 C78,48 86,48 86,40'),
+  ei: ST('M52,60 H74') + ST('M74,60 V69') + ST('M83,38 V50'),
+  ou: '<circle class="st" cx="64" cy="58" r="11"/>' + ST('M79,40 C79,48 87,48 87,40')
+};
+const CLS_P = {
+  mind: '<path class="cls" d="M17,95 C17,87 27,87 27,92 C27,96 21,97 20,93"/>',
+  matter: '<rect class="fl2" x="17" y="86" width="9" height="9" rx="1.5"/>',
+  life: '<path class="cls" d="M22,98 V86 M22,90 C18,87 17,85 16,83 M22,90 C26,87 27,85 28,83"/>',
+  time: '<path class="cls" d="M16,95 C17,87 27,86 28,91 M28,91 L24,88 M28,91 L25,95"/>',
+  social: '<circle class="fl2" cx="17" cy="94" r="2"/><circle class="fl2" cx="29" cy="94" r="2"/><path class="cls" d="M19,94 H27"/>',
+  speech: '<path class="cls" d="M16,87 H28 M16,92 H26 M16,97 H23"/>',
+  animal: '<circle class="fl2" cx="18" cy="86" r="1.8"/><circle class="fl2" cx="23" cy="84" r="1.8"/><circle class="fl2" cx="28" cy="86" r="1.8"/><path class="cls" d="M17,96 C20,91 26,91 29,96"/>'
+};
+function unitSVG(u) {
+  let s = '<rect class="frame" x="6" y="26" width="84" height="82" rx="10"/>';
+  if (u.syl.on) s += ONSET_P[u.syl.on] || '';
+  s += NUC_P[u.syl.nuc] || '';
+  if (u.syl.coda) s += ST('M52,88 H84');
+  if (u.cls && CLS_P[u.cls]) s += CLS_P[u.cls];
+  if (u.name) s += '<path class="nameline" d="M8,116 H88"/>';
+  return s;
+}
+function glyphSVG(word, px = 46, drawable = false) {
+  const w = typeof word === 'string' ? parseWord(word) : word;
+  if (!w) return null;
+  const n = w.units.length;
+  let x = 4, parts = '';
+  w.units.forEach((u, i) => {
+    const s = w.particle ? 0.58 : (u.name ? 1 : (i === n - 1 ? 1 : 0.74));
+    parts += `<g transform="translate(${x.toFixed(1)},${(108 * (1 - s)).toFixed(1)}) scale(${s})">${unitSVG(u)}</g>`;
+    x += 92 * s + 3;
+  });
+  const W = x + 3;
+  let roof = '';
+  if (!w.particle) {
+    const a = 8, b = W - 8;
+    const d = w.contour === 'pred' ? `M${a},7 L${b},20` : w.contour === 'attr' ? `M${a},20 L${b},7` : `M${a},14 L${b},14`;
+    roof = `<path class="roof" d="${d}"/>`;
+  }
+  return `<svg class="gly${drawable ? ' drawable' : ''}" viewBox="0 0 ${W.toFixed(0)} 122" style="height:${px}px;width:${(px * W / 122).toFixed(1)}px"${w.particle ? ' opacity=".82"' : ''} aria-hidden="true">${roof}${parts}</svg>`;
+}
+
+/* ============ Page assembly ============ */
+function wordButton(core, px) {
+  const svg = glyphSVG(core, px);
+  if (!svg) return null;
+  const b = document.createElement('button');
+  b.className = 'dw'; b.dataset.w = core; b.type = 'button';
+  b.setAttribute('aria-label', core + ' — ' + gloss(core) + '。点击可听发音。');
+  b.innerHTML = svg + `<span class="r">${core}</span><span class="g">${gloss(core)}</span>`;
+  return b;
+}
+function buildSent(el) {
+  const px = el.classList.contains('big') ? 56 : 44;
+  el.dataset.sent.trim().split(/\s+/).forEach(t => {
+    const comma = /[,，]$/.test(t);
+    const core = t.replace(/[.,，。]+$/, '');
+    if (core) {
+      const b = wordButton(core, px);
+      if (b) el.appendChild(b);
+    }
+    if (comma) { const g = document.createElement('span'); g.className = 'gap'; el.appendChild(g); }
+  });
+}
+qsa('[data-sent]').forEach(buildSent);
+
+qsa('.card[data-word]').forEach(c => {
+  const wd = c.dataset.word;
+  c.innerHTML = `<div class="glyph"></div><div class="rom">${wd}</div><div class="mean">${c.dataset.mean}</div><div class="ety">${c.dataset.ety}</div>`;
+  const b = wordButton(wd, 62);
+  b.querySelector('.r').remove(); b.querySelector('.g').remove();
+  c.querySelector('.glyph').appendChild(b);
+});
+
+/* Clickable dictionary entries in the appendix tables */
+qsa('[data-dw]').forEach(el => {
+  const b = wordButton(el.dataset.dw, 40);
+  if (!b) return;
+  if (el.dataset.nog !== undefined) b.querySelector('.g').remove();
+  el.appendChild(b);
+});
+
+/* Hero glyph */
+(function hero() {
+  const h = qs('#heroGlyphs'); if (!h) return;
+  const b = wordButton('datunwen', 96);
+  b.querySelector('.g').textContent = 'da「大」· tun「同」· wen「文」——点击听这门语言念出自己的名字';
+  b.querySelector('svg').classList.add('drawable');
+  h.appendChild(b);
+})();
+
+/* Block anatomy (Lesson 6) */
+(function anatomy() {
+  const el = qs('#anatomy'); if (!el) return;
+  const items = [
+    ['var(--dian)', '屋顶 ＝ 音高手势', '一条轮廓铺满整个词：平屋顶＝事物，降屋顶＝分句的动词（本例：-q），升屋顶＝修饰语。助词不带屋顶。屋顶的跨度就是词的边界——一条旋律，一个屋顶，一个词。'],
+    ['currentColor', '左格 ＝ 起首辅音', 'k 那个带角的基础形状标出它在哪里发音（舌根）；附加的小笔画——一点、一道顶横、一条斜线——标出怎么发（浊、鼻、擦）。'],
+    ['currentColor', '右上 ＝ 元音', 'a 是那条长横；每个元音都有自己的笔画，双元音在角上再加一条小尾巴。'],
+    ['currentColor', '右下横条 ＝ 韵尾 -n', '唯一可能的音节收尾——一道底横。'],
+    ['var(--zhu)', '左下红记号 ＝ 分类符', '一个沉默的语义标签（完整设计里约 40 类；此处为「心」）。渲染器根据词典自动加上——从不发音。工程化了的汉字偏旁。'],
+    ['var(--glyph-frame)', '灰框 ＝ 学习者格子，非结构', '不承担任何作用——像写字本上的田字格。在复合词里，修饰方块缩小、中心方块填满框：词的树，画在纸上。']
+  ];
+  el.innerHTML = `<div class="anwrap"><div style="text-align:center">${glyphSVG('kanq', 190)}<div class="figcap" style="text-align:center">kanq「看见」= kan（看）+ 下降轮廓（-q）</div></div><ul class="anlegend">${items.map(i => `<li><span class="sw" style="background:${i[0]}"></span><span><b>${i[1]}</b><span class="d"> ${i[2]}</span></span></li>`).join('')}</ul></div>`;
+})();
+
+/* Sandbox (IME) */
+(function ime() {
+  const inp = qs('#imeIn'), out = qs('#imeOut'); if (!inp) return;
+  function render() {
+    out.innerHTML = '';
+    inp.value.trim().split(/\s+/).forEach(t => {
+      const comma = /[,，]$/.test(t);
+      const core = t.replace(/[.,，。]+$/, '');
+      if (core) {
+        const b = wordButton(core, 52);
+        if (b) out.appendChild(b);
+        else { const e = document.createElement('span'); e.className = 'err'; e.textContent = '✗ ' + core + '（不符合音系）'; out.appendChild(e); }
+      }
+      if (comma) { const g = document.createElement('span'); g.className = 'gap'; out.appendChild(g); }
+    });
+  }
+  inp.addEventListener('input', render);
+  qsa('#imeChips button').forEach(b => b.addEventListener('click', () => { inp.value = b.dataset.fill; render(); inp.focus(); }));
+  render();
+})();
+
+/* ============ Formant synthesizer (Klatt-style, continuous tract) ============ */
+let AC = null, master = null, noiseBuf = null, glottalWave = null;
+function ac() {
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = AC.createDynamicsCompressor();
+    comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 5;
+    const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4800; lp.Q.value = 0.4;
+    const hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 75;
+    const g = AC.createGain(); g.gain.value = 1.25;
+    comp.connect(lp); lp.connect(hp); hp.connect(g); g.connect(AC.destination);
+    master = comp;
+    noiseBuf = AC.createBuffer(1, Math.floor(AC.sampleRate * 1.2), AC.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    /* Glottal pulse: harmonics decaying as 1/n^1.55 — a soft source, closer to a real voice than a sawtooth */
+    const N = 48, re = new Float32Array(N + 1), im = new Float32Array(N + 1);
+    for (let n = 1; n <= N; n++) im[n] = 1 / Math.pow(n, 1.55);
+    glottalWave = AC.createPeriodicWave(re, im);
+  }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+/* Vowel formant targets (F1–F4) and amplitudes */
+const VOW = {
+  a: [780, 1240, 2600, 3300], e: [460, 1950, 2600, 3300], i: [300, 2250, 2900, 3400],
+  o: [480, 900, 2500, 3200], u: [320, 780, 2400, 3200]
+};
+const AV = [1, .55, .28, .14], AN = [.9, .22, .12, .08];
+const LOCUS = { lab: 850, alv: 1750, vel: 2250, pal: 2100 };
+const F0C = { ref: [178, 168], pred: [212, 112], attr: [122, 200], low: [108, 104] };
+/* Expand each syllable into a phone timeline: {d duration, F formant targets, A amplitudes, v voicing, n aspiration, s fricative path, burst plosive} */
+function phonesFor(syl, particle) {
+  const ph = [];
+  const n1 = syl.nuc[0], n2 = syl.nuc.length > 1 ? syl.nuc[1] : null;
+  const on = syl.on;
+  const vdur = (n2 ? .195 : .15) * (particle ? .72 : 1);
+  if (on) {
+    const place = 'pbmfw'.includes(on) ? 'lab' : 'kgh'.includes(on) ? 'vel' : 'xcy'.includes(on) ? 'pal' : 'alv';
+    const locus = [300, LOCUS[place], place === 'vel' ? 2400 : 2600, 3300];
+    if ('ptk'.includes(on)) {
+      ph.push({ d: .058, v: 0, F: locus });
+      ph.push({ d: .012, v: 0, burst: { p: [0, .55], t: [2, .6], k: [1, .65] }[on] });
+      ph.push({ d: .032, v: 0, n: .3, F: VOW[n1], A: AV });
+    } else if ('bdg'.includes(on)) {
+      ph.push({ d: .045, v: .15, F: [170, LOCUS[place], 2500, 3300], A: [1, .12, .05, .03] });
+      ph.push({ d: .012, v: .2, burst: { b: [0, .28], d: [2, .3], g: [1, .33] }[on] });
+    } else if (on === 'm' || on === 'n') {
+      ph.push({ d: .072, v: .55, F: [250, on === 'm' ? 1000 : 1500, 2300, 3300], A: AN });
+    } else if (on === 'r' || on === 'l') {
+      ph.push({ d: .05, v: .7, F: [360, 1150, 2700, 3300], A: [.9, .5, .3, .12] });
+    } else if (on === 'w' || on === 'y') {
+      ph.push({ d: .058, v: .78, F: VOW[on === 'w' ? 'u' : 'i'], A: AV });
+    } else if (on === 'f') { ph.push({ d: .085, v: 0, s: [0, .14], F: locus });
+    } else if (on === 's') { ph.push({ d: .09, v: 0, s: [2, .22], F: locus });
+    } else if (on === 'x') { ph.push({ d: .09, v: 0, s: [1, .24], F: locus });
+    } else if (on === 'h') { ph.push({ d: .07, v: 0, n: .32, F: VOW[n1], A: AV });
+    } else if (on === 'c') {
+      ph.push({ d: .045, v: 0, F: locus });
+      ph.push({ d: .065, v: 0, s: [1, .24] });
+    }
+  }
+  ph.push({ d: n2 ? vdur * .55 : vdur, v: 1, F: VOW[n1], A: AV, vowel: true });
+  if (n2) ph.push({ d: vdur * .45, v: .95, F: VOW[n2], A: AV, glide: .05, vowel: true });
+  if (syl.coda) ph.push({ d: .065, v: .5, F: [250, 1400, 2300, 3300], A: AN });
+  return ph;
+}
+function scheduleWord(raw, t0, f0mul = 1) {
+  const w = parseWord(raw); if (!w) return 0.15;
+  return scheduleParsed(w, t0, f0mul);
+}
+function scheduleParsed(w, t0, f0mul = 1) {
+  ac();
+  const amp = w.particle ? .5 : 1;
+  const phones = [];
+  w.units.forEach((u, ui) => {
+    const ps = phonesFor(u.syl, w.particle);
+    if (ui === w.units.length - 1) for (const p of ps) if (p.vowel) p.d *= 1.12;
+    phones.push(...ps);
+  });
+  const total = phones.reduce((a, p) => a + p.d, 0);
+  const [A, B] = F0C[w.contour];
+  /* Glottal source: continuous voicing across the word + slight vibrato */
+  const o = AC.createOscillator(); o.setPeriodicWave(glottalWave);
+  o.frequency.setValueAtTime(A * f0mul, t0);
+  o.frequency.linearRampToValueAtTime(B * f0mul, t0 + total);
+  const lfo = AC.createOscillator(); lfo.frequency.value = 5.2;
+  const lg = AC.createGain(); lg.gain.value = 2.6;
+  lfo.connect(lg); lg.connect(o.frequency);
+  const vG = AC.createGain(); vG.gain.setValueAtTime(0, t0); o.connect(vG);
+  /* Aspiration noise (shaped by the formants) */
+  const asp = AC.createBufferSource(); asp.buffer = noiseBuf; asp.loop = true;
+  const aG = AC.createGain(); aG.gain.setValueAtTime(0, t0); asp.connect(aG);
+  /* Four formant resonators */
+  const Fs = [], Gs = [], Qv = [9, 13, 12, 10];
+  for (let k = 0; k < 4; k++) {
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = Qv[k];
+    const g = AC.createGain(); g.gain.setValueAtTime(0, t0);
+    vG.connect(f); aG.connect(f); f.connect(g); g.connect(master);
+    Fs.push(f); Gs.push(g);
+  }
+  /* Three fricative/burst spectral paths: 0 labial-dull · 1 palatal-mid · 2 dental-sharp */
+  const fr = AC.createBufferSource(); fr.buffer = noiseBuf; fr.loop = true; fr.playbackRate.value = .97;
+  const frG = [['lowpass', 1400, .7], ['bandpass', 2850, 3.2], ['highpass', 5200, .8]].map(sp => {
+    const f = AC.createBiquadFilter(); f.type = sp[0]; f.frequency.value = sp[1]; f.Q.value = sp[2];
+    const g = AC.createGain(); g.gain.setValueAtTime(0, t0);
+    fr.connect(f); f.connect(g); g.connect(master);
+    return g;
+  });
+  /* Timeline automation */
+  const first = phones.find(p => p.F) || { F: VOW.a };
+  for (let k = 0; k < 4; k++) Fs[k].frequency.setValueAtTime(first.F[k], t0);
+  let t = t0;
+  for (const p of phones) {
+    const tc = p.glide || .024;
+    if (p.F) for (let k = 0; k < 4; k++) Fs[k].frequency.setTargetAtTime(p.F[k], t, tc);
+    const A4 = p.A || AV;
+    const open = (p.v || p.n) ? 1 : 0.0001;
+    for (let k = 0; k < 4; k++) Gs[k].gain.setTargetAtTime(A4[k] * open * .9, t, .014);
+    vG.gain.setTargetAtTime((p.v || 0) * .5 * amp, t, .013);
+    aG.gain.setTargetAtTime(((p.n || 0) * .9 + (p.vowel ? .015 : 0)) * amp, t, .015);
+    for (let pi = 0; pi < 3; pi++) {
+      if (p.s && p.s[0] === pi) frG[pi].gain.setTargetAtTime(p.s[1] * amp, t, .02);
+      else if (!(p.burst && p.burst[0] === pi)) frG[pi].gain.setTargetAtTime(0.0001, t, .018);
+    }
+    if (p.burst) {
+      const g = frG[p.burst[0]];
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(p.burst[1] * amp, t + .004);
+      g.gain.linearRampToValueAtTime(0.0001, t + .015);
+    }
+    t += p.d;
+  }
+  vG.gain.setTargetAtTime(0.0001, t, .02);
+  aG.gain.setTargetAtTime(0.0001, t, .02);
+  for (const g of Gs) g.gain.setTargetAtTime(0.0001, t, .025);
+  for (const g of frG) g.gain.setTargetAtTime(0.0001, t, .02);
+  const tEnd = t + .14;
+  o.start(t0); o.stop(tEnd); lfo.start(t0); lfo.stop(tEnd);
+  asp.start(t0); asp.stop(tEnd); fr.start(t0); fr.stop(tEnd);
+  return total;
+}
+function flashWord(el, tRel, dur) {
+  if (!el) return;
+  setTimeout(() => el.classList.add('playing'), tRel * 1000);
+  setTimeout(() => el.classList.remove('playing'), (tRel + dur) * 1000);
+}
+function playWord(raw, el) {
+  const dur = scheduleWord(raw, ac().currentTime + 0.05);
+  flashWord(el, 0.05, dur);
+}
+function playSentence(str) {
+  ac();
+  const esc = str.replace(/"/g, '\\"');
+  const line = document.querySelector(`[data-sent="${esc}"]`);
+  const btns = line ? [...line.querySelectorAll('.dw')] : [];
+  const T0 = AC.currentTime + 0.08;
+  let t = 0, bi = 0, wi = 0;
+  str.trim().split(/\s+/).forEach(tok => {
+    const comma = /[,，]$/.test(tok);
+    const core = tok.replace(/[.,，。]+$/, '');
+    if (core) {
+      const dur = scheduleWord(core, T0 + t, Math.pow(0.986, wi++));
+      flashWord(btns[bi++], 0.08 + t, dur);
+      t += dur + 0.07;
+    }
+    if (comma) t += 0.22;
+  });
+}
+document.addEventListener('click', e => {
+  const dw = e.target.closest('.dw');
+  if (dw) { playWord(dw.dataset.w, dw); return; }
+  const ph = e.target.closest('.phb');
+  if (ph) {
+    ac();
+    const syl = sylParse(ph.dataset.syl, false);
+    if (syl) scheduleParsed({ contour: 'ref', particle: false, units: [{ syl, cls: null, name: false }] }, AC.currentTime + 0.05);
+    return;
+  }
+  const pl = e.target.closest('button.play');
+  if (pl) playSentence(pl.dataset.say);
+});
+</script>
+
+</body>
+</html>

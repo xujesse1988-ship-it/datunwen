@@ -12,6 +12,7 @@ No build, no server, no network. Clone and open in any modern browser:
 |---|---|
 | [`datunwen.html`](datunwen.html) | **Design book (中文)** — phonology, pitch grammar, script, word-folding morphology, two translation stress tests. Ships a live glyph renderer, an in-page Klatt formant synthesizer (click any word to hear it), a typing sandbox, and embedded neural reference audio. |
 | [`course-en.html`](course-en.html) | **A First Course (English)** — 8 lessons + exercises for native English speakers, from the sound system to reading the script, with a free-typing sandbox and full vocabulary appendix. |
+| [`course-zh.html`](course-zh.html) | **入门课程（中文）** — course-en.html 的中文版：8 节课 + 练习，从语音、音高语法讲到读文字，例字与类比全部为中文读者重做（拼音对照、以「啊」的平/降/升类比词类音高、字调 vs 句调的澄清），含实时渲染发声沙盒与完整词汇附录。 |
 | [`dictionary.html`](dictionary.html) | **Dictionary v0.2 (Datunwen → English / 中文)** — 263 entries, live search, type filters, bidirectional reverse indexes, and per-entry audio in all three pitch postures. |
 | [`lexicon.json`](lexicon.json) | Machine-readable lexicon — the single source of truth for vocabulary (schema below). |
 | [`tools/build-dictionary.js`](tools/build-dictionary.js) | Rebuilds `dictionary.html` from `lexicon.json`, reusing the engine and CSS from `datunwen.html`: `node tools/build-dictionary.js` |
