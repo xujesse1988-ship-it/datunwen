@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Datunwen (Omnilingua) — a beginner's course in English. Eight short lessons on the constructed language whose grammar rides on pitch. Every word is clickable and speaks.">
+<title>Datunwen — A First Course</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+button { font: inherit; }
+
+/* ============ Design tokens: paper & ink (light) / rubbing (dark) ============ */
+:root {
+  --paper: #FAF9F6;
+  --panel: #F1EFE8;
+  --panel2: #EBE9E1;
+  --ink: #1F2328;
+  --ink-2: #5B6068;
+  --ink-3: #8B8F96;
+  --hairline: #E0DED6;
+  --hairline2: #D2CFC5;
+  --zhu: #BE3E2C;          /* cinnabar = semantic channel */
+  --zhu-soft: #BE3E2C1f;
+  --dian: #35558F;         /* indigo = phonetic channel */
+  --dian-soft: #35558F17;
+  --good: #3E7A4E;
+  --glyph-frame: #C9C6BB;
+  --shadow: 0 1px 2px rgba(31,35,40,.05), 0 8px 28px -12px rgba(31,35,40,.14);
+  --serif: Georgia, "Times New Roman", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  --sans: -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #17191D; --panel: #1E2126; --panel2: #23262C;
+    --ink: #E8E6E1; --ink-2: #A6AAB2; --ink-3: #7A7E86;
+    --hairline: #2C2F35; --hairline2: #383C43;
+    --zhu: #E06A52; --zhu-soft: #E06A5226;
+    --dian: #5E90EE; --dian-soft: #5E90EE1f;
+    --good: #6FBF82; --glyph-frame: #43474F;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -12px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="light"] {
+  --paper: #FAF9F6; --panel: #F1EFE8; --panel2: #EBE9E1;
+  --ink: #1F2328; --ink-2: #5B6068; --ink-3: #8B8F96;
+  --hairline: #E0DED6; --hairline2: #D2CFC5;
+  --zhu: #BE3E2C; --zhu-soft: #BE3E2C1f;
+  --dian: #35558F; --dian-soft: #35558F17;
+  --good: #3E7A4E; --glyph-frame: #C9C6BB;
+  --shadow: 0 1px 2px rgba(31,35,40,.05), 0 8px 28px -12px rgba(31,35,40,.14);
+}
+:root[data-theme="dark"] {
+  --paper: #17191D; --panel: #1E2126; --panel2: #23262C;
+  --ink: #E8E6E1; --ink-2: #A6AAB2; --ink-3: #7A7E86;
+  --hairline: #2C2F35; --hairline2: #383C43;
+  --zhu: #E06A52; --zhu-soft: #E06A5226;
+  --dian: #5E90EE; --dian-soft: #5E90EE1f;
+  --good: #6FBF82; --glyph-frame: #43474F;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -12px rgba(0,0,0,.5);
+}
+
+/* ============ Base ============ */
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--serif); font-size: 17px; line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px 120px; }
+p { margin: 0 0 1em; max-width: 72ch; }
+a { color: var(--dian); text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 700; }
+em { font-style: normal; border-bottom: 2px solid var(--zhu-soft); }
+::selection { background: var(--dian-soft); }
+ul.plain { padding-left: 22px; }
+ul.plain li { margin: 6px 0; }
+
+/* ============ Top bar ============ */
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--sans); font-size: 13px;
+}
+.topnav .in {
+  max-width: 1060px; margin: 0 auto; padding: 10px 28px;
+  display: flex; gap: 16px; align-items: center; overflow-x: auto; white-space: nowrap;
+}
+.topnav .name { font-family: var(--serif); font-weight: 700; font-size: 15px; margin-right: 6px; }
+.topnav .name .seal { color: var(--zhu); }
+.topnav a { color: var(--ink-2); }
+.topnav a:hover { color: var(--ink); text-decoration: none; }
+
+/* ============ Hero ============ */
+header.hero { padding: 64px 0 20px; }
+.hero .kicker {
+  font-family: var(--sans); font-size: 12.5px; letter-spacing: .22em;
+  color: var(--ink-2); text-transform: uppercase; margin-bottom: 22px;
+}
+.hero .kicker .seal {
+  display: inline-block; border: 1.5px solid var(--zhu); color: var(--zhu);
+  padding: 2px 8px; margin-right: 12px; letter-spacing: .3em; font-weight: 600;
+}
+#heroGlyphs { margin: 8px 0 4px; }
+#heroGlyphs svg { max-width: 100%; height: auto; }
+.hero h1 {
+  font-size: clamp(30px, 4.6vw, 44px); line-height: 1.25; margin: 18px 0 10px;
+  font-weight: 700; text-wrap: balance; letter-spacing: .01em;
+}
+.hero .sub { font-size: 18.5px; color: var(--ink-2); max-width: 62ch; }
+.hero .hint {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+  font-family: var(--sans); font-size: 13px; color: var(--dian);
+  background: var(--dian-soft); border-radius: 100px; padding: 6px 14px;
+}
+
+/* Axiom cards */
+.axioms { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 28px 0 8px; }
+.axiom {
+  background: var(--panel); border: 1px solid var(--hairline);
+  border-radius: 14px; padding: 18px 20px 14px;
+}
+.axiom .no { font-family: var(--sans); font-size: 11.5px; letter-spacing: .18em; color: var(--zhu); font-weight: 700; }
+.axiom h3 { margin: 6px 0 6px; font-size: 17.5px; }
+.axiom p { font-size: 14.5px; line-height: 1.75; color: var(--ink-2); margin: 0; }
+
+/* ============ Sections / lessons ============ */
+section { margin-top: 84px; scroll-margin-top: 70px; }
+.sechead { display: flex; align-items: baseline; gap: 16px; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 8px; }
+.sechead .num {
+  font-family: var(--serif); color: var(--zhu); font-weight: 700; font-size: 14px;
+  border: 1.5px solid var(--zhu); padding: 3px 9px; letter-spacing: .1em; white-space: nowrap;
+}
+.sechead h2 { font-size: clamp(24px, 3vw, 30px); margin: 0; font-weight: 700; text-wrap: balance; }
+.sechead .en { margin-left: auto; font-family: Georgia, serif; font-style: italic; font-size: 13.5px; color: var(--ink-3); }
+.lede { font-size: 18px; color: var(--ink-2); margin: 18px 0 26px; max-width: 68ch; }
+h3.sub { font-size: 20px; margin: 44px 0 12px; }
+h3.sub .tag { font-family: var(--sans); font-size: 11px; letter-spacing: .15em; color: var(--dian); background: var(--dian-soft); padding: 3px 8px; border-radius: 4px; vertical-align: 3px; margin-left: 10px; }
+h4 { font-size: 16.5px; margin: 26px 0 8px; }
+
+/* ============ Tables ============ */
+.tblwrap { overflow-x: auto; margin: 16px 0 22px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 14px; }
+th {
+  text-align: left; font-size: 11.5px; letter-spacing: .12em; color: var(--ink-2);
+  font-weight: 600; padding: 10px 14px; border-bottom: 1.5px solid var(--hairline2);
+  white-space: nowrap; background: var(--panel2);
+}
+td { padding: 9px 14px; border-bottom: 1px solid var(--hairline); vertical-align: top; line-height: 1.65; }
+tr:last-child td { border-bottom: none; }
+td.rom, span.rom { font-family: var(--mono); font-weight: 600; color: var(--dian); white-space: nowrap; }
+td.ipa { font-family: var(--mono); color: var(--ink-2); white-space: nowrap; }
+td.void { color: var(--hairline2); text-align: center; }
+.tblwrap.int td, .tblwrap.int th { white-space: normal; min-width: 76px; }
+.tblwrap.int th[scope="row"] { white-space: nowrap; }
+
+/* ============ Word blocks (clickable, speaking) ============ */
+.dw {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; border-radius: 10px; padding: 6px 7px 4px; margin: 1px;
+  transition: background .15s; vertical-align: middle; border: 1px solid transparent;
+}
+.dw:hover, .dw:focus-visible { background: var(--dian-soft); border-color: var(--hairline); outline: none; }
+.dw.playing { background: var(--dian-soft); border-color: var(--dian); }
+.dw .r { font-family: var(--mono); font-size: 12.5px; color: var(--dian); font-weight: 600; }
+.dw .g { font-family: var(--sans); font-size: 11.5px; color: var(--ink-2); }
+.glyphline {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px;
+  padding: 20px 16px 14px; background: var(--panel); border: 1px solid var(--hairline);
+  border-radius: 14px; margin: 14px 0;
+}
+.glyphline.big { padding: 26px 20px 18px; }
+.sentbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 12px 0 6px; font-family: var(--sans); }
+.sentbar .cap { font-size: 13px; color: var(--ink-2); }
+button.play {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--paper); background: var(--dian); border: none; border-radius: 100px;
+  padding: 7px 16px; display: inline-flex; align-items: center; gap: 7px;
+  transition: transform .12s, opacity .15s;
+}
+button.play:hover { opacity: .9; }
+button.play:active { transform: scale(.97); }
+button.play:focus-visible { outline: 2px solid var(--zhu); outline-offset: 2px; }
+button.play.ghost { background: transparent; color: var(--dian); border: 1.5px solid var(--dian); }
+.roman-line { font-family: var(--mono); font-size: 15.5px; margin: 10px 0 2px; color: var(--ink); overflow-x: auto; }
+.roman-line .q { color: var(--zhu); }
+
+/* ============ Panels & notes ============ */
+.notecard {
+  background: var(--panel); border: 1px solid var(--hairline); border-left: 3px solid var(--zhu);
+  border-radius: 10px; padding: 14px 18px; margin: 18px 0; font-size: 15px;
+}
+.notecard.blue { border-left-color: var(--dian); }
+.notecard .t { font-family: var(--sans); font-size: 12px; letter-spacing: .14em; font-weight: 700; color: var(--zhu); display: block; margin-bottom: 4px; }
+.notecard.blue .t { color: var(--dian); }
+.notecard p { margin: 0 0 6px; } .notecard p:last-child { margin: 0; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin: 16px 0; }
+.figcap { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); margin: 6px 2px 0; line-height: 1.6; }
+figure { margin: 22px 0; }
+
+/* Word-building cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+.card {
+  background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px;
+  padding: 14px 14px 12px; text-align: center;
+}
+.card .glyph { display: flex; justify-content: center; }
+.card .rom { font-family: var(--mono); font-weight: 700; color: var(--dian); font-size: 15px; }
+.card .mean { font-size: 15px; margin: 2px 0; }
+.card .ety { font-family: var(--sans); font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+.card.derived { border-top: 3px solid var(--zhu); }
+.foldarrow { text-align: center; font-size: 20px; color: var(--zhu); margin: 4px 0; font-family: var(--sans); }
+
+/* Sandbox (IME) */
+.ime {
+  background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px;
+  padding: 18px; margin: 18px 0; box-shadow: var(--shadow);
+}
+.ime label { font-family: var(--sans); font-size: 12px; letter-spacing: .12em; color: var(--ink-2); display: block; margin-bottom: 8px; }
+.ime input {
+  width: 100%; box-sizing: border-box; font-family: var(--mono); font-size: 16px;
+  padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--hairline2);
+  background: var(--paper); color: var(--ink);
+}
+.ime input:focus { outline: none; border-color: var(--dian); }
+.ime .out { min-height: 120px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px; padding-top: 14px; }
+.ime .err { color: var(--zhu); font-family: var(--sans); font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chips button {
+  font-family: var(--mono); font-size: 12.5px; cursor: pointer; color: var(--ink-2);
+  background: var(--paper); border: 1px solid var(--hairline2); border-radius: 100px; padding: 4px 12px;
+}
+.chips button:hover { color: var(--dian); border-color: var(--dian); }
+
+/* Pitch contour mini-diagrams */
+.contgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+.contcell { background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px 14px; }
+.contcell svg { display: block; width: 100%; height: 54px; }
+.contcell .nm { font-family: var(--sans); font-size: 13.5px; font-weight: 700; }
+.contcell .nm .rom { font-family: var(--mono); color: var(--dian); }
+.contcell .ds { font-family: var(--sans); font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+
+/* Audio figures */
+.audiogrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 16px 0; }
+.audiof { margin: 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 16px 12px; }
+.audiof figcaption { font-family: var(--sans); font-size: 13.5px; margin-bottom: 10px; line-height: 1.6; }
+.audiof figcaption .rm { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--dian); margin-top: 3px; }
+.audiof audio { width: 100%; height: 38px; }
+
+/* Exercises */
+.exercise {
+  background: var(--panel); border: 1px solid var(--hairline); border-left: 3px solid var(--good);
+  border-radius: 12px; padding: 16px 20px 12px; margin: 32px 0 10px;
+}
+.exercise .xt { font-family: var(--sans); font-size: 12px; letter-spacing: .14em; font-weight: 700; color: var(--good); display: block; margin-bottom: 6px; }
+.exercise ol { margin: 0; padding-left: 22px; font-size: 15.5px; }
+.exercise li { margin: 10px 0 16px; }
+.exercise details { margin-top: 6px; font-family: var(--sans); font-size: 14px; }
+.exercise summary { cursor: pointer; color: var(--dian); font-weight: 600; width: max-content; border-radius: 6px; padding: 2px 8px; }
+.exercise summary:hover { background: var(--dian-soft); }
+.exercise .ans { border-left: 2px solid var(--good); margin-top: 6px; padding: 6px 12px; background: var(--paper); border-radius: 0 8px 8px 0; line-height: 1.7; }
+
+kbd {
+  font-family: var(--mono); font-size: .85em; background: var(--panel2);
+  border: 1px solid var(--hairline2); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px;
+}
+.footer { margin-top: 100px; border-top: 1px solid var(--hairline); padding-top: 22px; font-family: var(--sans); font-size: 13px; color: var(--ink-3); line-height: 1.8; }
+.footer .seal { color: var(--zhu); border: 1.5px solid var(--zhu); display: inline-block; padding: 1px 7px; margin-right: 8px; letter-spacing: .2em; }
+
+/* ============ Glyph engine ============ */
+button.dw { appearance: none; -webkit-appearance: none; background: transparent; font: inherit; color: inherit; }
+.gly { display: block; }
+.gly .st { stroke: currentColor; stroke-width: 4.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gly .fl { fill: currentColor; stroke: none; }
+.gly .roof { stroke: var(--dian); stroke-width: 5.4; fill: none; stroke-linecap: round; }
+.gly .frame { stroke: var(--glyph-frame); stroke-width: 2; fill: none; }
+.gly .cls { stroke: var(--zhu); stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gly .fl2 { fill: var(--zhu); stroke: none; }
+.gly .nameline { stroke: var(--zhu); stroke-width: 3; fill: none; stroke-dasharray: 1.5 6.5; stroke-linecap: round; }
+.gap { display: inline-block; width: 20px; }
+.anwrap { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; margin: 14px 0; }
+.anlegend { list-style: none; margin: 0; padding: 0; font-family: var(--sans); font-size: 14px; max-width: 520px; flex: 1; min-width: 280px; }
+.anlegend li { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--hairline); line-height: 1.65; }
+.anlegend li:last-child { border-bottom: none; }
+.anlegend .sw { flex: none; width: 14px; height: 14px; border-radius: 4px; margin-top: 5px; }
+.anlegend b { font-weight: 700; }
+.anlegend .d { color: var(--ink-2); }
+
+/* Syllable demo buttons */
+.phb { font-family: var(--mono); cursor: pointer; background: var(--paper); border: 1px solid var(--hairline2); border-radius: 8px; padding: 4px 10px; font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.phb small { display: block; font-weight: 400; font-size: 10.5px; color: var(--ink-3); font-family: var(--sans); }
+.phb:hover { border-color: var(--dian); color: var(--dian); }
+.phb:focus-visible { outline: 2px solid var(--dian); outline-offset: 1px; }
+
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .wrap { padding: 0 18px 90px; }
+  header.hero { padding: 40px 0 16px; }
+  .sechead { flex-wrap: wrap; } .sechead .en { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+@keyframes drawin { to { stroke-dashoffset: 0; } }
+.drawable path, .drawable line, .drawable circle { stroke-dasharray: 260; stroke-dashoffset: 260; animation: drawin 1.1s ease forwards; }
+@media (prefers-reduced-motion: reduce) { .drawable path, .drawable line, .drawable circle { stroke-dasharray: none; stroke-dashoffset: 0; } }
+</style>
+</head>
+<body>
+
+<nav class="topnav"><div class="in">
+  <span class="name"><span class="seal">大同语</span> datunwen</span>
+  <a href="#l0">0 · Welcome</a><a href="#l1">1 · Sounds</a><a href="#l2">2 · Pitch</a><a href="#l3">3 · Sentences</a><a href="#l4">4 · Time</a><a href="#l5">5 · Words</a><a href="#l6">6 · Script</a><a href="#l7">7 · Graduation</a><a href="#appx">Appendix</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker"><span class="seal" title="大同语 dàtóngyǔ — “great-togetherness language”, the Chinese etymology of the name">大同语</span> DATUNWEN · A FIRST COURSE FOR ENGLISH SPEAKERS</div>
+  <div id="heroGlyphs" aria-label="the word datunwen written in Datunwen block script"></div>
+  <h1>Datunwen — A First Course</h1>
+  <p class="sub">A constructed language where the <strong>melody of your voice does the grammar</strong>. Eight short lessons. No linguistics degree required — if you can hear the difference between <em>“You saw the cat.”</em> and <em>“You saw the cat?”</em>, you already have every skill this language asks for.</p>
+  <span class="hint">◉ Every blue word block on this page is clickable — click it and your browser speaks it (no downloads, no internet needed).</span>
+</header>
+
+<!-- ============================================================ LESSON 0 -->
+<section id="l0">
+  <div class="sechead"><span class="num">LESSON 0</span><h2>Welcome</h2><span class="en">Orientation</span></div>
+  <p class="lede">Datunwen (“Omnilingua”) is an engineered world language: sixteen consonants that nearly every human being can pronounce, a few hundred self-explaining roots, and one signature invention — grammar carried on pitch. This page is a complete beginner’s course; here is the whole design philosophy in three cards.</p>
+
+  <div class="axioms">
+    <div class="axiom"><span class="no">AXIOM Ⅰ</span><h3>Two channels, one mouth</h3>
+      <p>Your tongue and lips spell out the <em>words</em>; at the same time, the pitch of your voice — controlled by the larynx, almost independently — tags each word’s <em>job</em> in the sentence. Grammar rides a parallel channel, so not one syllable is wasted on it.</p></div>
+    <div class="axiom"><span class="no">AXIOM Ⅱ</span><h3>Only pay for surprises</h3>
+      <p>In the default word order, nothing is marked — zero endings, zero little words. Only when you <em>rearrange</em> a sentence for emphasis does a one-syllable tag appear, exactly where it is needed. Grammar priced like information.</p></div>
+    <div class="axiom"><span class="no">AXIOM Ⅲ</span><h3>One word, one roof</h3>
+      <p>A word is one pitch melody in the ear, one roofed block-cluster on the page, one unit in the grammar. What you hear, what you see, and what you parse are three views of the same object.</p></div>
+  </div>
+
+  <h3 class="sub">How to use this page</h3>
+  <ul class="plain">
+    <li><strong>Click any word block</strong> — the little pictures with blue lettering underneath. Your browser synthesizes the word live, with the correct pitch contour.</li>
+    <li><strong>▶ buttons</strong> play whole sentences, word by word.</li>
+    <li><strong>Audio players</strong> hold studio-quality neural recordings. They load from the <span class="rom">audio/</span> folder that ships alongside this file — keep the two together.</li>
+    <li><strong>Exercises</strong> end every lesson. Answers hide behind “Show answer” — commit to a guess first!</li>
+  </ul>
+
+  <figure>
+    <div class="glyphline" data-sent="datunwen"></div>
+    <figcaption class="figcap">Your first word — the language’s own name: <span class="rom">da</span> “big” + <span class="rom">tun</span> “together” + <span class="rom">wen</span> “language”. (Etymology note: the roots echo Chinese 大 dà, 同 tóng, 文 wén.) Click it.</figcaption>
+  </figure>
+
+  <div class="exercise">
+    <span class="xt">EXERCISE 0 · Warm-up</span>
+    <ol>
+      <li>According to Axiom Ⅰ, what carries the grammar in Datunwen — extra syllables, or the melody of your voice?
+        <details><summary>Show answer</summary><div class="ans">The melody (pitch). Words are made in the mouth; grammar is sung by the larynx on a parallel channel, so grammar costs zero syllables.</div></details></li>
+      <li>True or false: for every Datunwen word you must memorize whether it is a noun, a verb, or an adjective.
+        <details><summary>Show answer</summary><div class="ans">False. Word class is not stored in the dictionary at all — the pitch contour you say the word with assigns its part of speech in real time. (Lesson 2 is all about this.)</div></details></li>
+      <li>Click <span class="rom">datunwen</span> above. How many syllables do you hear, and what does each mean?
+        <details><summary>Show answer</summary><div class="ans">Three: <span class="rom">da</span> “big” + <span class="rom">tun</span> “together” + <span class="rom">wen</span> “language” — “the great-togetherness language”.</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 1 -->
+<section id="l1">
+  <div class="sechead"><span class="num">LESSON 1</span><h2>The sounds — you already own all of them</h2><span class="en">Phonology</span></div>
+  <p class="lede">Sixteen consonants, five vowels, four diphthongs — each chosen because nearly every language on Earth has it, and each spelled with one letter that says what it sounds like. There is nothing here an English speaker cannot already say.</p>
+
+  <h3 class="sub">1.1 The sixteen consonants<span class="tag">CLICK TO HEAR</span></h3>
+  <p>Every button below plays the consonant on the vowel <span class="rom">a</span> (“ah”). The columns tell you <em>where</em> in the mouth the sound is made; the rows tell you <em>how</em>.</p>
+  <div class="tblwrap"><table>
+    <tr><th>how \ where</th><th>lips</th><th>tongue tip</th><th>tongue body</th><th>tongue back · throat</th></tr>
+    <tr><td><strong>strong stop</strong><br><small>puffy (English-style) <em>or</em> plain voiceless — both correct</small></td>
+      <td><button class="phb" data-syl="pa">p<small>as in “pie”</small></button></td>
+      <td><button class="phb" data-syl="ta">t<small>as in “tie”</small></button></td>
+      <td class="void">—</td>
+      <td><button class="phb" data-syl="ka">k<small>as in “key”</small></button></td></tr>
+    <tr><td><strong>soft stop</strong><br><small>voiced (English-style) <em>or</em> unpuffed — both correct</small></td>
+      <td><button class="phb" data-syl="ba">b<small>as in “buy”</small></button></td>
+      <td><button class="phb" data-syl="da">d<small>as in “dye”</small></button></td>
+      <td class="void">—</td>
+      <td><button class="phb" data-syl="ga">g<small>as in “guy”</small></button></td></tr>
+    <tr><td><strong>nasal</strong></td>
+      <td><button class="phb" data-syl="ma">m<small>as in “my”</small></button></td>
+      <td><button class="phb" data-syl="na">n<small>as in “no”</small></button></td>
+      <td class="void">—</td><td class="void">—</td></tr>
+    <tr><td><strong>hiss</strong></td>
+      <td><button class="phb" data-syl="fa">f<small>as in “fan”</small></button></td>
+      <td><button class="phb" data-syl="sa">s<small>as in “sun”</small></button></td>
+      <td><button class="phb" data-syl="xa">x<small>= “sh” in “ship”</small></button></td>
+      <td><button class="phb" data-syl="ha">h<small>as in “hat”</small></button></td></tr>
+    <tr><td><strong>ch-sound</strong></td>
+      <td class="void">—</td><td class="void">—</td>
+      <td><button class="phb" data-syl="ca">c<small>= “ch” in “chin”</small></button></td>
+      <td class="void">—</td></tr>
+    <tr><td><strong>liquid</strong><br><small>one sound, two spellings</small></td>
+      <td class="void">—</td>
+      <td><button class="phb" data-syl="ra">r<small>as in “run”</small></button> <button class="phb" data-syl="la">l<small>as in “light”</small></button></td>
+      <td class="void">—</td><td class="void">—</td></tr>
+    <tr><td><strong>glide</strong></td>
+      <td><button class="phb" data-syl="wa">w<small>as in “wet”</small></button></td>
+      <td class="void">—</td>
+      <td><button class="phb" data-syl="ya">y<small>as in “yes”</small></button></td>
+      <td class="void">—</td></tr>
+  </table></div>
+  <p class="figcap">Watch the two spelling traps: <span class="rom">x</span> is always “sh” (never “ks”), and <span class="rom">c</span> is always “ch” (never “k” or “s”).</p>
+
+  <div class="duo">
+    <div class="notecard blue"><span class="t">THE FRIENDLY PAIRS · p/b · t/d · k/g</span>
+      <p>How do <span class="rom">p</span> and <span class="rom">b</span> differ? <strong>Your choice.</strong> Distinguish them the English way (puff of air: <em>p</em>ie vs <em>b</em>uy) or the Spanish/French way (voiceless vs voiced) — Datunwen accepts either. The pairs are designed so that almost any accent in the world lands on the right side.</p></div>
+    <div class="notecard blue"><span class="t">ONE LIQUID, TWO LETTERS · r / l</span>
+      <p>The letters <span class="rom">r</span> and <span class="rom">l</span> spell <strong>one single sound</strong>. Say it as an English r, an l, or a quick Spanish tap — all correct, and no two words are ever distinguished by r versus l. Each word’s <em>spelling</em> is fixed (it is always <span class="rom">ren</span>, never “len”), but your <em>pronunciation</em> is free. Half the world’s learners just exhaled.</p></div>
+  </div>
+
+  <h3 class="sub">1.2 Five vowels, four diphthongs<span class="tag">CLICK TO HEAR</span></h3>
+  <p>Pure, Spanish-like vowels — no English drift. The diphthong buttons are framed on <span class="rom">h</span> so you can hear them ride a syllable.</p>
+  <div class="tblwrap"><table>
+    <tr><th>vowel</th><th>sounds like</th><th>diphthong</th><th>sounds like</th></tr>
+    <tr><td><button class="phb" data-syl="a">a</button></td><td>“ah” as in sp<strong>a</strong></td>
+        <td><button class="phb" data-syl="hai">hai</button></td><td><span class="rom">ai</span> = “eye”, as in h<strong>igh</strong></td></tr>
+    <tr><td><button class="phb" data-syl="e">e</button></td><td>as in b<strong>e</strong>t, crisp — no glide</td>
+        <td><button class="phb" data-syl="hau">hau</button></td><td><span class="rom">au</span> = “ow!”, as in h<strong>ow</strong></td></tr>
+    <tr><td><button class="phb" data-syl="i">i</button></td><td>“ee” as in sk<strong>i</strong></td>
+        <td><button class="phb" data-syl="hei">hei</button></td><td><span class="rom">ei</span> = “ay”, as in d<strong>ay</strong></td></tr>
+    <tr><td><button class="phb" data-syl="o">o</button></td><td>pure “o”, as in Spanish n<strong>o</strong></td>
+        <td><button class="phb" data-syl="hou">hou</button></td><td><span class="rom">ou</span> = “oh”, as in l<strong>ow</strong></td></tr>
+    <tr><td><button class="phb" data-syl="u">u</button></td><td>“oo” as in fl<strong>u</strong></td>
+        <td class="void">—</td><td class="void">—</td></tr>
+  </table></div>
+
+  <h3 class="sub">1.3 One possible ending: -n</h3>
+  <p>A syllable may end in <span class="rom">-n</span> — and in nothing else. Say it as “n”, as “ng”, or just nasalize the vowel (like casual English “-in’ ” for “-ing”): all three count as the same thing. Try:
+    <button class="phb" data-syl="kan">kan</button>
+    <button class="phb" data-syl="tun">tun</button>
+    <button class="phb" data-syl="mun">mun</button>
+  </p>
+
+  <div class="notecard"><span class="t">THE WHOLE SOUND SYSTEM IN ONE LINE</span>
+    <p>A syllable = <strong>one consonant + one vowel (+ optional -n)</strong>. That’s it. No clusters — no “str-”, no “-mp”, ever. 16 consonants × 9 vowel choices × 2 (with or without -n) = <strong>288 possible syllables</strong>.</p>
+    <p>One footnote: every <em>content word</em> begins with a consonant. Only the little grammar particles may be bare vowels (<span class="rom">e</span>, <span class="rom">i</span>, <span class="rom">o</span>, <span class="rom">u</span>, <span class="rom">a</span>…) — which conveniently makes them instantly recognizable as grammar.</p></div>
+
+  <div class="exercise">
+    <span class="xt">EXERCISE 1 · Sound check</span>
+    <ol>
+      <li>Which of these are legal Datunwen syllables? <span class="rom">kai · sta · mun · blan · pou</span>
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">kai</span>, <span class="rom">mun</span>, <span class="rom">pou</span> are legal (consonant + vowel/diphthong + optional -n). <span class="rom">sta</span> and <span class="rom">blan</span> are impossible — they open with consonant clusters, which Datunwen forbids.</div></details></li>
+      <li>A Spanish speaker pronounces <span class="rom">da</span> with a fully voiced d and no puff of air; an American aspirates her <span class="rom">ta</span> heavily and says her <span class="rom">ra</span> as an American r. Who is mispronouncing?
+        <details><summary>Show answer</summary><div class="ans">Neither. The strong/soft pairs accept aspiration <em>or</em> voicing as the distinguishing trick, and r/l is one phoneme with free pronunciation. Both accents are 100% correct Datunwen.</div></details></li>
+      <li>What is the only consonant that can close a syllable, and how many ways may you pronounce it?
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">-n</span> — pronounceable as [n], as [ng], or as pure nasalization of the vowel. All equivalent.</div></details></li>
+      <li>Do the math: how many distinct syllables does Datunwen have, and from what?
+        <details><summary>Show answer</summary><div class="ans">288 = 16 consonants × 9 vowel nuclei (5 vowels + 4 diphthongs) × 2 (with or without the -n ending).</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 2 -->
+<section id="l2">
+  <div class="sechead"><span class="num">LESSON 2</span><h2>The pitch trick — melody is the grammar</h2><span class="en">The Signature Invention</span></div>
+  <p class="lede">Say these two English sentences aloud: <em>“You saw the cat.”</em> — voice falls. <em>“You saw the cat?”</em> — voice rises. Same words; the melody alone changed the meaning. English spends that melodic channel on attitude. Datunwen spends it on grammar.</p>
+
+  <p>Here is the whole system. Every content word is spoken with <strong>one pitch contour stretched over the entire word</strong>, and that contour announces the word’s job in the sentence — noun-job, verb-job, or modifier-job. The dictionary stores no parts of speech at all; <em>you</em> assign them, live, with your voice:</p>
+
+  <div class="contgrid">
+    <div class="contcell"><svg viewBox="0 0 200 54" aria-hidden="true"><path d="M20,16 L180,16" stroke="var(--dian)" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+      <div class="nm">Level high · <span class="rom">thing</span> <span class="rom">(spelling: unmarked)</span></div>
+      <div class="ds">The word is being used as a <strong>thing</strong> — subject or object, the noun slot. Like flatly listing items.<br><button class="play ghost" data-say="ka" style="margin-top:6px">▶ ka “knowledge”</button></div></div>
+    <div class="contcell"><svg viewBox="0 0 200 54" aria-hidden="true"><path d="M20,10 C90,10 130,40 180,44" stroke="var(--dian)" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+      <div class="nm">Falling · <span class="rom">verb</span> <span class="rom">(spelling: add -q)</span></div>
+      <div class="ds">The word is <strong>the statement itself</strong> — the verb of the clause. It is the “full stop” melody of an English declarative: <em>“Done.”</em><br><button class="play ghost" data-say="kaq" style="margin-top:6px">▶ kaq “knows”</button></div></div>
+    <div class="contcell"><svg viewBox="0 0 200 54" aria-hidden="true"><path d="M20,44 C90,40 130,10 180,10" stroke="var(--dian)" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+      <div class="nm">Rising · <span class="rom">modifier</span> <span class="rom">(spelling: add -z)</span></div>
+      <div class="ds">The word <strong>modifies what comes next</strong> — adjective or adverb slot. Rising = “hang on, more coming”, exactly English’s mid-sentence continuation rise.<br><button class="play ghost" data-say="kaz" style="margin-top:6px">▶ kaz “cognitive / knowingly”</button></div></div>
+    <div class="contcell"><svg viewBox="0 0 200 54" aria-hidden="true"><path d="M20,44 L180,44" stroke="var(--dian)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="2 7"/></svg>
+      <div class="nm">Low flat · <span class="rom">particle</span> <span class="rom">(closed set of 23)</span></div>
+      <div class="ds">The 23 little grammar words — case tags, connectives, time anchors — all low, short and quiet, like English’s unstressed “of”, “the”, “and”.<br><button class="play ghost" data-say="lo" style="margin-top:6px">▶ lo “in / at”</button></div></div>
+  </div>
+
+  <figure>
+    <div class="glyphline" data-sent="ka kaq kaz"></div>
+    <figcaption class="figcap">One root, three postures — same mouth movements, three different jobs. In the script (Lesson 6) the contour is literally the <strong>roof</strong> over the word: flat, falling, rising. Click each block.</figcaption>
+  </figure>
+
+  <div class="duo">
+    <div class="notecard"><span class="t">THE MUTE LETTERS q AND z</span>
+      <p>In spelling, word-final <span class="rom">q</span> means “say this word with a falling contour”, and <span class="rom">z</span> means “rising”. They are <strong>never pronounced as consonants</strong> — <span class="rom">kaq</span> is “ka” with a falling voice, not “kak”; <span class="rom">kaz</span> is “ka” rising, not “kazz”. Think of them as a question-mark or full stop that happens to sit inside the word.</p></div>
+    <div class="notecard blue"><span class="t">NOTHING TO MEMORIZE — REALLY</span>
+      <p>This is not like Mandarin, where every word carries an arbitrary tone you must memorize forever. Here pitch carries <strong>zero dictionary information</strong> — it is three grammar rules, total, applied to any word. It is far closer to English question intonation than to Chinese tones: you already do this; Datunwen just made it official.</p></div>
+  </div>
+
+  <h3 class="sub">Hear it on a real human voice</h3>
+  <p>The in-page clicks use rule-based synthesis. These reference recordings are a neural voice with the pitch grammar imposed on it — proof that the contours are a separate layer you can lay over any voice. (They load from the <span class="rom">audio/</span> folder next to this file.)</p>
+  <div class="audiogrid">
+    <figure class="audiof"><figcaption>The <span class="rom">ka</span> trio — level, falling, rising. Measured from this very recording: level 287→273&nbsp;Hz, falling 318→183&nbsp;Hz, rising 199→314&nbsp;Hz. The grammar is literally in the waveform.<span class="rm">ka · kaq · kaz</span></figcaption>
+      <audio controls preload="none" src="audio/ka-trio.mp3"></audio></figure>
+    <figure class="audiof"><figcaption>The language says its own name. Level contour — here it is being used as a plain noun.<span class="rm">datunwen</span></figcaption>
+      <audio controls preload="none" src="audio/datunwen-name.mp3"></audio></figure>
+  </div>
+
+  <div class="exercise">
+    <span class="xt">EXERCISE 2 · Contours</span>
+    <ol>
+      <li>The root <span class="rom">kan</span> means “see”. Write the form that means <em>sees</em> (the verb of a clause), and describe its melody.
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">kanq</span> — spoken with a falling contour across the whole word. (The q itself is silent.)</div></details></li>
+      <li>The root <span class="rom">mau</span> means “cat”. Write the form that means <em>feline / cat-like</em>, modifying the next word.
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">mauz</span> — rising contour = modifier posture.</div></details></li>
+      <li>You hear a word whose pitch starts high and falls to low. Without knowing the word, what do you already know about the sentence?
+        <details><summary>Show answer</summary><div class="ans">That word is the predicate — the verb of the clause. You’ve located the sentence’s backbone before you even looked anything up.</div></details></li>
+      <li>How is <span class="rom">kaq</span> pronounced — “kak”, or something else?
+        <details><summary>Show answer</summary><div class="ans">Something else: [ka] with a falling pitch. Word-final q and z are mute contour letters, never consonants.</div></details></li>
+      <li>A word is spoken low, flat, short and unstressed. What kind of word is it, and roughly how many of them exist?
+        <details><summary>Show answer</summary><div class="ans">A grammar particle — the closed class. There are exactly 23 of them (full table in the Appendix).</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 3 -->
+<section id="l3">
+  <div class="sechead"><span class="num">LESSON 3</span><h2>Your first sentences</h2><span class="en">Syntax I</span></div>
+  <p class="lede">You know the sounds and the melodies. That is genuinely all you need — here is a real sentence.</p>
+
+  <figure>
+    <div class="glyphline big" data-sent="mau canq le pei"></div>
+    <div class="roman-line">mau can<span class="q">q</span> le pei.</div>
+    <div class="sentbar"><button class="play" data-say="mau canq le pei">▶ Play sentence</button><span class="cap">“The cat ate the fish.” — click single blocks to hear each word alone.</span></div>
+  </figure>
+
+  <p>Read it like a native: <span class="rom">mau</span> “cat” rides level (it’s a thing — the subject). <span class="rom">canq</span> falls (it’s the verb: “eats”). <span class="rom">le</span> is a low little particle meaning “completed” (Lesson 4 explains it — for now it makes the eating finished: “ate”). <span class="rom">pei</span> “fish” rides level again (a thing — the object).</p>
+
+  <div class="notecard blue"><span class="t">RULE R2 · DEFAULT ORDER</span>
+    <p><strong>Subject – Verb – Object</strong>, exactly like English. And every modifier comes <em>before</em> what it modifies, like English “<em>big</em> cat”. Stay in this order and — by rule R3 — you mark nothing at all: no endings, no case tags, zero.</p></div>
+
+  <h3 class="sub">3.1 Asking — the particle <span class="rom">u</span></h3>
+  <p>To ask a yes/no question, put the low particle <span class="rom">u</span> at the end — a spoken question mark. (Meet the pronouns while you’re here: <span class="rom">mi</span> “I”, <span class="rom">yu</span> “you”, <span class="rom">ta</span> “he/she/it” — and the pointing word <span class="rom">to</span> “that”. Pronouns are ordinary content words: they carry contours like everything else.)</p>
+  <figure>
+    <div class="glyphline" data-sent="yu kanq le to mau u"></div>
+    <div class="roman-line">yu kan<span class="q">q</span> le to mau u?</div>
+    <div class="sentbar"><button class="play" data-say="yu kanq le to mau u">▶ Play</button><span class="cap">“Did you see that cat?”</span></div>
+  </figure>
+
+  <h3 class="sub">3.2 Denying — the particle <span class="rom">bu</span></h3>
+  <p>Negation is <span class="rom">bu</span> “not” before the verb. (Etymology note: from Chinese 不 bù.)</p>
+  <figure>
+    <div class="glyphline" data-sent="mi bu kanq to mau"></div>
+    <div class="roman-line">mi bu kan<span class="q">q</span> to mau.</div>
+    <div class="sentbar"><button class="play" data-say="mi bu kanq to mau">▶ Play</button><span class="cap">“I don’t see that cat” — or “didn’t”, under a past time-anchor (Lesson 4).</span></div>
+  </figure>
+
+  <h3 class="sub">3.3 Bending the order — and paying one syllable</h3>
+  <p>Want to lead with the fish, English-style: <em>“That fish — the cat ate it.”</em>? Fine. But the fish has now left its default slot, so — rule R3 — it takes a tag: <span class="rom">wo</span>, “this one is the patient (the done-to)”.</p>
+  <figure>
+    <div class="glyphline" data-sent="pei wo, mau canq le"></div>
+    <div class="roman-line">pei wo, mau can<span class="q">q</span> le.</div>
+    <div class="sentbar"><button class="play" data-say="pei wo, mau canq le">▶ Play</button><span class="cap">“The fish — the cat ate it.” One cheap syllable buys total clarity.</span></div>
+  </figure>
+  <p>There are exactly three such tags, used <em>only</em> when word order deviates: <span class="rom">ga</span> = agent (the doer), <span class="rom">wo</span> = patient (the done-to), <span class="rom">ni</span> = to/for (recipient or goal). (Etymology note: borrowed from Japanese が·を·に.) In default SVO order they never appear — that is Axiom Ⅱ in action.</p>
+
+  <h3 class="sub">3.4 Drills</h3>
+  <figure>
+    <div class="glyphline" data-sent="ta kanq mau"></div>
+    <div class="sentbar"><button class="play" data-say="ta kanq mau">▶ Play</button><span class="cap">“He sees a cat.” — no time marking: a plain, time-neutral statement.</span></div>
+  </figure>
+  <figure>
+    <div class="glyphline" data-sent="mau bu canq mau"></div>
+    <div class="sentbar"><button class="play" data-say="mau bu canq mau">▶ Play</button><span class="cap">“Cats don’t eat cats.” — a timeless truth, and (spoiler for Lesson 4) legally allowed to carry no tense at all.</span></div>
+  </figure>
+
+  <div class="exercise">
+    <span class="xt">EXERCISE 3 · First sentences</span>
+    <ol>
+      <li>Translate into English: <span class="rom">ta canq le pei</span>
+        <details><summary>Show answer</summary><div class="ans">“He/she/it ate the fish.” (<span class="rom">le</span> = completed.)</div></details></li>
+      <li>Turn <span class="rom">mau canq le pei</span> into the question “Did the cat eat the fish?”
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">mau canq le pei u?</span> — just add the low question particle <span class="rom">u</span> at the end.</div></details></li>
+      <li>Say “I don’t eat fish.” (as a general fact about yourself)
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">mi bu canq pei.</span> — <span class="rom">bu</span> before the verb; no time anchor needed for a general truth.</div></details></li>
+      <li>In <span class="rom">pei wo, mau canq le</span>, why does <span class="rom">wo</span> appear — and why is there no tag at all in <span class="rom">mau canq le pei</span>?
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">pei</span> was fronted out of its default object slot, so it must be tagged as patient (<span class="rom">wo</span>). In default SVO order, position already says who does what to whom, so rule R3 charges nothing.</div></details></li>
+      <li>Which word in <span class="rom">yu kanq le to mau u</span> is the verb, and what are the <em>two</em> independent signals that tell you so?
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">kanq</span>. Signal 1: its falling pitch contour (the -q). Signal 2: its position — second slot in the default S-V-O order.</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 4 -->
+<section id="l4">
+  <div class="sechead"><span class="num">LESSON 4</span><h2>Time travel — set the scene once</h2><span class="en">Tense &amp; Aspect</span></div>
+  <p class="lede">English stamps tense onto every single verb: <em>saw, ate, will see, will eat</em>… Datunwen refuses to pay per verb. You set the scene <strong>once</strong> — like a novel’s “Once upon a time” — and every sentence after it lives there until you say otherwise.</p>
+
+  <p>The three <strong>time anchors</strong> are low particles: <span class="rom">tan</span> = past, <span class="rom">nau</span> = present, <span class="rom">fu</span> = future. (Etymology notes: cf. French <em>antan</em> “yesteryear”, English <em>now</em> / Latin <em>nunc</em>, Latin <em>futūrus</em>.) Drop one at the start of a stretch of talk and it <em>scopes</em>: it binds every following clause until you re-anchor. Optionally, two <strong>aspect particles</strong> ride right after the verb: <span class="rom">le</span> = completed (etymology note: Chinese 了 le) and <span class="rom">xu</span> = still going (Chinese 续 xù “continue”).</p>
+
+  <figure>
+    <div class="glyphline big" data-sent="an tandi, mi kanq le to mau"></div>
+    <div class="roman-line">an tandi, mi kan<span class="q">q</span> le to mau.</div>
+    <div class="sentbar"><button class="play" data-say="an tandi, mi kanq le to mau">▶ Play</button><span class="cap">“Yesterday, I saw that cat.” — the fully explicit, formal version.</span></div>
+  </figure>
+  <p>Two new pieces: <span class="rom">an</span> is the “at (a time)” particle, and <span class="rom">tandi</span> “yesterday” is a fossilized compound — <span class="rom">tan</span> past + <span class="rom">di</span> day = “past-day”. So the opening literally says “at past-day” — and that phrase <em>is</em> the anchor for everything that follows.</p>
+
+  <h3 class="sub">4.1 The explicitness dial — three legal registers</h3>
+  <p>Formal speech spells everything out; between friends, context already carries most of it. All three rows below are fully grammatical and mean the same thing — explicitness in Datunwen is a dial, not a fate:</p>
+  <div class="tblwrap"><table>
+    <tr><th>register</th><th>“Yesterday I saw that cat.”</th><th>what got compressed</th></tr>
+    <tr><td><strong>Formal</strong> (law, science)</td><td class="rom">an tandi, mi kanq le to mau.</td><td>anchor, aspect and pointer all explicit</td></tr>
+    <tr><td><strong>Everyday</strong></td><td class="rom">tandi mi kanq to mau.</td><td>a time word at the head of the sentence counts as the anchor by itself (<span class="rom">an</span> dropped); <span class="rom">le</span> is implied by the past anchor</td></tr>
+    <tr><td><strong>Among friends</strong></td><td class="rom">tandi mi kanq mau.</td><td>context supplies <em>which</em> cat; truth-conditions unchanged</td></tr>
+  </table></div>
+  <figure>
+    <div class="glyphline" data-sent="tandi mi kanq to mau"></div>
+    <div class="sentbar"><button class="play" data-say="tandi mi kanq to mau">▶ Play the everyday version</button></div>
+  </figure>
+
+  <h3 class="sub">4.2 Future, right-now, and the free ride</h3>
+  <figure>
+    <div class="glyphline" data-sent="fu mi kanq yu"></div>
+    <div class="roman-line">fu mi kan<span class="q">q</span> yu.</div>
+    <div class="sentbar"><button class="play" data-say="fu mi kanq yu">▶ Play</button><span class="cap">“I will see you.” — <span class="rom">fu</span> anchors the future; the verb itself never changes shape.</span></div>
+  </figure>
+  <figure>
+    <div class="glyphline" data-sent="nau mau canq xu pei"></div>
+    <div class="roman-line">nau mau can<span class="q">q</span> xu pei.</div>
+    <div class="sentbar"><button class="play" data-say="nau mau canq xu pei">▶ Play</button><span class="cap">“The cat is eating the fish right now.” — <span class="rom">nau</span> anchors the present; <span class="rom">xu</span> after the verb = still in progress.</span></div>
+  </figure>
+  <p>And the payoff — <strong>anchors are inherited</strong>. One anchor, two clauses, and the second verb pays nothing (<span class="rom">i</span> = “and”, a low particle):</p>
+  <figure>
+    <div class="glyphline" data-sent="an tandi, mi kanq le to mau, i to mau canq le pei"></div>
+    <div class="roman-line">an tandi, mi kan<span class="q">q</span> le to mau, i to mau can<span class="q">q</span> le pei.</div>
+    <div class="sentbar"><button class="play" data-say="an tandi, mi kanq le to mau, i to mau canq le pei">▶ Play</button><span class="cap">“Yesterday I saw that cat, and that cat ate a fish.” Tell ten more sentences about yesterday — all ten verbs stay unmarked.</span></div>
+  </figure>
+
+  <div class="notecard"><span class="t">TIMELESS IS LEGAL</span>
+    <p>Definitions, laws of nature, proverbs — statements true at <em>all</em> times — take no anchor at all: <span class="rom">mau canq pei</span> “cats eat fish”. That silence is not laziness; it is the accurate choice, and rule R4 licenses it. Keep this in mind for the Declaration of Human Rights in Lesson 7.</p></div>
+
+  <div class="exercise">
+    <span class="xt">EXERCISE 4 · Time</span>
+    <ol>
+      <li>Say “I will see you.”
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">fu mi kanq yu.</span> — future anchor first, then plain SVO.</div></details></li>
+      <li>What is the difference in meaning between <span class="rom">mau canq pei</span> and <span class="rom">nau mau canq xu pei</span>?
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">mau canq pei</span> is timeless/generic: “cats eat fish”. <span class="rom">nau mau canq xu pei</span> is anchored to the present with durative <span class="rom">xu</span>: “the cat is eating the fish right now”.</div></details></li>
+      <li>True or false: after opening a story with <span class="rom">tan</span>, you must repeat <span class="rom">tan</span> before every verb.
+        <details><summary>Show answer</summary><div class="ans">False — that is the whole point. An anchor scopes over everything that follows until you set a new one. English re-marks tense on every verb; Datunwen pays once per scene.</div></details></li>
+      <li>Give two ways — one formal, one relaxed — to say “Yesterday you saw the fish.”
+        <details><summary>Show answer</summary><div class="ans">Formal: <span class="rom">an tandi, yu kanq le pei.</span> Relaxed: <span class="rom">tandi yu kanq pei.</span> (Sentence-initial time word = anchor; <span class="rom">le</span> implied.)</div></details></li>
+      <li>What exactly does <span class="rom">le</span> add to a verb, and where does it sit?
+        <details><summary>Show answer</summary><div class="ans">It marks the action as completed (perfective) and sits immediately after the verb: <span class="rom">canq le</span> “ate / has eaten”. Etymology note: borrowed from Chinese 了.</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 5 -->
+<section id="l5">
+  <div class="sechead"><span class="num">LESSON 5</span><h2>Building words — roots that explain themselves</h2><span class="en">Morphology</span></div>
+  <p class="lede">The full design has about 250 one-syllable roots plus a single folding rule — and that generates the entire open vocabulary. Nothing to memorize by brute force: every big abstract word can be taken apart and read on the spot. Here is your beginner set.</p>
+
+  <h3 class="sub">5.1 Twelve roots<span class="tag">CLICK TO HEAR</span></h3>
+  <div class="cards">
+    <div class="card" data-word="ka" data-mean="know" data-ety="etymology note: 知 — the k of Latin cognōscere"></div>
+    <div class="card" data-word="su" data-mean="self" data-ety="etymology note: 己 — Latin reflexive suī"></div>
+    <div class="card" data-word="lin" data-mean="link · relation" data-ety="etymology note: 连 lián — English link: a double hit"></div>
+    <div class="card" data-word="mo" data-mean="matter · stuff" data-ety="etymology note: 物 — Latin mōlēs / māteria"></div>
+    <div class="card" data-word="ten" data-mean="time" data-ety="etymology note: 时 — Latin tempus"></div>
+    <div class="card" data-word="din" data-mean="worth" data-ety="etymology note: 值 — Latin dignus “worthy”"></div>
+    <div class="card" data-word="kau" data-mean="cause" data-ety="etymology note: 因 — Latin causa"></div>
+    <div class="card" data-word="wi" data-mean="life" data-ety="etymology note: 生 — Latin vīta, French vie"></div>
+    <div class="card" data-word="xin" data-mean="new · begin" data-ety="etymology note: 新 xīn"></div>
+    <div class="card" data-word="tun" data-mean="together · same" data-ety="etymology note: 同 tóng"></div>
+    <div class="card" data-word="sei" data-mean="exist · be" data-ety="etymology note: 在 — German sein, Chinese 是 shì"></div>
+    <div class="card" data-word="tai" data-mean="state" data-ety="etymology note: 态 tài"></div>
+  </div>
+
+  <h3 class="sub">5.2 The folding rule: head on the right</h3>
+  <p>Compounds are <strong>[modifier + head]</strong> — the right-hand root names the kind of thing, the left-hand root narrows it down. English already works this way: a <em>bookshop</em> is a shop, a <em>catfish</em> is a fish. Fold once:</p>
+  <div class="foldarrow">su “self” ＋ ka “know” ↓ fold</div>
+  <div class="cards">
+    <div class="card derived" data-word="suka" data-mean="consciousness" data-ety="self-knowing — the exact anatomy of Latin con-scientia"></div>
+    <div class="card derived" data-word="linka" data-mean="logic · reason" data-ety="link-knowing — Greek logos, “gathering the relations”"></div>
+    <div class="card derived" data-word="moka" data-mean="physics · science" data-ety="matter-knowing — Greek physikē reborn, root by root"></div>
+    <div class="card derived" data-word="tenlin" data-mean="history" data-ety="time-links — time, chained into a story"></div>
+    <div class="card derived" data-word="sulin" data-mean="society" data-ety="self-links — selves, linked; cf. Latin socius “companion”"></div>
+    <div class="card derived" data-word="xinwi" data-mean="birth" data-ety="new-life — life at its opening"></div>
+    <div class="card derived" data-word="tunseitai" data-mean="superposition" data-ety="[together-exist]-state — a depth-2 fold; you’ll meet it in Lesson 7"></div>
+  </div>
+  <p>Folding is recursive — a compound can be folded into a bigger compound, like <span class="rom">tunseitai</span> above: [<span class="rom">tun</span>+<span class="rom">sei</span> “co-exist”] + <span class="rom">tai</span> “state” = “the state of existing together”. A physics term you can decode with no physics.</p>
+
+  <div class="notecard"><span class="t">THE su- FAMILY — A PHILOSOPHY IN THREE WORDS</span>
+    <p><span class="rom">sukau</span> <strong>freedom</strong> = self + cause: that which is its own cause (Spinoza’s <em>causa sui</em> — and character-for-character the Chinese 自由, “from-self”). <span class="rom">sudin</span> <strong>dignity</strong> = self + worth: worth you have by being, not by grant. <span class="rom">sulindin</span> <strong>rights</strong> = [self + link] + worth: the worth recognized in the web between persons — rights exist only in community. Lesson 7 puts all three in one famous sentence.</p></div>
+  <div class="cards">
+    <div class="card derived" data-word="sukau" data-mean="freedom" data-ety="self-cause · causa sui"></div>
+    <div class="card derived" data-word="sudin" data-mean="dignity" data-ety="self-worth · suī + dignus"></div>
+    <div class="card derived" data-word="sulindin" data-mean="rights" data-ety="[self-link]-worth · a depth-2 fold"></div>
+  </div>
+
+  <h3 class="sub">5.3 One word, three postures — still true for compounds</h3>
+  <p>The contour rides the <em>whole</em> word, however long. No derivational suffixes, ever:</p>
+  <figure>
+    <div class="glyphline" data-sent="suka sukaq sukaz"></div>
+    <figcaption class="figcap"><span class="rom">suka</span> “consciousness” (level, a thing) → <span class="rom">sukaq</span> “is aware of” (falling, a verb) → <span class="rom">sukaz</span> “consciously” (rising, a modifier).</figcaption>
+  </figure>
+
+  <h3 class="sub">5.4 Gluing phrases: <span class="rom">e</span> and <span class="rom">ye</span></h3>
+  <p>Two low particles attach modifiers to a following noun — and because there are <em>two</em> of them, a classic ambiguity dies:</p>
+  <ul class="plain">
+    <li><span class="rom">e</span> attaches a <strong>noun phrase</strong> — English <em>’s</em>. (Etymology note: Chinese 的 de, Japanese の no.)</li>
+    <li><span class="rom">ye</span> attaches a whole <strong>clause</strong> — English <em>that…</em> / <em>who…</em>. (Etymology note: classical Chinese 者 zhě.)</li>
+  </ul>
+  <div class="duo">
+    <figure style="margin:0">
+      <div class="glyphline" data-sent="mau e pei"></div>
+      <div class="sentbar"><span class="cap"><span class="rom">mau e pei</span> = “the cat’s fish”</span></div>
+    </figure>
+    <figure style="margin:0">
+      <div class="glyphline" data-sent="pei e mau"></div>
+      <div class="sentbar"><span class="cap"><span class="rom">pei e mau</span> = “the fish’s cat” (odd cat, clear grammar)</span></div>
+    </figure>
+  </div>
+  <p>Now the famous pair. English <em>“I saw the man with the telescope”</em> never resolves who has the telescope. Datunwen cannot even write the ambiguity:</p>
+  <div class="duo">
+    <figure style="margin:0">
+      <div class="glyphline" data-sent="canq le pei ye mau"></div>
+      <div class="sentbar"><button class="play ghost" data-say="canq le pei ye mau">▶ Play</button><span class="cap"><span class="rom">ye</span> attaches the clause “ate the fish” → <strong>“the cat that ate the fish”</strong></span></div>
+    </figure>
+    <figure style="margin:0">
+      <div class="glyphline" data-sent="canq le pei e mau"></div>
+      <div class="sentbar"><button class="play ghost" data-say="canq le pei e mau">▶ Play</button><span class="cap"><span class="rom">e</span> can only attach a noun phrase, so it must be “the fish’s cat” → <strong>“(someone) ate the fish’s cat”</strong></span></div>
+    </figure>
+  </div>
+  <p>One letter of difference, two unmistakably different sentences. And you can nest as deep as you like: <span class="rom">mi kanq le canq le pei ye mau</span> — “I saw the cat that ate the fish.”</p>
+
+  <div class="exercise">
+    <span class="xt">EXERCISE 5 · Word-building</span>
+    <ol>
+      <li>Build “history” out of <span class="rom">ten</span> “time” and <span class="rom">lin</span> “link”.
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">tenlin</span> — modifier first, head last: “time-links”. (<span class="rom">linten</span> would be some sort of time belonging to links!)</div></details></li>
+      <li>Which single root is the <em>head</em> of <span class="rom">sulindin</span> “rights” — and so, what kind of thing does the word say rights fundamentally are?
+        <details><summary>Show answer</summary><div class="ans">The rightmost root <span class="rom">din</span> “worth”. Rights are a kind of worth — specifically, [self-link]-worth: worth arising from the links between selves.</div></details></li>
+      <li>Translate both: <span class="rom">mau e pei</span> and <span class="rom">pei e mau</span>.
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">mau e pei</span> = “the cat’s fish”; <span class="rom">pei e mau</span> = “the fish’s cat”. <span class="rom">X e Y</span> always reads “X’s Y” — modifier before head, like everything in this language.</div></details></li>
+      <li>Decode the pair: <span class="rom">canq le pei ye mau</span> vs <span class="rom">canq le pei e mau</span>.
+        <details><summary>Show answer</summary><div class="ans">With <span class="rom">ye</span>: “the cat <em>that ate the fish</em>” (a clause hangs on the cat). With <span class="rom">e</span>: “ate <em>the fish’s cat</em>” (only a noun phrase can hang on <span class="rom">e</span>, so someone ate that unlucky cat).</div></details></li>
+      <li>Without looking back: <span class="rom">su</span> = self, <span class="rom">ka</span> = know. What is <span class="rom">suka</span>, and which classical word has the identical anatomy?
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">suka</span> = consciousness, “self-knowing” — the same two pieces as Latin <em>con-scientia</em>.</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 6 -->
+<section id="l6">
+  <div class="sechead"><span class="num">LESSON 6</span><h2>Reading the script</h2><span class="en">The Block Writing</span></div>
+  <p class="lede">You have been reading Datunwen script this whole time. Each square block is one syllable, assembled from feature-strokes — think Korean hangul squares crossed with Chinese radicals — and the roof over a block-cluster is the pitch contour itself. Here is the key to the whole system, on the single word <span class="rom">kanq</span> “sees”.</p>
+
+  <div id="anatomy"></div>
+
+  <h3 class="sub">6.1 The roof is the grammar</h3>
+  <p>Same block, three roofs — the writing shows the melody:</p>
+  <figure>
+    <div class="glyphline" data-sent="kan kanq kanz"></div>
+    <figcaption class="figcap"><span class="rom">kan</span> “sight” (flat roof) · <span class="rom">kanq</span> “sees” (falling roof) · <span class="rom">kanz</span> “visual” (rising roof). Particles get <em>no</em> roof and shrink — spot them in any sentence line above.</figcaption>
+  </figure>
+
+  <h3 class="sub">6.2 The geometry, in one breath</h3>
+  <p><strong>Left cell</strong>: the onset consonant — a base shape for <em>where</em> it’s made, small marks (dot, top-bar, slash) for <em>how</em>. <strong>Top right</strong>: the vowel; diphthongs add a tail. <strong>Bottom-right bar</strong>: the coda <span class="rom">-n</span>, the only ending there is. Inside a compound, modifier blocks shrink and the head block fills the frame — the word’s family tree, drawn on the page:</p>
+  <figure>
+    <div class="glyphline" data-sent="suka sulindin datunwen"></div>
+    <figcaption class="figcap">One roof per word, however many blocks: <span class="rom">suka</span> (2 blocks), <span class="rom">sulindin</span> (3), <span class="rom">datunwen</span> (3). Small blocks modify; the last, full-size block is the head.</figcaption>
+  </figure>
+
+  <h3 class="sub">6.3 Silent radicals</h3>
+  <p>The little red mark in a block’s bottom-left corner is a <strong>classifier</strong> — a semantic tag from a set of about 40 classes in the full design (“mind”, “animal”, “speech”, “matter”…). It is <em>never pronounced</em>: the renderer adds it automatically from the dictionary, purely as visual redundancy for the eye. It is the Chinese radical, engineered. Compare:</p>
+  <figure>
+    <div class="glyphline" data-sent="mau ka wen mo"></div>
+    <figcaption class="figcap">Four words, four silent radicals: <span class="rom">mau</span> (animal — paw and whiskers), <span class="rom">ka</span> (mind — a curl), <span class="rom">wen</span> (speech — ruled lines), <span class="rom">mo</span> (matter — a solid square). Foreign proper names instead get a dotted red <em>name-line</em> under their blocks — you’ll see it under “Schrödinger” in Lesson 7.</figcaption>
+  </figure>
+
+  <div class="notecard"><span class="t">ABOUT THE GREY FRAME</span>
+    <p>The thin grey square around each block is <strong>not part of the writing</strong>. It is a learner’s grid — like the ruled squares in a child’s handwriting workbook — kept on in this course so you can see each syllable’s boundaries. Fluent text drops it. Nothing structural rests on it.</p></div>
+
+  <div class="exercise">
+    <span class="xt">EXERCISE 6 · Reading</span>
+    <ol>
+      <li>Scrolling back to any sentence line: how do you spot the verb <em>without reading a single letter</em>?
+        <details><summary>Show answer</summary><div class="ans">Find the block-cluster whose roof falls from left down to right. One falling roof = the clause’s predicate.</div></details></li>
+      <li>What does the small red mark in the bottom-left of a block tell you, and how is it pronounced?
+        <details><summary>Show answer</summary><div class="ans">It is the classifier — a silent semantic tag (one of ~40 classes, e.g. animal, mind, speech). It is not pronounced at all; it exists only for the reading eye.</div></details></li>
+      <li>What does a bar across the bottom-right of a block mean?
+        <details><summary>Show answer</summary><div class="ans">The syllable ends in <span class="rom">-n</span> — the only coda the language allows.</div></details></li>
+      <li>In <span class="rom">sulindin</span>, why are the first two blocks smaller than the third?
+        <details><summary>Show answer</summary><div class="ans">Small blocks are modifiers, the full-size final block is the head: [su + lin] modify din “worth”. The layout literally draws the word’s tree — and the single roof overhead says “all of this is one word”.</div></details></li>
+      <li>Is the grey square frame pronounced, structural, or neither?
+        <details><summary>Show answer</summary><div class="ans">Neither — it is pedagogical scaffolding, a learner’s grid. Fluent writing omits it.</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ LESSON 7 -->
+<section id="l7">
+  <div class="sechead"><span class="num">LESSON 7</span><h2>Graduation — two famous sentences</h2><span class="en">Stress Tests</span></div>
+  <p class="lede">One sentence from quantum mechanics, one from human-rights law: the two hardest things a beginner course could end on — and you can now read both. Everything below is made of pieces you already own.</p>
+
+  <h3 class="sub">7.1 Schrödinger’s cat</h3>
+  <figure>
+    <div class="glyphline big" data-sent="en Xedinga e mau cuq lo mun io wi e tunseitai"></div>
+    <div class="roman-line">en Xedinga e mau cu<span class="q">q</span> lo mun io wi e tunseitai.</div>
+    <div class="sentbar"><button class="play" data-say="en Xedinga e mau cuq lo mun io wi e tunseitai">▶ Play sentence</button><span class="cap">“Schrödinger’s cat is in a superposition of death and life.” — 16 syllables, formal register.</span></div>
+  </figure>
+  <div class="tblwrap int"><table>
+    <tr><th scope="row">word</th><td class="rom">en</td><td class="rom">Xedinga</td><td class="rom">e</td><td class="rom">mau</td><td class="rom">cuq</td><td class="rom">lo</td><td class="rom">mun</td><td class="rom">io</td><td class="rom">wi</td><td class="rom">e</td><td class="rom">tunseitai</td></tr>
+    <tr><th scope="row">melody</th><td>low</td><td>level</td><td>low</td><td>level</td><td><strong>falling</strong></td><td>low</td><td>level</td><td>low</td><td>level</td><td>low</td><td>level</td></tr>
+    <tr><th scope="row">meaning</th><td>name-marker</td><td>Schrödinger</td><td>’s</td><td>cat</td><td>is-located</td><td>in</td><td>death</td><td>⊕ and-or</td><td>life</td><td>of</td><td>superposition</td></tr>
+    <tr><th scope="row">doing what</th><td>“a foreign name follows”</td><td>the name, folded into the sound system</td><td>attaches the name to…</td><td>…the subject</td><td>the verb — the only falling roof</td><td>opens the “where”</td><td>option 1</td><td>holds both options together</td><td>option 2</td><td>attaches [death⊕life] to…</td><td>…the head noun</td></tr>
+  </table></div>
+  <div class="duo">
+    <div class="notecard"><span class="t">io — THE CONNECTIVE CLASSICAL LOGIC FORGOT</span>
+      <p>Plain <span class="rom">i</span> “and” would claim the cat is dead <em>and</em> alive — a contradiction. Plain <span class="rom">o</span> “or” would claim it is one <em>or</em> the other — exactly what quantum mechanics denies. <span class="rom">io</span>, a transparent fusion of the two, asserts the options <em>as a joint whole</em>, without judging either separately. Ordinary people use it for “half-asleep io half-awake”; physicists use it for Hilbert space. One humble particle closes both misreadings by grammar alone.</p></div>
+    <div class="notecard blue"><span class="t">TWO MORE THINGS YOUR EAR ALREADY CAUGHT</span>
+      <p><span class="rom">Xedinga</span> is “Schrödinger” folded into the 288 syllables (sh→<span class="rom">x</span>, ö→<span class="rom">e</span>, the ng unpacked into <span class="rom">n·g</span>), introduced by the name-marker <span class="rom">en</span> and written with a dotted name-line under its blocks. And notice: the sentence’s <em>only</em> falling contour sits on <span class="rom">cuq</span> — however long the subject grows, your ear locks the verb instantly.</p></div>
+  </div>
+  <div class="audiogrid">
+    <figure class="audiof"><figcaption>Neural reference — a natural voice with the pitch grammar imposed on it (from the <span class="rom">audio/</span> folder).<span class="rm">en Xedinga e mau cuq lo mun io wi e tunseitai.</span></figcaption>
+      <audio controls preload="none" src="audio/schrodinger-cat.mp3"></audio></figure>
+    <figure class="audiof"><figcaption>Comparison — the same words with ordinary text-to-speech prosody, <em>before</em> the pitch grammar is applied. Listen for what vanished: the word-class melodies.<span class="rm">the “natural prosody” version</span></figcaption>
+      <audio controls preload="none" src="audio/schrodinger-cat-natural.mp3"></audio></figure>
+  </div>
+  <p>Street version — same truth-conditions, scaffolding handed back to context. The noun <span class="rom">tunseitai</span> turns into the verb by contour alone (<span class="rom">a</span> is the topic-pause particle, “as for…”):</p>
+  <figure>
+    <div class="glyphline" data-sent="Xedinga-mau a, mun io wi e tunseitaiq"></div>
+    <div class="roman-line">Xedinga-mau a, mun io wi e tunseitai<span class="q">q</span>.</div>
+    <div class="sentbar"><button class="play ghost" data-say="Xedinga-mau a, mun io wi e tunseitaiq">▶ Play the street version</button><span class="cap">“The Schrödinger-cat? In a death-⊕-life superposition.” — <span class="rom">tunseitaiq</span>, falling: “is-in-a-superposition”.</span></div>
+  </figure>
+
+  <h3 class="sub">7.2 Universal Declaration of Human Rights, Article 1</h3>
+  <p><em>“All human beings are born free and equal in dignity and rights.”</em></p>
+  <figure>
+    <div class="glyphline big" data-sent="mei ren an xinwi sukauq, i lo sudin i sulindin pinq"></div>
+    <div class="roman-line">mei ren an xinwi sukau<span class="q">q</span>, i lo sudin i sulindin pin<span class="q">q</span>.</div>
+    <div class="sentbar"><button class="play" data-say="mei ren an xinwi sukauq, i lo sudin i sulindin pinq">▶ Play sentence</button><span class="cap">16 syllables — with every quantifier, predicate and attachment fully explicit.</span></div>
+  </figure>
+  <div class="tblwrap int"><table>
+    <tr><th scope="row">word</th><td class="rom">mei</td><td class="rom">ren</td><td class="rom">an</td><td class="rom">xinwi</td><td class="rom">sukauq</td><td class="rom">i</td><td class="rom">lo</td><td class="rom">sudin</td><td class="rom">i</td><td class="rom">sulindin</td><td class="rom">pinq</td></tr>
+    <tr><th scope="row">melody</th><td>low</td><td>level</td><td>low</td><td>level</td><td><strong>falling</strong></td><td>low</td><td>low</td><td>level</td><td>low</td><td>level</td><td><strong>falling</strong></td></tr>
+    <tr><th scope="row">meaning</th><td>every ∀</td><td>person</td><td>at (time)</td><td>birth</td><td>is-free</td><td>and</td><td>in</td><td>dignity</td><td>and</td><td>rights</td><td>is-equal</td></tr>
+    <tr><th scope="row">doing what</th><td>true quantifier, not rhetoric</td><td>subject</td><td>opens the “when”</td><td>new-life: the moment of birth</td><td>verb 1: self-caused</td><td>joins the two clauses</td><td>opens the domain</td><td>self-worth</td><td>joins the two nouns</td><td>[self-link]-worth</td><td>verb 2: level-with-each-other</td></tr>
+  </table></div>
+  <div class="duo">
+    <div class="notecard"><span class="t">THE SILENCE THAT IS PRECISE</span>
+      <p>No time anchor anywhere — and that is correct. This is a generic, normative statement, true at all moments; rule R4 legally leaves it unmarked. English is forced to write “<em>are born</em>”; Datunwen’s tenselessness says exactly what the Declaration means. Your ear finds the two falling roofs — <span class="rom">sukauq</span>, <span class="rom">pinq</span> — and knows there are two predicates; the two <span class="rom">i</span>’s glue at different levels (clause + clause, noun + noun), sorted for you by the prosodic boundaries.</p></div>
+    <div class="notecard blue"><span class="t">THE ARGUMENT HIDDEN IN THE MORPHOLOGY</span>
+      <p>Three key words share the root <span class="rom">su</span> “self”: freedom = <em>self-cause</em>, dignity = <em>self-worth</em>, rights = <em>self-link-worth</em>. The article’s philosophy — freedom springs from the self, dignity belongs to the self, rights are dignity recognized between selves — is preserved in the word-building itself. Reading the three words <em>is</em> reading the argument.</p></div>
+  </div>
+  <div class="audiogrid">
+    <figure class="audiof"><figcaption>Neural reference — pitch grammar imposed (from <span class="rom">audio/</span>).<span class="rm">mei ren an xinwi sukauq, i lo sudin i sulindin pinq.</span></figcaption>
+      <audio controls preload="none" src="audio/udhr-article1.mp3"></audio></figure>
+    <figure class="audiof"><figcaption>Comparison — natural prosody, no pitch grammar.<span class="rm">the “natural prosody” version</span></figcaption>
+      <audio controls preload="none" src="audio/udhr-article1-natural.mp3"></audio></figure>
+  </div>
+
+  <div class="notecard"><span class="t">YOU MADE IT</span>
+    <p>Your toolkit: 288 syllables you can already pronounce · three pitch rules · SVO with modifiers-first · anchors set once · one folding rule · <span class="rom">e</span>/<span class="rom">ye</span> · 23 particles · two dozen roots. The complete reference — full particle logic, the information-density arithmetic, the design trade-offs — lives in the companion design book, <span class="rom">datunwen.html</span>.</p></div>
+
+  <div class="exercise">
+    <span class="xt">EXERCISE 7 · Final</span>
+    <ol>
+      <li>In the Schrödinger sentence, name the verb and the two independent ways you can find it.
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">cuq</span> “is-located”. By ear: the only falling contour in the sentence. By eye: the only falling roof (and in spelling, the only -q).</div></details></li>
+      <li>Why does the sentence use <span class="rom">io</span> instead of <span class="rom">i</span> or <span class="rom">o</span>?
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">i</span> would assert “dead and alive” (contradiction); <span class="rom">o</span> would assert “dead or alive, one of them” (what quantum mechanics denies). <span class="rom">io</span> ⊕ asserts the options as one jointly-held whole — superposition, straight from the grammar.</div></details></li>
+      <li>In the UDHR sentence, which two words are the predicates, and how does your ear know?
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">sukauq</span> “is-free” and <span class="rom">pinq</span> “is-equal” — the two falling contours (the two -q’s).</div></details></li>
+      <li>Why does <span class="rom">en</span> stand before <span class="rom">Xedinga</span>, and what visual mark does the name get in the script?
+        <details><summary>Show answer</summary><div class="ans"><span class="rom">en</span> is the proper-name marker: it announces that the next blocks are a foreign name spelled by sound. In the script the name carries a dotted red name-line beneath its blocks.</div></details></li>
+      <li>Why is the UDHR sentence allowed to have no tense at all — and what would adding <span class="rom">tan</span> wrongly imply?
+        <details><summary>Show answer</summary><div class="ans">It is a timeless normative statement, and rule R4 licenses zero anchoring for statements true at all times. Adding <span class="rom">tan</span> would anchor it to the past — as if people <em>used to</em> be born free and equal.</div></details></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ APPENDIX -->
+<section id="appx">
+  <div class="sechead"><span class="num">APPENDIX</span><h2>Reference &amp; sandbox</h2><span class="en">Look It Up, Try It Out</span></div>
+  <p class="lede">Everything taught in this course, in four tables — every entry clickable — plus a sandbox that renders and speaks anything you type.</p>
+
+  <h3 class="sub">A.1 The five rules on one card</h3>
+  <div class="tblwrap"><table>
+    <tr><th>rule</th><th>name</th><th>one-line version</th></tr>
+    <tr><td><strong>R1</strong></td><td>Contour law</td><td>One pitch contour per content word assigns its job: level = thing, falling = verb, rising = modifier; particles low.</td></tr>
+    <tr><td><strong>R2</strong></td><td>Default order</td><td>Subject–Verb–Object; every modifier before its head.</td></tr>
+    <tr><td><strong>R3</strong></td><td>Pay for deviation</td><td>Default order = zero marking. Reorder, and the moved piece takes <span class="rom">ga</span>/<span class="rom">wo</span>/<span class="rom">ni</span>.</td></tr>
+    <tr><td><strong>R4</strong></td><td>Anchor law</td><td>Set time once (<span class="rom">tan</span>/<span class="rom">nau</span>/<span class="rom">fu</span>); it scopes until re-anchored. Aspect <span class="rom">le</span>/<span class="rom">xu</span> after the verb. Timeless truths legally unmarked.</td></tr>
+    <tr><td><strong>R5</strong></td><td>Operator law</td><td>Logic words are exact: <span class="rom">i</span> ∧ · <span class="rom">o</span> ∨ · <span class="rom">io</span> ⊕ · <span class="rom">bu</span> ¬ · <span class="rom">mei</span> ∀ · <span class="rom">un</span> ∃; attachment splits into <span class="rom">e</span> (noun phrase) vs <span class="rom">ye</span> (clause).</td></tr>
+  </table></div>
+
+  <h3 class="sub">A.2 Content roots<span class="tag">CLICK ANY ENTRY</span></h3>
+  <div class="tblwrap"><table>
+    <tr><th>word</th><th>meaning</th><th>silent radical</th><th>note</th></tr>
+    <tr><td data-dw="ka" data-nog></td><td>know</td><td>mind</td><td>etymology note: 知 · Latin cognōscere</td></tr>
+    <tr><td data-dw="mo" data-nog></td><td>matter · thing</td><td>matter</td><td>etymology note: 物 · Latin mōlēs/māteria</td></tr>
+    <tr><td data-dw="ten" data-nog></td><td>time</td><td>time</td><td>etymology note: 时 · Latin tempus</td></tr>
+    <tr><td data-dw="lin" data-nog></td><td>link · relation</td><td>—</td><td>etymology note: 连 lián · English link</td></tr>
+    <tr><td data-dw="su" data-nog></td><td>self</td><td>mind</td><td>etymology note: 己 · Latin suī</td></tr>
+    <tr><td data-dw="wi" data-nog></td><td>life</td><td>life</td><td>etymology note: 生 · Latin vīta</td></tr>
+    <tr><td data-dw="mun" data-nog></td><td>death</td><td>life</td><td>etymology note: 死 · Latin mortuus, Chinese 殁 mò</td></tr>
+    <tr><td data-dw="mau" data-nog></td><td>cat</td><td>animal</td><td>etymology note: 猫 māo · “meow” · Thai maew</td></tr>
+    <tr><td data-dw="kau" data-nog></td><td>cause</td><td>—</td><td>etymology note: 因 · Latin causa</td></tr>
+    <tr><td data-dw="xin" data-nog></td><td>new · begin</td><td>time</td><td>etymology note: 新 xīn</td></tr>
+    <tr><td data-dw="tun" data-nog></td><td>together · same</td><td>social</td><td>etymology note: 同 tóng</td></tr>
+    <tr><td data-dw="sei" data-nog></td><td>exist · be</td><td>—</td><td>etymology note: 在 · German sein, Chinese 是</td></tr>
+    <tr><td data-dw="tai" data-nog></td><td>state</td><td>—</td><td>etymology note: 态 tài</td></tr>
+    <tr><td data-dw="din" data-nog></td><td>worth</td><td>mind</td><td>etymology note: 值 · Latin dignus</td></tr>
+    <tr><td data-dw="pin" data-nog></td><td>equal · level</td><td>—</td><td>etymology note: 平 píng · Latin plānus</td></tr>
+    <tr><td data-dw="da" data-nog></td><td>big</td><td>—</td><td>etymology note: 大 dà</td></tr>
+    <tr><td data-dw="ren" data-nog></td><td>person</td><td>social</td><td>etymology note: 人 rén</td></tr>
+    <tr><td data-dw="wen" data-nog></td><td>language · writing</td><td>speech</td><td>etymology note: 文 wén</td></tr>
+    <tr><td data-dw="cu" data-nog></td><td>be-located-at</td><td>—</td><td>etymology note: 处 chù</td></tr>
+    <tr><td data-dw="kan" data-nog></td><td>see · look</td><td>mind</td><td>etymology note: 看 kàn</td></tr>
+    <tr><td data-dw="can" data-nog></td><td>eat</td><td>life</td><td>etymology note: 食</td></tr>
+    <tr><td data-dw="pei" data-nog></td><td>fish</td><td>animal</td><td>etymology note: 鱼</td></tr>
+    <tr><td data-dw="di" data-nog></td><td>day</td><td>time</td><td>etymology note: 日 · cf. Latin diēs</td></tr>
+  </table></div>
+  <h4>Pronouns &amp; the pointing word — content words, they carry contours</h4>
+  <div class="tblwrap"><table>
+    <tr><th>word</th><th>meaning</th><th>note</th></tr>
+    <tr><td data-dw="mi" data-nog></td><td>I / me</td><td>etymology note: Latin mē</td></tr>
+    <tr><td data-dw="yu" data-nog></td><td>you</td><td>etymology note: English you</td></tr>
+    <tr><td data-dw="ta" data-nog></td><td>he / she / it</td><td>etymology note: Chinese 他 tā</td></tr>
+    <tr><td data-dw="to" data-nog></td><td>that (demonstrative)</td><td>etymology note: Slavic to · English that</td></tr>
+  </table></div>
+
+  <h3 class="sub">A.3 Compounds met in this course</h3>
+  <div class="tblwrap"><table>
+    <tr><th>word</th><th>fold</th><th>meaning</th></tr>
+    <tr><td data-dw="suka" data-nog></td><td>self + know</td><td>consciousness</td></tr>
+    <tr><td data-dw="linka" data-nog></td><td>link + know</td><td>logic · reason</td></tr>
+    <tr><td data-dw="moka" data-nog></td><td>matter + know</td><td>physics · science</td></tr>
+    <tr><td data-dw="tenlin" data-nog></td><td>time + link</td><td>history</td></tr>
+    <tr><td data-dw="sulin" data-nog></td><td>self + link</td><td>society</td></tr>
+    <tr><td data-dw="sudin" data-nog></td><td>self + worth</td><td>dignity</td></tr>
+    <tr><td data-dw="sulindin" data-nog></td><td>[self + link] + worth</td><td>rights</td></tr>
+    <tr><td data-dw="sukau" data-nog></td><td>self + cause</td><td>freedom</td></tr>
+    <tr><td data-dw="xinwi" data-nog></td><td>new + life</td><td>birth</td></tr>
+    <tr><td data-dw="tunseitai" data-nog></td><td>[together + exist] + state</td><td>superposition</td></tr>
+    <tr><td data-dw="tandi" data-nog></td><td>past + day</td><td>yesterday (lexicalized)</td></tr>
+    <tr><td data-dw="datunwen" data-nog></td><td>big + together + language</td><td>Datunwen, the language’s own name</td></tr>
+  </table></div>
+
+  <h3 class="sub">A.4 All 23 particles — the entire closed class</h3>
+  <div class="tblwrap"><table>
+    <tr><th>word</th><th>job</th><th>mnemonic source (etymology notes)</th></tr>
+    <tr><td data-dw="e" data-nog></td><td>attaches a noun phrase as modifier — “’s / of”</td><td>的 de · の no</td></tr>
+    <tr><td data-dw="ye" data-nog></td><td>attaches a clause as modifier — “that… / who…”</td><td>classical 者 zhě</td></tr>
+    <tr><td data-dw="i" data-nog></td><td>and ∧</td><td>Spanish y · Russian и</td></tr>
+    <tr><td data-dw="o" data-nog></td><td>or ∨</td><td>Spanish o · Latin aut</td></tr>
+    <tr><td data-dw="io" data-nog></td><td>superpositive both-and ⊕</td><td>transparent fusion of i + o</td></tr>
+    <tr><td data-dw="bu" data-nog></td><td>not ¬</td><td>不 bù</td></tr>
+    <tr><td data-dw="mei" data-nog></td><td>every ∀ (before the noun)</td><td>每 měi</td></tr>
+    <tr><td data-dw="un" data-nog></td><td>some ∃ · indefinite</td><td>Latin ūnus</td></tr>
+    <tr><td data-dw="a" data-nog></td><td>topic pause — “as for…”</td><td>啊 a</td></tr>
+    <tr><td data-dw="u" data-nog></td><td>yes/no question, sentence-final</td><td>a-priori design</td></tr>
+    <tr><td data-dw="an" data-nog></td><td>at (a time) · “when”</td><td>a-priori design</td></tr>
+    <tr><td data-dw="lo" data-nog></td><td>in / at (place or domain)</td><td>Latin locus</td></tr>
+    <tr><td data-dw="de" data-nog></td><td>from (source)</td><td>Latin dē</td></tr>
+    <tr><td data-dw="en" data-nog></td><td>proper-name marker (precedes foreign names)</td><td>the n- of name · nōmen · 名</td></tr>
+    <tr><td data-dw="ga" data-nog></td><td>agent tag (only when order deviates)</td><td>Japanese が ga</td></tr>
+    <tr><td data-dw="wo" data-nog></td><td>patient tag (only when order deviates)</td><td>Japanese を wo</td></tr>
+    <tr><td data-dw="ni" data-nog></td><td>dative — to / for (recipient, goal)</td><td>Japanese に ni</td></tr>
+    <tr><td data-dw="nen" data-nog></td><td>can (ability / possibility)</td><td>能 néng</td></tr>
+    <tr><td data-dw="tan" data-nog></td><td>past anchor</td><td>French antan “yesteryear”</td></tr>
+    <tr><td data-dw="nau" data-nog></td><td>present anchor</td><td>now · Latin nunc</td></tr>
+    <tr><td data-dw="fu" data-nog></td><td>future anchor</td><td>Latin futūrus</td></tr>
+    <tr><td data-dw="le" data-nog></td><td>perfective — completed (after the verb)</td><td>了 le</td></tr>
+    <tr><td data-dw="xu" data-nog></td><td>durative — still going (after the verb)</td><td>续 xù “continue”</td></tr>
+  </table></div>
+
+  <h3 class="sub">A.5 Sandbox — type anything<span class="tag">LIVE RENDER + SPEECH</span></h3>
+  <div class="ime">
+    <label for="imeIn">Type romanized Datunwen (add -q for a falling verb, -z for a rising modifier; Capitalized words are treated as proper names; hyphen joins name-compounds)</label>
+    <input id="imeIn" type="text" spellcheck="false" autocomplete="off"
+      value="mei ren an xinwi sukauq" aria-describedby="imeNote">
+    <div class="out" id="imeOut" aria-live="polite"></div>
+    <div class="chips" id="imeChips">
+      <button data-fill="mei ren an xinwi sukauq">human rights</button>
+      <button data-fill="en Xedinga e mau cuq lo mun io wi e tunseitai">Schrödinger’s cat</button>
+      <button data-fill="mau canq le pei">the cat ate the fish</button>
+      <button data-fill="suka sukaq sukaz">one word, three postures</button>
+      <button data-fill="datunwen">the name</button>
+    </div>
+    <p class="figcap" id="imeNote">Anything that fits the sound system will render and speak — click the blocks it draws. Words from this course show their meaning; other phonotactically-legal words render block-by-block with no gloss; impossible strings (clusters, stray letters) are flagged ✗.</p>
+  </div>
+</section>
+
+<div class="footer">
+  <span class="seal">大同语</span> Datunwen — A First Course · companion to the design book <span class="rom">datunwen.html</span>, whose lexicon, glyph engine and formant synthesizer power this page.<br>
+  Word clicks are synthesized live in your browser (Klatt-style formant synthesis). The ▶ audio players are neural reference recordings (Piper × WORLD, pitch grammar imposed) and require the <span class="rom">audio/</span> folder alongside this file. Everything else is self-contained.
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+'use strict';
+const qs = s => document.querySelector(s), qsa = s => [...document.querySelectorAll(s)];
+
+/*PURE-START*/
+/* ============ Lexicon ============ */
+const ONS = ['p','b','t','d','k','g','m','n','f','s','x','h','c','r','l','w','y'];
+const LEX = {
+  ka:{g:'know',c:'mind'}, mo:{g:'matter',c:'matter'}, ten:{g:'time',c:'time'}, lin:{g:'link',c:null},
+  su:{g:'self',c:'mind'}, wi:{g:'life',c:'life'}, mun:{g:'death',c:'life'}, mau:{g:'cat',c:'animal'},
+  kau:{g:'cause',c:null}, xin:{g:'new',c:'time'}, tun:{g:'together',c:'social'}, sei:{g:'exist',c:null},
+  tai:{g:'state',c:null}, din:{g:'worth',c:'mind'}, pin:{g:'equal',c:null}, da:{g:'big',c:null},
+  ren:{g:'person',c:'social'}, wen:{g:'language',c:'speech'}, cu:{g:'be-at',c:null}, kan:{g:'see',c:'mind'},
+  can:{g:'eat',c:'life'}, pei:{g:'fish',c:'animal'}, di:{g:'day',c:'time'}, to:{g:'that',c:null},
+  mi:{g:'I',c:null}, yu:{g:'you',c:null}, ta:{g:'he/she/it',c:null}
+};
+const COMP = {
+  suka:['su','ka'], linka:['lin','ka'], moka:['mo','ka'], tenlin:['ten','lin'],
+  sulin:['su','lin'], sudin:['su','din'], sulindin:['su','lin','din'], sukau:['su','kau'],
+  xinwi:['xin','wi'], tunseitai:['tun','sei','tai'], datunwen:['da','tun','wen'], tandi:['tan','di']
+};
+const PART = {
+  e:'’s', i:'and', o:'or', io:'and-or ⊕', a:'topic', u:'question', bu:'not',
+  mei:'every ∀', un:'some ∃', an:'at (time)', en:'(name:)', lo:'in/at', de:'from',
+  ga:'agent', wo:'patient', ni:'to/for', ye:'that… (rel.)',
+  nau:'NOW', tan:'PAST', fu:'FUTURE', le:'done', xu:'ongoing', nen:'can'
+};
+const WG = {
+  ka:'knowledge', kaq:'knows (v.)', kaz:'cognitive (mod)',
+  kan:'sight', kanq:'sees (v.)', kanz:'visual (mod)',
+  can:'eating', canq:'eats (v.)',
+  mau:'cat', mauq:'is a cat (v.)', mauz:'feline (mod)',
+  pei:'fish', ren:'person', mun:'death', wi:'life', di:'day',
+  to:'that', mi:'I', yu:'you', ta:'he/she/it',
+  tandi:'yesterday', cu:'place', cuq:'is at (v.)',
+  sei:'existence', seiq:'exists (v.)',
+  tunseitai:'superposition', tunseitaiq:'is superposed (v.)',
+  Xedinga:'Schrödinger', 'Xedinga-mau':'Schrödinger-cat',
+  xinwi:'birth', sukau:'freedom', sukauq:'is free (v.)',
+  sudin:'dignity', sulindin:'rights', pin:'equality', pinq:'is equal (v.)',
+  suka:'consciousness', sukaq:'is aware (v.)', sukaz:'consciously (mod)',
+  linka:'logic', moka:'physics', tenlin:'history', sulin:'society',
+  datunwen:'Datunwen', da:'big', wen:'language', xin:'new', tun:'together',
+  su:'self', lin:'link', mo:'matter', ten:'time', din:'worth', kau:'cause', tai:'state'
+};
+
+/* ============ Syllabification & word parsing ============ */
+const SYL_RE = new RegExp('^(' + ONS.join('|') + ')?(ai|au|ei|ou|[aeiou])(n)?$');
+function sylParse(s, needOnset) {
+  const m = SYL_RE.exec(s);
+  if (!m) return null;
+  if (needOnset && !m[1]) return null;
+  return { on: m[1] || '', nuc: m[2], coda: m[3] || '' };
+}
+function syllabify(s, needOnset = true) {
+  if (!s.length) return [];
+  for (let L = Math.min(4, s.length); L >= 1; L--) {
+    const head = sylParse(s.slice(0, L), needOnset);
+    if (head) {
+      const rest = syllabify(s.slice(L), needOnset);
+      if (rest) return [head, ...rest];
+    }
+  }
+  return null;
+}
+function parseWord(raw) {
+  const w = { raw, contour: 'ref', units: [], particle: false };
+  let tok = raw;
+  if (PART[tok] !== undefined) {
+    w.particle = true; w.contour = 'low';
+    const syls = syllabify(tok, false);
+    if (!syls) return null;
+    syls.forEach(s => w.units.push({ syl: s, cls: null, name: false }));
+    return w;
+  }
+  const m = /^(.+?)([qz])$/.exec(tok);
+  if (m) { tok = m[1]; w.contour = m[2] === 'q' ? 'pred' : 'attr'; }
+  for (const seg of tok.split('-')) {
+    if (!seg) return null;
+    if (/^[A-Z]/.test(seg)) {
+      const syls = syllabify(seg.toLowerCase());
+      if (!syls) return null;
+      syls.forEach(s => w.units.push({ syl: s, cls: null, name: true }));
+    } else {
+      const morphs = COMP[seg] ? COMP[seg] : (LEX[seg] ? [seg] : null);
+      if (morphs) {
+        for (const mo of morphs) {
+          const syls = syllabify(mo, PART[mo] === undefined);
+          if (!syls) return null;
+          syls.forEach((s, i) => w.units.push({ syl: s, cls: i === 0 ? ((LEX[mo] || {}).c || null) : null, name: false }));
+        }
+      } else {
+        const syls = syllabify(seg);
+        if (!syls) return null;
+        syls.forEach(s => w.units.push({ syl: s, cls: null, name: false }));
+      }
+    }
+  }
+  return w.units.length ? w : null;
+}
+function gloss(raw) {
+  if (WG[raw]) return WG[raw];
+  if (PART[raw] !== undefined) return PART[raw];
+  const m = /^(.+?)([qz])$/.exec(raw);
+  const base = m ? m[1] : raw;
+  const suf = m ? (m[2] === 'q' ? ' (v.)' : ' (mod)') : '';
+  const morphs = COMP[base] || (LEX[base] ? [base] : null);
+  if (morphs) return morphs.map(x => LEX[x] ? LEX[x].g : (PART[x] || '?')).join('·') + suf;
+  return /^[A-Z]/.test(raw) ? 'name' : '—';
+}
+/*PURE-END*/
+
+/* ============ Glyph components (featural geometry) ============ */
+const ST = d => `<path class="st" d="${d}"/>`;
+const FL = (x, y, r = 3.4) => `<circle class="fl" cx="${x}" cy="${y}" r="${r}"/>`;
+const CIRC = '<circle class="st" cx="29" cy="66" r="13"/>';
+const VL = ST('M29,40 V92'), ANG = ST('M16,40 H42 V92'), TBAR = ST('M16,40 H42'), SLASH = ST('M40,46 L18,88');
+const ONSET_P = {
+  p: CIRC, b: CIRC + FL(29, 66), m: CIRC + TBAR, f: CIRC + SLASH,
+  w: '<circle class="st" cx="28" cy="74" r="9"/>' + ST('M34,67 C38,58 42,50 43,42'),
+  t: VL, d: VL + FL(37, 66), n: VL + TBAR, s: VL + SLASH,
+  r: ST('M29,40 V76 C29,88 38,92 44,84'),
+  c: VL + SLASH + ST('M21,40 H37'),
+  l: ST('M29,40 V76 C29,88 38,92 44,84'),
+  k: ANG, g: ANG + FL(29, 72), h: ANG + ST('M38,52 L18,88'),
+  x: ST('M42,42 C16,48 16,84 42,90') + ST('M38,52 L20,84'),
+  y: ST('M39,60 C27,62 27,80 39,82') + ST('M39,56 C41,50 43,45 44,40')
+};
+const NUC_P = {
+  a: ST('M52,58 H84'),
+  e: ST('M52,58 H78') + ST('M78,58 V69'),
+  i: ST('M68,40 V74'),
+  o: '<circle class="st" cx="68" cy="57" r="13"/>',
+  u: ST('M52,44 C52,74 84,74 84,44'),
+  ai: ST('M52,58 H78') + ST('M83,38 V50'),
+  au: ST('M52,58 H76') + ST('M78,40 C78,48 86,48 86,40'),
+  ei: ST('M52,60 H74') + ST('M74,60 V69') + ST('M83,38 V50'),
+  ou: '<circle class="st" cx="64" cy="58" r="11"/>' + ST('M79,40 C79,48 87,48 87,40')
+};
+const CLS_P = {
+  mind: '<path class="cls" d="M17,95 C17,87 27,87 27,92 C27,96 21,97 20,93"/>',
+  matter: '<rect class="fl2" x="17" y="86" width="9" height="9" rx="1.5"/>',
+  life: '<path class="cls" d="M22,98 V86 M22,90 C18,87 17,85 16,83 M22,90 C26,87 27,85 28,83"/>',
+  time: '<path class="cls" d="M16,95 C17,87 27,86 28,91 M28,91 L24,88 M28,91 L25,95"/>',
+  social: '<circle class="fl2" cx="17" cy="94" r="2"/><circle class="fl2" cx="29" cy="94" r="2"/><path class="cls" d="M19,94 H27"/>',
+  speech: '<path class="cls" d="M16,87 H28 M16,92 H26 M16,97 H23"/>',
+  animal: '<circle class="fl2" cx="18" cy="86" r="1.8"/><circle class="fl2" cx="23" cy="84" r="1.8"/><circle class="fl2" cx="28" cy="86" r="1.8"/><path class="cls" d="M17,96 C20,91 26,91 29,96"/>'
+};
+function unitSVG(u) {
+  let s = '<rect class="frame" x="6" y="26" width="84" height="82" rx="10"/>';
+  if (u.syl.on) s += ONSET_P[u.syl.on] || '';
+  s += NUC_P[u.syl.nuc] || '';
+  if (u.syl.coda) s += ST('M52,88 H84');
+  if (u.cls && CLS_P[u.cls]) s += CLS_P[u.cls];
+  if (u.name) s += '<path class="nameline" d="M8,116 H88"/>';
+  return s;
+}
+function glyphSVG(word, px = 46, drawable = false) {
+  const w = typeof word === 'string' ? parseWord(word) : word;
+  if (!w) return null;
+  const n = w.units.length;
+  let x = 4, parts = '';
+  w.units.forEach((u, i) => {
+    const s = w.particle ? 0.58 : (u.name ? 1 : (i === n - 1 ? 1 : 0.74));
+    parts += `<g transform="translate(${x.toFixed(1)},${(108 * (1 - s)).toFixed(1)}) scale(${s})">${unitSVG(u)}</g>`;
+    x += 92 * s + 3;
+  });
+  const W = x + 3;
+  let roof = '';
+  if (!w.particle) {
+    const a = 8, b = W - 8;
+    const d = w.contour === 'pred' ? `M${a},7 L${b},20` : w.contour === 'attr' ? `M${a},20 L${b},7` : `M${a},14 L${b},14`;
+    roof = `<path class="roof" d="${d}"/>`;
+  }
+  return `<svg class="gly${drawable ? ' drawable' : ''}" viewBox="0 0 ${W.toFixed(0)} 122" style="height:${px}px;width:${(px * W / 122).toFixed(1)}px"${w.particle ? ' opacity=".82"' : ''} aria-hidden="true">${roof}${parts}</svg>`;
+}
+
+/* ============ Page assembly ============ */
+function wordButton(core, px) {
+  const svg = glyphSVG(core, px);
+  if (!svg) return null;
+  const b = document.createElement('button');
+  b.className = 'dw'; b.dataset.w = core; b.type = 'button';
+  b.setAttribute('aria-label', core + ' — ' + gloss(core) + '. Click to hear it spoken.');
+  b.innerHTML = svg + `<span class="r">${core}</span><span class="g">${gloss(core)}</span>`;
+  return b;
+}
+function buildSent(el) {
+  const px = el.classList.contains('big') ? 56 : 44;
+  el.dataset.sent.trim().split(/\s+/).forEach(t => {
+    const comma = /[,，]$/.test(t);
+    const core = t.replace(/[.,，。]+$/, '');
+    if (core) {
+      const b = wordButton(core, px);
+      if (b) el.appendChild(b);
+    }
+    if (comma) { const g = document.createElement('span'); g.className = 'gap'; el.appendChild(g); }
+  });
+}
+qsa('[data-sent]').forEach(buildSent);
+
+qsa('.card[data-word]').forEach(c => {
+  const wd = c.dataset.word;
+  c.innerHTML = `<div class="glyph"></div><div class="rom">${wd}</div><div class="mean">${c.dataset.mean}</div><div class="ety">${c.dataset.ety}</div>`;
+  const b = wordButton(wd, 62);
+  b.querySelector('.r').remove(); b.querySelector('.g').remove();
+  c.querySelector('.glyph').appendChild(b);
+});
+
+/* Clickable dictionary entries in the appendix tables */
+qsa('[data-dw]').forEach(el => {
+  const b = wordButton(el.dataset.dw, 40);
+  if (!b) return;
+  if (el.dataset.nog !== undefined) b.querySelector('.g').remove();
+  el.appendChild(b);
+});
+
+/* Hero glyph */
+(function hero() {
+  const h = qs('#heroGlyphs'); if (!h) return;
+  const b = wordButton('datunwen', 96);
+  b.querySelector('.g').textContent = 'da “big” · tun “together” · wen “language” — click to hear the language say its own name';
+  b.querySelector('svg').classList.add('drawable');
+  h.appendChild(b);
+})();
+
+/* Block anatomy (Lesson 6) */
+(function anatomy() {
+  const el = qs('#anatomy'); if (!el) return;
+  const items = [
+    ['var(--dian)', 'Roof = the pitch gesture', 'One contour spans the whole word: flat roof = thing, falling roof = the clause’s verb (this example: -q), rising roof = modifier. Particles get no roof. The roof’s span IS the word boundary — one melody, one roof, one word.'],
+    ['currentColor', 'Left cell = onset consonant', 'The angled base shape of k marks where it’s made (back of the tongue); small added strokes — a dot, a top bar, a slash — mark how (voiced, nasal, hissed).'],
+    ['currentColor', 'Top right = the vowel', 'a is the long bar; every vowel has its own stroke, and diphthongs add a small tail in the corner.'],
+    ['currentColor', 'Bottom-right bar = coda -n', 'The only possible syllable ending — one floor stroke.'],
+    ['var(--zhu)', 'Red mark, bottom left = classifier', 'A silent semantic tag (about 40 classes in the full design; here “mind”). The renderer adds it automatically from the dictionary — never pronounced. The Chinese radical, engineered.'],
+    ['var(--glyph-frame)', 'Grey frame = learner’s grid, not structure', 'Carries no weight — like the ruled squares of a handwriting workbook. In compounds, modifier blocks shrink and the head fills the frame: the word-tree drawn on the page.']
+  ];
+  el.innerHTML = `<div class="anwrap"><div style="text-align:center">${glyphSVG('kanq', 190)}<div class="figcap" style="text-align:center">kanq “sees” = kan (see) + falling contour (-q)</div></div><ul class="anlegend">${items.map(i => `<li><span class="sw" style="background:${i[0]}"></span><span><b>${i[1]}</b><span class="d"> ${i[2]}</span></span></li>`).join('')}</ul></div>`;
+})();
+
+/* Sandbox (IME) */
+(function ime() {
+  const inp = qs('#imeIn'), out = qs('#imeOut'); if (!inp) return;
+  function render() {
+    out.innerHTML = '';
+    inp.value.trim().split(/\s+/).forEach(t => {
+      const comma = /[,，]$/.test(t);
+      const core = t.replace(/[.,，。]+$/, '');
+      if (core) {
+        const b = wordButton(core, 52);
+        if (b) out.appendChild(b);
+        else { const e = document.createElement('span'); e.className = 'err'; e.textContent = '✗ ' + core + ' (not possible in the sound system)'; out.appendChild(e); }
+      }
+      if (comma) { const g = document.createElement('span'); g.className = 'gap'; out.appendChild(g); }
+    });
+  }
+  inp.addEventListener('input', render);
+  qsa('#imeChips button').forEach(b => b.addEventListener('click', () => { inp.value = b.dataset.fill; render(); inp.focus(); }));
+  render();
+})();
+
+/* ============ Formant synthesizer (Klatt-style, continuous tract) ============ */
+let AC = null, master = null, noiseBuf = null, glottalWave = null;
+function ac() {
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = AC.createDynamicsCompressor();
+    comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 5;
+    const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4800; lp.Q.value = 0.4;
+    const hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 75;
+    const g = AC.createGain(); g.gain.value = 1.25;
+    comp.connect(lp); lp.connect(hp); hp.connect(g); g.connect(AC.destination);
+    master = comp;
+    noiseBuf = AC.createBuffer(1, Math.floor(AC.sampleRate * 1.2), AC.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    /* Glottal pulse: harmonics decaying as 1/n^1.55 — a soft source, closer to a real voice than a sawtooth */
+    const N = 48, re = new Float32Array(N + 1), im = new Float32Array(N + 1);
+    for (let n = 1; n <= N; n++) im[n] = 1 / Math.pow(n, 1.55);
+    glottalWave = AC.createPeriodicWave(re, im);
+  }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+/* Vowel formant targets (F1–F4) and amplitudes */
+const VOW = {
+  a: [780, 1240, 2600, 3300], e: [460, 1950, 2600, 3300], i: [300, 2250, 2900, 3400],
+  o: [480, 900, 2500, 3200], u: [320, 780, 2400, 3200]
+};
+const AV = [1, .55, .28, .14], AN = [.9, .22, .12, .08];
+const LOCUS = { lab: 850, alv: 1750, vel: 2250, pal: 2100 };
+const F0C = { ref: [178, 168], pred: [212, 112], attr: [122, 200], low: [108, 104] };
+/* Expand each syllable into a phone timeline: {d duration, F formant targets, A amplitudes, v voicing, n aspiration, s fricative path, burst plosive} */
+function phonesFor(syl, particle) {
+  const ph = [];
+  const n1 = syl.nuc[0], n2 = syl.nuc.length > 1 ? syl.nuc[1] : null;
+  const on = syl.on;
+  const vdur = (n2 ? .195 : .15) * (particle ? .72 : 1);
+  if (on) {
+    const place = 'pbmfw'.includes(on) ? 'lab' : 'kgh'.includes(on) ? 'vel' : 'xcy'.includes(on) ? 'pal' : 'alv';
+    const locus = [300, LOCUS[place], place === 'vel' ? 2400 : 2600, 3300];
+    if ('ptk'.includes(on)) {
+      ph.push({ d: .058, v: 0, F: locus });
+      ph.push({ d: .012, v: 0, burst: { p: [0, .55], t: [2, .6], k: [1, .65] }[on] });
+      ph.push({ d: .032, v: 0, n: .3, F: VOW[n1], A: AV });
+    } else if ('bdg'.includes(on)) {
+      ph.push({ d: .045, v: .15, F: [170, LOCUS[place], 2500, 3300], A: [1, .12, .05, .03] });
+      ph.push({ d: .012, v: .2, burst: { b: [0, .28], d: [2, .3], g: [1, .33] }[on] });
+    } else if (on === 'm' || on === 'n') {
+      ph.push({ d: .072, v: .55, F: [250, on === 'm' ? 1000 : 1500, 2300, 3300], A: AN });
+    } else if (on === 'r' || on === 'l') {
+      ph.push({ d: .05, v: .7, F: [360, 1150, 2700, 3300], A: [.9, .5, .3, .12] });
+    } else if (on === 'w' || on === 'y') {
+      ph.push({ d: .058, v: .78, F: VOW[on === 'w' ? 'u' : 'i'], A: AV });
+    } else if (on === 'f') { ph.push({ d: .085, v: 0, s: [0, .14], F: locus });
+    } else if (on === 's') { ph.push({ d: .09, v: 0, s: [2, .22], F: locus });
+    } else if (on === 'x') { ph.push({ d: .09, v: 0, s: [1, .24], F: locus });
+    } else if (on === 'h') { ph.push({ d: .07, v: 0, n: .32, F: VOW[n1], A: AV });
+    } else if (on === 'c') {
+      ph.push({ d: .045, v: 0, F: locus });
+      ph.push({ d: .065, v: 0, s: [1, .24] });
+    }
+  }
+  ph.push({ d: n2 ? vdur * .55 : vdur, v: 1, F: VOW[n1], A: AV, vowel: true });
+  if (n2) ph.push({ d: vdur * .45, v: .95, F: VOW[n2], A: AV, glide: .05, vowel: true });
+  if (syl.coda) ph.push({ d: .065, v: .5, F: [250, 1400, 2300, 3300], A: AN });
+  return ph;
+}
+function scheduleWord(raw, t0, f0mul = 1) {
+  const w = parseWord(raw); if (!w) return 0.15;
+  return scheduleParsed(w, t0, f0mul);
+}
+function scheduleParsed(w, t0, f0mul = 1) {
+  ac();
+  const amp = w.particle ? .5 : 1;
+  const phones = [];
+  w.units.forEach((u, ui) => {
+    const ps = phonesFor(u.syl, w.particle);
+    if (ui === w.units.length - 1) for (const p of ps) if (p.vowel) p.d *= 1.12;
+    phones.push(...ps);
+  });
+  const total = phones.reduce((a, p) => a + p.d, 0);
+  const [A, B] = F0C[w.contour];
+  /* Glottal source: continuous voicing across the word + slight vibrato */
+  const o = AC.createOscillator(); o.setPeriodicWave(glottalWave);
+  o.frequency.setValueAtTime(A * f0mul, t0);
+  o.frequency.linearRampToValueAtTime(B * f0mul, t0 + total);
+  const lfo = AC.createOscillator(); lfo.frequency.value = 5.2;
+  const lg = AC.createGain(); lg.gain.value = 2.6;
+  lfo.connect(lg); lg.connect(o.frequency);
+  const vG = AC.createGain(); vG.gain.setValueAtTime(0, t0); o.connect(vG);
+  /* Aspiration noise (shaped by the formants) */
+  const asp = AC.createBufferSource(); asp.buffer = noiseBuf; asp.loop = true;
+  const aG = AC.createGain(); aG.gain.setValueAtTime(0, t0); asp.connect(aG);
+  /* Four formant resonators */
+  const Fs = [], Gs = [], Qv = [9, 13, 12, 10];
+  for (let k = 0; k < 4; k++) {
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = Qv[k];
+    const g = AC.createGain(); g.gain.setValueAtTime(0, t0);
+    vG.connect(f); aG.connect(f); f.connect(g); g.connect(master);
+    Fs.push(f); Gs.push(g);
+  }
+  /* Three fricative/burst spectral paths: 0 labial-dull · 1 palatal-mid · 2 dental-sharp */
+  const fr = AC.createBufferSource(); fr.buffer = noiseBuf; fr.loop = true; fr.playbackRate.value = .97;
+  const frG = [['lowpass', 1400, .7], ['bandpass', 2850, 3.2], ['highpass', 5200, .8]].map(sp => {
+    const f = AC.createBiquadFilter(); f.type = sp[0]; f.frequency.value = sp[1]; f.Q.value = sp[2];
+    const g = AC.createGain(); g.gain.setValueAtTime(0, t0);
+    fr.connect(f); f.connect(g); g.connect(master);
+    return g;
+  });
+  /* Timeline automation */
+  const first = phones.find(p => p.F) || { F: VOW.a };
+  for (let k = 0; k < 4; k++) Fs[k].frequency.setValueAtTime(first.F[k], t0);
+  let t = t0;
+  for (const p of phones) {
+    const tc = p.glide || .024;
+    if (p.F) for (let k = 0; k < 4; k++) Fs[k].frequency.setTargetAtTime(p.F[k], t, tc);
+    const A4 = p.A || AV;
+    const open = (p.v || p.n) ? 1 : 0.0001;
+    for (let k = 0; k < 4; k++) Gs[k].gain.setTargetAtTime(A4[k] * open * .9, t, .014);
+    vG.gain.setTargetAtTime((p.v || 0) * .5 * amp, t, .013);
+    aG.gain.setTargetAtTime(((p.n || 0) * .9 + (p.vowel ? .015 : 0)) * amp, t, .015);
+    for (let pi = 0; pi < 3; pi++) {
+      if (p.s && p.s[0] === pi) frG[pi].gain.setTargetAtTime(p.s[1] * amp, t, .02);
+      else if (!(p.burst && p.burst[0] === pi)) frG[pi].gain.setTargetAtTime(0.0001, t, .018);
+    }
+    if (p.burst) {
+      const g = frG[p.burst[0]];
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(p.burst[1] * amp, t + .004);
+      g.gain.linearRampToValueAtTime(0.0001, t + .015);
+    }
+    t += p.d;
+  }
+  vG.gain.setTargetAtTime(0.0001, t, .02);
+  aG.gain.setTargetAtTime(0.0001, t, .02);
+  for (const g of Gs) g.gain.setTargetAtTime(0.0001, t, .025);
+  for (const g of frG) g.gain.setTargetAtTime(0.0001, t, .02);
+  const tEnd = t + .14;
+  o.start(t0); o.stop(tEnd); lfo.start(t0); lfo.stop(tEnd);
+  asp.start(t0); asp.stop(tEnd); fr.start(t0); fr.stop(tEnd);
+  return total;
+}
+function flashWord(el, tRel, dur) {
+  if (!el) return;
+  setTimeout(() => el.classList.add('playing'), tRel * 1000);
+  setTimeout(() => el.classList.remove('playing'), (tRel + dur) * 1000);
+}
+function playWord(raw, el) {
+  const dur = scheduleWord(raw, ac().currentTime + 0.05);
+  flashWord(el, 0.05, dur);
+}
+function playSentence(str) {
+  ac();
+  const esc = str.replace(/"/g, '\\"');
+  const line = document.querySelector(`[data-sent="${esc}"]`);
+  const btns = line ? [...line.querySelectorAll('.dw')] : [];
+  const T0 = AC.currentTime + 0.08;
+  let t = 0, bi = 0, wi = 0;
+  str.trim().split(/\s+/).forEach(tok => {
+    const comma = /[,，]$/.test(tok);
+    const core = tok.replace(/[.,，。]+$/, '');
+    if (core) {
+      const dur = scheduleWord(core, T0 + t, Math.pow(0.986, wi++));
+      flashWord(btns[bi++], 0.08 + t, dur);
+      t += dur + 0.07;
+    }
+    if (comma) t += 0.22;
+  });
+}
+document.addEventListener('click', e => {
+  const dw = e.target.closest('.dw');
+  if (dw) { playWord(dw.dataset.w, dw); return; }
+  const ph = e.target.closest('.phb');
+  if (ph) {
+    ac();
+    const syl = sylParse(ph.dataset.syl, false);
+    if (syl) scheduleParsed({ contour: 'ref', particle: false, units: [{ syl, cls: null, name: false }] }, AC.currentTime + 0.05);
+    return;
+  }
+  const pl = e.target.closest('button.play');
+  if (pl) playSentence(pl.dataset.say);
+});
+</script>
+
+</body>
+</html>

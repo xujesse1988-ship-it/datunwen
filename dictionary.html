@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="大同语词典 v0.2：大同语 → English / 中文 三语检索，含字形渲染与合成发音。">
+<title>大同语词典 · Datunwen Dictionary</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+button { font: inherit; }
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+button { font: inherit; }
+
+
+/* ============ 设计令牌：纸本墨书（浅）/ 碑拓（深） ============ */
+:root {
+  --paper: #FAF9F6;        /* 纸 */
+  --panel: #F1EFE8;        /* 镶板 */
+  --panel2: #EBE9E1;
+  --ink: #1F2328;          /* 墨 */
+  --ink-2: #5B6068;        /* 淡墨 */
+  --ink-3: #8B8F96;        /* 极淡 */
+  --hairline: #E0DED6;     /* 界栏 */
+  --hairline2: #D2CFC5;
+  --zhu: #BE3E2C;          /* 朱砂 = 表意通道 */
+  --zhu-soft: #BE3E2C1f;
+  --dian: #35558F;         /* 靛青 = 表音通道 */
+  --dian-soft: #35558F17;
+  --good: #3E7A4E;
+  --glyph-frame: #C9C6BB;
+  --shadow: 0 1px 2px rgba(31,35,40,.05), 0 8px 28px -12px rgba(31,35,40,.14);
+  --serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", Georgia, "Times New Roman", serif;
+  --sans: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #17191D; --panel: #1E2126; --panel2: #23262C;
+    --ink: #E8E6E1; --ink-2: #A6AAB2; --ink-3: #7A7E86;
+    --hairline: #2C2F35; --hairline2: #383C43;
+    --zhu: #E06A52; --zhu-soft: #E06A5226;
+    --dian: #5E90EE; --dian-soft: #5E90EE1f;
+    --good: #6FBF82; --glyph-frame: #43474F;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -12px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="light"] {
+  --paper: #FAF9F6; --panel: #F1EFE8; --panel2: #EBE9E1;
+  --ink: #1F2328; --ink-2: #5B6068; --ink-3: #8B8F96;
+  --hairline: #E0DED6; --hairline2: #D2CFC5;
+  --zhu: #BE3E2C; --zhu-soft: #BE3E2C1f;
+  --dian: #35558F; --dian-soft: #35558F17;
+  --good: #3E7A4E; --glyph-frame: #C9C6BB;
+  --shadow: 0 1px 2px rgba(31,35,40,.05), 0 8px 28px -12px rgba(31,35,40,.14);
+}
+:root[data-theme="dark"] {
+  --paper: #17191D; --panel: #1E2126; --panel2: #23262C;
+  --ink: #E8E6E1; --ink-2: #A6AAB2; --ink-3: #7A7E86;
+  --hairline: #2C2F35; --hairline2: #383C43;
+  --zhu: #E06A52; --zhu-soft: #E06A5226;
+  --dian: #5E90EE; --dian-soft: #5E90EE1f;
+  --good: #6FBF82; --glyph-frame: #43474F;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -12px rgba(0,0,0,.5);
+}
+
+/* ============ 基底 ============ */
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--serif); font-size: 17px; line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px 120px; }
+p { margin: 0 0 1em; max-width: 72ch; }
+a { color: var(--dian); text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 700; }
+em { font-style: normal; border-bottom: 2px solid var(--zhu-soft); }
+::selection { background: var(--dian-soft); }
+
+/* ============ 顶栏 ============ */
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--sans); font-size: 13px;
+}
+.topnav .in {
+  max-width: 1060px; margin: 0 auto; padding: 10px 28px;
+  display: flex; gap: 18px; align-items: center; overflow-x: auto; white-space: nowrap;
+}
+.topnav .name { font-family: var(--serif); font-weight: 700; font-size: 15px; margin-right: 6px; }
+.topnav .name .seal { color: var(--zhu); }
+.topnav a { color: var(--ink-2); }
+.topnav a:hover { color: var(--ink); text-decoration: none; }
+
+/* ============ 首屏 ============ */
+header.hero { padding: 72px 0 26px; }
+.hero .kicker {
+  font-family: var(--sans); font-size: 12.5px; letter-spacing: .22em;
+  color: var(--ink-2); text-transform: uppercase; margin-bottom: 22px;
+}
+.hero .kicker .seal {
+  display: inline-block; border: 1.5px solid var(--zhu); color: var(--zhu);
+  padding: 2px 8px; margin-right: 12px; letter-spacing: .3em; font-weight: 600;
+}
+#heroGlyphs { margin: 8px 0 4px; }
+#heroGlyphs svg { max-width: 100%; height: auto; }
+.hero h1 {
+  font-size: clamp(30px, 4.6vw, 46px); line-height: 1.25; margin: 18px 0 10px;
+  font-weight: 700; text-wrap: balance; letter-spacing: .01em;
+}
+.hero h1 .lat { color: var(--ink-2); font-weight: 400; font-style: italic; font-family: Georgia, serif; }
+.hero .sub { font-size: 18.5px; color: var(--ink-2); max-width: 62ch; }
+.hero .hint {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+  font-family: var(--sans); font-size: 13px; color: var(--dian);
+  background: var(--dian-soft); border-radius: 100px; padding: 6px 14px;
+}
+
+/* 公理卡 */
+.axioms { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 34px 0 8px; }
+.axiom {
+  background: var(--panel); border: 1px solid var(--hairline);
+  border-radius: 14px; padding: 18px 20px 14px;
+}
+.axiom .no { font-family: var(--sans); font-size: 11.5px; letter-spacing: .18em; color: var(--zhu); font-weight: 700; }
+.axiom h3 { margin: 6px 0 6px; font-size: 17.5px; }
+.axiom p { font-size: 14.5px; line-height: 1.75; color: var(--ink-2); margin: 0; }
+
+/* ============ 章节 ============ */
+section { margin-top: 84px; scroll-margin-top: 70px; }
+.sechead { display: flex; align-items: baseline; gap: 16px; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 8px; }
+.sechead .num {
+  font-family: var(--serif); color: var(--zhu); font-weight: 700; font-size: 15px;
+  border: 1.5px solid var(--zhu); padding: 3px 9px; letter-spacing: .1em; white-space: nowrap;
+}
+.sechead h2 { font-size: clamp(24px, 3vw, 30px); margin: 0; font-weight: 700; text-wrap: balance; }
+.sechead .en { margin-left: auto; font-family: Georgia, serif; font-style: italic; font-size: 13.5px; color: var(--ink-3); }
+.lede { font-size: 18px; color: var(--ink-2); margin: 18px 0 26px; max-width: 68ch; }
+h3.sub { font-size: 20px; margin: 44px 0 12px; }
+h3.sub .tag { font-family: var(--sans); font-size: 11px; letter-spacing: .15em; color: var(--dian); background: var(--dian-soft); padding: 3px 8px; border-radius: 4px; vertical-align: 3px; margin-left: 10px; }
+h4 { font-size: 16.5px; margin: 26px 0 8px; }
+
+/* ============ 表格 ============ */
+.tblwrap { overflow-x: auto; margin: 16px 0 22px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 14px; }
+th {
+  text-align: left; font-size: 11.5px; letter-spacing: .12em; color: var(--ink-2);
+  font-weight: 600; padding: 10px 14px; border-bottom: 1.5px solid var(--hairline2);
+  white-space: nowrap; background: var(--panel2);
+}
+td { padding: 9px 14px; border-bottom: 1px solid var(--hairline); vertical-align: top; line-height: 1.65; }
+tr:last-child td { border-bottom: none; }
+td.rom, span.rom { font-family: var(--mono); font-weight: 600; color: var(--dian); white-space: nowrap; }
+td.ipa { font-family: var(--mono); color: var(--ink-2); white-space: nowrap; }
+td.zh { font-family: var(--serif); }
+tabular, .num-col { font-variant-numeric: tabular-nums; }
+
+/* ============ 词块（可点击发音） ============ */
+.dw {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; border-radius: 10px; padding: 6px 7px 4px; margin: 1px;
+  transition: background .15s; vertical-align: middle; border: 1px solid transparent;
+}
+.dw:hover, .dw:focus-visible { background: var(--dian-soft); border-color: var(--hairline); outline: none; }
+.dw.playing { background: var(--dian-soft); border-color: var(--dian); }
+.dw .r { font-family: var(--mono); font-size: 12.5px; color: var(--dian); font-weight: 600; }
+.dw .g { font-family: var(--sans); font-size: 11.5px; color: var(--ink-2); }
+.dw .note { font-family: var(--sans); font-size: 10px; color: var(--ink-3); letter-spacing: .06em; }
+.glyphline {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px;
+  padding: 20px 16px 14px; background: var(--panel); border: 1px solid var(--hairline);
+  border-radius: 14px; margin: 14px 0;
+}
+.glyphline.big { padding: 26px 20px 18px; }
+.sentbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 18px 0 6px; font-family: var(--sans); }
+.sentbar .cap { font-size: 13px; color: var(--ink-2); }
+button.play {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--paper); background: var(--dian); border: none; border-radius: 100px;
+  padding: 7px 16px; display: inline-flex; align-items: center; gap: 7px;
+  transition: transform .12s, opacity .15s;
+}
+button.play:hover { opacity: .9; }
+button.play:active { transform: scale(.97); }
+button.play:focus-visible { outline: 2px solid var(--zhu); outline-offset: 2px; }
+button.play.ghost { background: transparent; color: var(--dian); border: 1.5px solid var(--dian); }
+.roman-line { font-family: var(--mono); font-size: 15.5px; margin: 10px 0 2px; color: var(--ink); overflow-x: auto; }
+.roman-line .q { color: var(--zhu); }
+
+/* ============ 面板 / 注 ============ */
+.notecard {
+  background: var(--panel); border: 1px solid var(--hairline); border-left: 3px solid var(--zhu);
+  border-radius: 10px; padding: 14px 18px; margin: 18px 0; font-size: 15px;
+}
+.notecard.blue { border-left-color: var(--dian); }
+.notecard .t { font-family: var(--sans); font-size: 12px; letter-spacing: .14em; font-weight: 700; color: var(--zhu); display: block; margin-bottom: 4px; }
+.notecard.blue .t { color: var(--dian); }
+.notecard p { margin: 0 0 6px; } .notecard p:last-child { margin: 0; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin: 16px 0; }
+.figcap { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); margin: 6px 2px 0; line-height: 1.6; }
+figure { margin: 22px 0; }
+
+/* 卡片网格（构词） */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+.card {
+  background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px;
+  padding: 14px 14px 12px; text-align: center;
+}
+.card .glyph { display: flex; justify-content: center; }
+.card .rom { font-family: var(--mono); font-weight: 700; color: var(--dian); font-size: 15px; }
+.card .mean { font-size: 15px; margin: 2px 0; }
+.card .ety { font-family: var(--sans); font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+.card.derived { border-top: 3px solid var(--zhu); }
+.foldarrow { text-align: center; font-size: 20px; color: var(--zhu); margin: 4px 0; font-family: var(--sans); }
+
+/* IME demo */
+.ime {
+  background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px;
+  padding: 18px; margin: 18px 0; box-shadow: var(--shadow);
+}
+.ime label { font-family: var(--sans); font-size: 12px; letter-spacing: .12em; color: var(--ink-2); display: block; margin-bottom: 8px; }
+.ime input {
+  width: 100%; box-sizing: border-box; font-family: var(--mono); font-size: 16px;
+  padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--hairline2);
+  background: var(--paper); color: var(--ink);
+}
+.ime input:focus { outline: none; border-color: var(--dian); }
+.ime .out { min-height: 120px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px; padding-top: 14px; }
+.ime .err { color: var(--zhu); font-family: var(--sans); font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chips button {
+  font-family: var(--mono); font-size: 12.5px; cursor: pointer; color: var(--ink-2);
+  background: var(--paper); border: 1px solid var(--hairline2); border-radius: 100px; padding: 4px 12px;
+}
+.chips button:hover { color: var(--dian); border-color: var(--dian); }
+
+/* 音高曲线小图 */
+.contgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+.contcell { background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px 14px; }
+.contcell svg { display: block; width: 100%; height: 54px; }
+.contcell .nm { font-family: var(--sans); font-size: 13.5px; font-weight: 700; }
+.contcell .nm .rom { font-family: var(--mono); color: var(--dian); }
+.contcell .ds { font-family: var(--sans); font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+
+.audiogrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 16px 0; }
+.audiof { margin: 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 16px 12px; }
+.audiof figcaption { font-family: var(--sans); font-size: 13.5px; margin-bottom: 10px; line-height: 1.6; }
+.audiof figcaption .rm { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--dian); margin-top: 3px; }
+.audiof audio { width: 100%; height: 38px; }
+/* 图表 */
+.chartbox { background: var(--panel); border: 1px solid var(--hairline); border-radius: 14px; padding: 18px 14px 8px; margin: 18px 0; position: relative; }
+.chartbox svg { width: 100%; height: auto; display: block; }
+.cb-title { font-family: var(--sans); font-size: 14.5px; font-weight: 700; margin: 0 6px 2px; }
+.cb-sub { font-family: var(--sans); font-size: 12.5px; color: var(--ink-2); margin: 0 6px 10px; }
+.tip {
+  position: fixed; z-index: 99; pointer-events: none; opacity: 0;
+  background: var(--ink); color: var(--paper); font-family: var(--sans); font-size: 12.5px;
+  border-radius: 8px; padding: 7px 11px; transition: opacity .12s; max-width: 260px; line-height: 1.55;
+}
+
+/* 对照排版 */
+.vsgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 14px 0; }
+.vs { background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 16px; }
+.vs .lb { font-family: var(--sans); font-size: 11.5px; letter-spacing: .14em; font-weight: 700; color: var(--ink-2); display: block; margin-bottom: 8px; }
+.vs .lb.hot { color: var(--zhu); }
+.vs .bd { font-size: 15.5px; }
+.vs .bd .rom-inline { font-family: var(--mono); color: var(--dian); font-weight: 600; }
+
+kbd {
+  font-family: var(--mono); font-size: .85em; background: var(--panel2);
+  border: 1px solid var(--hairline2); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px;
+}
+.footer { margin-top: 100px; border-top: 1px solid var(--hairline); padding-top: 22px; font-family: var(--sans); font-size: 13px; color: var(--ink-3); line-height: 1.8; }
+.footer .seal { color: var(--zhu); border: 1.5px solid var(--zhu); display: inline-block; padding: 1px 7px; margin-right: 8px; letter-spacing: .2em; }
+
+/* ============ 字形引擎 ============ */
+button.dw { appearance: none; -webkit-appearance: none; background: transparent; font: inherit; color: inherit; }
+.gly { display: block; }
+.gly .st { stroke: currentColor; stroke-width: 4.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gly .fl { fill: currentColor; stroke: none; }
+.gly .roof { stroke: var(--dian); stroke-width: 5.4; fill: none; stroke-linecap: round; }
+.gly .frame { stroke: var(--glyph-frame); stroke-width: 2; fill: none; }
+.gly .cls { stroke: var(--zhu); stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gly .fl2 { fill: var(--zhu); stroke: none; }
+.gly .nameline { stroke: var(--zhu); stroke-width: 3; fill: none; stroke-dasharray: 1.5 6.5; stroke-linecap: round; }
+.gap { display: inline-block; width: 20px; }
+.anwrap { display: flex; flex-wrap: wrap; gap: 30px; align-items: center; margin: 14px 0; }
+.anlegend { list-style: none; margin: 0; padding: 0; font-family: var(--sans); font-size: 14px; max-width: 520px; flex: 1; min-width: 280px; }
+.anlegend li { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--hairline); line-height: 1.65; }
+.anlegend li:last-child { border-bottom: none; }
+.anlegend .sw { flex: none; width: 14px; height: 14px; border-radius: 4px; margin-top: 5px; }
+.anlegend b { font-weight: 700; }
+.anlegend .d { color: var(--ink-2); }
+.audiogrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 16px 0; }
+.audiof { margin: 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 16px 12px; }
+.audiof figcaption { font-family: var(--sans); font-size: 13.5px; margin-bottom: 10px; line-height: 1.6; }
+.audiof figcaption .rm { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--dian); margin-top: 3px; }
+.audiof audio { width: 100%; height: 38px; }
+/* 图表 */
+.chartbox .grid { stroke: var(--hairline); stroke-width: 1; }
+.chartbox .axisln { stroke: var(--hairline2); stroke-width: 1.4; }
+.chartbox text { font-family: var(--sans); font-size: 11px; fill: var(--ink-3); }
+.chartbox text.lbl { font-size: 11.5px; fill: var(--ink-2); font-weight: 600; }
+.chartbox text.axt { font-size: 11.5px; fill: var(--ink-2); }
+.chartbox .iso { stroke: var(--hairline2); stroke-dasharray: 5 5; fill: none; stroke-width: 1.5; }
+.chartbox .natpt { fill: var(--ink-3); }
+.chartbox .hit { fill: transparent; cursor: pointer; }
+
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .wrap { padding: 0 18px 90px; }
+  header.hero { padding: 44px 0 18px; }
+  .sechead { flex-wrap: wrap; } .sechead .en { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+/* 首屏描画动画 */
+@keyframes drawin { to { stroke-dashoffset: 0; } }
+.drawable path, .drawable line, .drawable circle { stroke-dasharray: 260; stroke-dashoffset: 260; animation: drawin 1.1s ease forwards; }
+@media (prefers-reduced-motion: reduce) { .drawable path, .drawable line, .drawable circle { stroke-dasharray: none; stroke-dashoffset: 0; } }
+
+
+.phb { font-family: var(--mono); cursor: pointer; background: var(--paper); border: 1px solid var(--hairline2); border-radius: 8px; padding: 4px 10px; font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.phb small { display: block; font-weight: 400; font-size: 10.5px; color: var(--ink-3); font-family: var(--mono); }
+.phb:hover { border-color: var(--dian); color: var(--dian); }
+.phb:focus-visible { outline: 2px solid var(--dian); outline-offset: 1px; }
+td.void { color: var(--hairline2); text-align: center; }
+
+
+.searchbar { position: sticky; top: 42px; z-index: 40; background: var(--paper); padding: 12px 0 10px; border-bottom: 1px solid var(--hairline); }
+.searchbar input { width: 100%; box-sizing: border-box; font-family: var(--mono); font-size: 15px; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--hairline2); background: var(--panel); color: var(--ink); }
+.searchbar input:focus { outline: none; border-color: var(--dian); }
+.chips button.on { color: var(--paper); background: var(--dian); border-color: var(--dian); }
+.badges { display: flex; gap: 8px; margin: 12px 0 4px; font-family: var(--sans); font-size: 12.5px; flex-wrap: wrap; }
+.bigbdg { background: var(--panel); border: 1px solid var(--hairline); border-radius: 100px; padding: 4px 13px; color: var(--ink-2); }
+.bigbdg b { color: var(--ink); }
+.drow { display: flex; gap: 16px; padding: 13px 8px; border-bottom: 1px solid var(--hairline); scroll-margin-top: 120px; }
+.drow:target { background: var(--dian-soft); border-radius: 10px; }
+.drow .dg { flex: none; width: 96px; display: flex; justify-content: center; align-items: flex-start; }
+.dmain { flex: 1; min-width: 0; }
+.dhead { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; font-family: var(--sans); }
+.drom { font-family: var(--mono); font-weight: 700; color: var(--dian); font-size: 16.5px; }
+.dipa { font-family: var(--mono); color: var(--ink-3); font-size: 12.5px; }
+.bdg { font-size: 10.5px; letter-spacing: .07em; padding: 2px 8px; border-radius: 100px; border: 1px solid var(--hairline2); color: var(--ink-2); white-space: nowrap; }
+.bdg.canon { color: var(--zhu); border-color: var(--zhu); }
+.bdg.numb { color: var(--dian); border-color: var(--dian); }
+.dgl { font-size: 15.5px; margin: 3px 0 1px; }
+.dgl .zh { margin-left: 10px; color: var(--ink); }
+.dety { font-family: var(--sans); font-size: 12.5px; color: var(--ink-2); line-height: 1.65; }
+.dforms { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+.cbtn { font-family: var(--mono); font-size: 12px; cursor: pointer; color: var(--dian); background: transparent; border: 1px solid var(--hairline2); border-radius: 100px; padding: 3px 11px; }
+.cbtn:hover, .cbtn:focus-visible { border-color: var(--dian); outline: none; }
+.cbtn small { color: var(--ink-3); font-family: var(--sans); margin-left: 4px; }
+.ixd { margin: 26px 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px 18px; }
+.ixd summary { cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 14.5px; }
+.ixgrid { columns: 3 230px; column-gap: 26px; padding: 10px 0 4px; }
+.ixa { display: block; font-family: var(--sans); font-size: 13px; padding: 2.5px 0; color: var(--ink-2); break-inside: avoid; }
+.ixa:hover { color: var(--ink); text-decoration: none; }
+.ixa .rm { font-family: var(--mono); color: var(--dian); margin-left: 7px; font-weight: 600; }
+@media (max-width: 560px) { .drow .dg { width: 64px; } }
+
+</style>
+</head>
+<body>
+<nav class="topnav"><div class="in">
+  <span class="name"><span class="seal">大同语</span> 词典 · Dictionary</span>
+  <a href="datunwen.html">设计书</a><a href="course-en.html">English Course</a><a href="#idxEN-d">EN 索引</a><a href="#idxZH-d">中文索引</a>
+</div></nav>
+<div class="wrap">
+<header class="hero" style="padding:46px 0 10px">
+  <div class="kicker"><span class="seal">词 典</span> DICTIONARY · v0.2 · 2026-07-07</div>
+  <h1 style="font-size:clamp(26px,3.6vw,38px)">大同语词典 <span class="lat">Datunwen Dictionary</span></h1>
+  <p class="sub">大同语 → English · 中文。每个词条的字块与三姿态变体均可点击发音（浏览器内合成）。</p>
+  <div class="badges">
+    <span class="bigbdg">共 <b>263</b> 条</span>
+    <span class="bigbdg">正典 <b>62</b></span>
+    <span class="bigbdg">扩充草案 <b>201</b></span>
+    <span class="bigbdg">词根 <b>128</b> · 复合 <b>112</b> · 虚词 <b>23</b></span>
+    <span class="bigbdg">当前显示 <b id="shownN">0</b></span>
+  </div>
+  <div class="notecard"><span class="t">草案声明 · Draft notice</span>
+    <p>标「正典」的 62 条出自设计书本体。标「草案 v0.2」的 201 条为多 agent 分域起草、经全局机械校验（音系合法性 · 全表唯一性 · 最小对防火墙 · 复合分解）并由主设计裁决合并的<strong>扩充提案</strong>，尚待使用检验。The 62 “canon” entries come from the design book; “v0.2-draft” entries are machine-drafted, mechanically validated proposals awaiting field testing.</p></div>
+</header>
+<div class="searchbar">
+  <input id="q" type="search" spellcheck="false" placeholder="搜索 search：罗马字 / English / 中文 …">
+  <div class="chips" id="kchips" style="margin-top:9px">
+    <button data-k="all" class="on">全部</button><button data-k="root">词根·代词</button><button data-k="comp">复合词</button><button data-k="particle">虚词</button><button data-k="num">数词</button>
+  </div>
+</div>
+<div id="dict"></div>
+<details class="ixd" id="idxEN-d"><summary>English → Datunwen 索引</summary><div class="ixgrid" id="idxEN"></div></details>
+<details class="ixd" id="idxZH-d"><summary>中文 → 大同语 索引</summary><div class="ixgrid" id="idxZH"></div></details>
+<div class="footer"><p><span class="seal">跋</span>本词典由 tools/build-dictionary.js 自 lexicon.json（机读词库）程序化生成；字形与发音引擎复用自 datunwen.html。扩充层词形经三个并行 agent 起草、五重全局校验与人工裁决合并（v0.2，2026-07-07）。发音为规则合成的示意音。</p></div>
+</div>
+<div class="tip" id="tip" role="status"></div>
+<script>
+
+'use strict';
+const qs = s => document.querySelector(s), qsa = s => [...document.querySelectorAll(s)];
+
+/*PURE-START*/
+/* ============ 词典 ============ */
+const ONS = ['p','b','t','d','k','g','m','n','f','s','x','h','c','r','l','w','y'];
+const LEX = {"ka":{"g":"知","c":"mind"},"mo":{"g":"物","c":"matter"},"ten":{"g":"时","c":"time"},"lin":{"g":"连","c":null},"su":{"g":"己","c":"mind"},"wi":{"g":"生","c":"life"},"mun":{"g":"死","c":"life"},"mau":{"g":"猫","c":"animal"},"kau":{"g":"因","c":null},"xin":{"g":"新","c":"time"},"tun":{"g":"同","c":"social"},"sei":{"g":"在","c":null},"tai":{"g":"态","c":null},"din":{"g":"值","c":"mind"},"pin":{"g":"平","c":null},"da":{"g":"大","c":null},"ren":{"g":"人","c":"social"},"wen":{"g":"文","c":"speech"},"cu":{"g":"处","c":null},"kan":{"g":"看","c":"mind"},"can":{"g":"食","c":"life"},"pei":{"g":"鱼","c":"animal"},"di":{"g":"日","c":"time"},"to":{"g":"那","c":null},"mi":{"g":"我","c":null},"yu":{"g":"你","c":null},"ta":{"g":"他","c":null},"nulo":{"g":"零","c":null},"yuno":{"g":"一","c":null},"duwa":{"g":"二","c":null},"san":{"g":"三","c":null},"sifo":{"g":"四","c":null},"pente":{"g":"五","c":null},"lousi":{"g":"六","c":null},"seben":{"g":"七","c":null},"bato":{"g":"八","c":null},"nain":{"g":"九","c":null},"deka":{"g":"十","c":null},"cento":{"g":"百","c":null},"kilo":{"g":"千","c":null},"wa":{"g":"水","c":"matter"},"fogo":{"g":"火","c":"matter"},"tera":{"g":"土地","c":"matter"},"kase":{"g":"风","c":"matter"},"ri":{"g":"日","c":"matter"},"luna":{"g":"月亮","c":"matter"},"sela":{"g":"星","c":"matter"},"monta":{"g":"山","c":"matter"},"rein":{"g":"雨","c":"matter"},"moku":{"g":"树木","c":"life"},"roka":{"g":"石","c":"matter"},"ceilo":{"g":"天空","c":"matter"},"niyan":{"g":"年","c":"time"},"mesi":{"g":"月份","c":"time"},"naito":{"g":"夜","c":"time"},"cau":{"g":"早晨","c":"time"},"tou":{"g":"头","c":"life"},"xou":{"g":"手","c":"life"},"yan":{"g":"眼","c":"life"},"mimi":{"g":"耳","c":"life"},"kou":{"g":"口","c":"life"},"koro":{"g":"心","c":"life"},"heima":{"g":"血","c":"life"},"pedi":{"g":"脚","c":"life"},"cin":{"g":"亲","c":"social"},"mama":{"g":"妈妈","c":"social"},"papa":{"g":"爸爸","c":"social"},"beibi":{"g":"孩子","c":"social"},"wan":{"g":"去","c":null},"lai":{"g":"来","c":null},"gei":{"g":"给","c":"social"},"na":{"g":"拿/取","c":"social"},"fa":{"g":"做/制","c":null},"tein":{"g":"听","c":"mind"},"yau":{"g":"要/想要","c":"mind"},"min":{"g":"睡","c":"life"},"bi":{"g":"喝/饮","c":"life"},"cou":{"g":"走/移动","c":null},"bau":{"g":"持/抱/携","c":null},"kai":{"g":"开","c":null},"fen":{"g":"关/封","c":null},"mai":{"g":"交易/换","c":"social"},"xun":{"g":"寻找","c":"mind"},"hau":{"g":"好","c":null},"wai":{"g":"坏","c":null},"xau":{"g":"小","c":"matter"},"ho":{"g":"热","c":"matter"},"han":{"g":"冷/寒","c":"matter"},"lon":{"g":"长","c":"matter"},"kun":{"g":"短","c":"matter"},"man":{"g":"多","c":null},"po":{"g":"少","c":null},"fai":{"g":"快","c":null},"ci":{"g":"慢","c":null},"con":{"g":"重","c":"matter"},"gon":{"g":"亮/明","c":"matter"},"hun":{"g":"暗","c":"matter"},"bai":{"g":"白","c":"matter"},"hei":{"g":"黑","c":"matter"},"rou":{"g":"红","c":"matter"},"domu":{"g":"屋","c":"social"},"pota":{"g":"门","c":"matter"},"dau":{"g":"道","c":"matter"},"cen":{"g":"城","c":"social"},"pekun":{"g":"钱","c":"social"},"lau":{"g":"劳动","c":"social"},"nomi":{"g":"名字","c":"speech"},"fan":{"g":"饭","c":"matter"},"yifu":{"g":"衣","c":"matter"},"ki":{"g":"工具","c":"matter"},"lowe":{"g":"爱","c":"mind"},"pa":{"g":"怕","c":"mind"},"xi":{"g":"喜","c":"mind"},"gen":{"g":"真","c":"mind"},"pan":{"g":"朋友","c":"social"},"kani":{"g":"狗","c":"animal"},"fou":{"g":"鸟","c":"animal"},"maro":{"g":"马","c":"animal"},"bagu":{"g":"虫","c":"animal"},"xe":{"g":"写","c":"speech"},"ge":{"g":"歌","c":"speech"},"ludo":{"g":"游戏","c":"social"},"maxin":{"g":"机器","c":"matter"},"beru":{"g":"战争","c":"social"},"yin":{"g":"音","c":"speech"},"foto":{"g":"图画","c":"speech"},"tori":{"g":"故事","c":"speech"},"dansu":{"g":"舞蹈","c":"social"}};
+const COMP = {"suka":["su","ka"],"linka":["lin","ka"],"moka":["mo","ka"],"tenlin":["ten","lin"],"sulin":["su","lin"],"sudin":["su","din"],"sulindin":["su","lin","din"],"sukau":["su","kau"],"xinwi":["xin","wi"],"tunseitai":["tun","sei","tai"],"datunwen":["da","tun","wen"],"tandi":["tan","di"],"fudi":["fu","di"],"naudi":["nau","di"],"futen":["fu","ten"],"tanten":["tan","ten"],"funiyan":["fu","niyan"],"tanniyan":["tan","niyan"],"dawa":["da","wa"],"datera":["da","tera"],"fogomonta":["fogo","monta"],"fogomoku":["fogo","moku"],"yanwa":["yan","wa"],"reinwa":["rein","wa"],"reinten":["rein","ten"],"ceilotai":["ceilo","tai"],"xinniyan":["xin","niyan"],"tunmoku":["tun","moku"],"dinroka":["din","roka"],"dinmo":["din","mo"],"cintera":["cin","tera"],"wenka":["wen","ka"],"selaka":["sela","ka"],"wika":["wi","ka"],"witen":["wi","ten"],"wimo":["wi","mo"],"mamawen":["mama","wen"],"kouwen":["kou","wen"],"xouwen":["xou","wen"],"xouka":["xou","ka"],"heimalin":["heima","lin"],"touren":["tou","ren"],"karen":["ka","ren"],"pinren":["pin","ren"],"teraka":["tera","ka"],"geimo":["gei","mo"],"canmo":["can","mo"],"bimo":["bi","mo"],"maimo":["mai","mo"],"teinmo":["tein","mo"],"kanmo":["kan","mo"],"baumo":["bau","mo"],"kaimo":["kai","mo"],"mairen":["mai","ren"],"faren":["fa","ren"],"xunren":["xun","ren"],"tunren":["tun","ren"],"xinren":["xin","ren"],"daren":["da","ren"],"xauren":["xau","ren"],"hauren":["hau","ren"],"wairen":["wai","ren"],"cancu":["can","cu"],"mincu":["min","cu"],"maicu":["mai","cu"],"wicu":["wi","cu"],"wancu":["wan","cu"],"gonten":["gon","ten"],"hunten":["hun","ten"],"canten":["can","ten"],"dadin":["da","din"],"xaudin":["xau","din"],"maidin":["mai","din"],"xinka":["xin","ka"],"xaumau":["xau","mau"],"pinmai":["pin","mai"],"sukan":["su","kan"],"tunwan":["tun","wan"],"kadomu":["ka","domu"],"candomu":["can","domu"],"pekundomu":["pekun","domu"],"sudomu":["su","domu"],"mundomu":["mun","domu"],"kanidomu":["kani","domu"],"marodomu":["maro","domu"],"laudomu":["lau","domu"],"yifudomu":["yifu","domu"],"gewen":["ge","wen"],"genwen":["gen","wen"],"xeki":["xe","ki"],"canki":["can","ki"],"beruki":["beru","ki"],"xemo":["xe","mo"],"ludomo":["ludo","mo"],"lauren":["lau","ren"],"peiren":["pei","ren"],"beruren":["beru","ren"],"dauren":["dau","ren"],"loweren":["lowe","ren"],"geren":["ge","ren"],"cendau":["cen","dau"],"cenpota":["cen","pota"],"laudi":["lau","di"],"widi":["wi","di"],"fouge":["fou","ge"],"kamaxin":["ka","maxin"],"wenmaxin":["wen","maxin"],"pintai":["pin","tai"],"patai":["pa","tai"],"xitai":["xi","tai"],"daufoto":["dau","foto"],"renfoto":["ren","foto"]};
+const PART = {"e":"之","ye":"者","i":"和","o":"或","io":"叠或","bu":"不","mei":"每","un":"某","a":"话题顿","u":"疑问","an":"于","lo":"于","de":"从","en":"名引","ga":"施事标","wo":"受事标","ni":"与格","nau":"今锚","tan":"昔锚","fu":"将锚","le":"完成体「了」","xu":"持续体「续」","nen":"能"};
+const WG = {"suka":"意识","linka":"理性","moka":"物理","tenlin":"历史","sulin":"社会","sudin":"尊严","sulindin":"权利","sukau":"自由","xinwi":"诞生","tunseitai":"叠加态","datunwen":"大同语","tandi":"昨日","fudi":"明天","naudi":"今天","futen":"未来","tanten":"过去","funiyan":"明年","tanniyan":"去年","dawa":"海","datera":"世界","fogomonta":"火山","fogomoku":"柴火","yanwa":"眼泪","reinwa":"雨水","reinten":"雨季","ceilotai":"天气","xinniyan":"新年","tunmoku":"森林","dinroka":"宝石","dinmo":"宝物","cintera":"故土","wenka":"语言学","selaka":"天文学","wika":"生物学","witen":"一生","wimo":"生物","mamawen":"母语","kouwen":"口语","xouwen":"手语","xouka":"手艺","heimalin":"血缘","touren":"首领","karen":"学者","pinren":"同侪","teraka":"地质学","geimo":"礼物","canmo":"食物","bimo":"饮料","maimo":"货物/商品","teinmo":"声音","kanmo":"影像/景象","baumo":"行李/负载","kaimo":"钥匙/开具","mairen":"商人","faren":"工匠/制作者","xunren":"寻觅者","tunren":"同伴/朋友","xinren":"新人/新来者","daren":"成人","xauren":"小孩","hauren":"好人/善人","wairen":"坏人","cancu":"食处/食堂","mincu":"卧室/睡处","maicu":"市场","wicu":"住所/栖息地","wancu":"目的地","gonten":"白昼","hunten":"夜晚","canten":"用餐时间","dadin":"昂贵/贵重","xaudin":"便宜/廉价","maidin":"价格","xinka":"新闻","xaumau":"小猫","pinmai":"公平交易","sukan":"自省/内观","tunwan":"同行/陪同","kadomu":"学校","candomu":"餐馆","pekundomu":"银行","sudomu":"家","mundomu":"坟墓","kanidomu":"狗窝","marodomu":"马厩","laudomu":"工作场所","yifudomu":"衣柜","gewen":"诗","genwen":"事实","xeki":"笔","canki":"餐具","beruki":"武器","xemo":"文件","ludomo":"玩具","lauren":"工人","peiren":"渔民","beruren":"士兵","dauren":"旅人","loweren":"爱人","geren":"歌手","cendau":"街道","cenpota":"城门","laudi":"工作日","widi":"生日","fouge":"鸟鸣","kamaxin":"电脑","wenmaxin":"电话","pintai":"和平","patai":"焦虑","xitai":"幸福","daufoto":"地图","renfoto":"肖像"};
+
+/* ============ 音节切分与词解析 ============ */
+const SYL_RE = new RegExp('^(' + ONS.join('|') + ')?(ai|au|ei|ou|[aeiou])(n)?$');
+function sylParse(s, needOnset) {
+  const m = SYL_RE.exec(s);
+  if (!m) return null;
+  if (needOnset && !m[1]) return null;
+  return { on: m[1] || '', nuc: m[2], coda: m[3] || '' };
+}
+function syllabify(s, needOnset = true) {
+  if (!s.length) return [];
+  for (let L = Math.min(4, s.length); L >= 1; L--) {
+    const head = sylParse(s.slice(0, L), needOnset);
+    if (head) {
+      const rest = syllabify(s.slice(L), needOnset);
+      if (rest) return [head, ...rest];
+    }
+  }
+  return null;
+}
+function parseWord(raw) {
+  const w = { raw, contour: 'ref', units: [], particle: false };
+  let tok = raw;
+  let mIdx = 0;
+  if (PART[tok] !== undefined) {
+    w.particle = true; w.contour = 'low';
+    const syls = syllabify(tok, false);
+    if (!syls) return null;
+    syls.forEach(s => w.units.push({ syl: s, cls: null, name: false, m: 0 }));
+    return w;
+  }
+  const mm = /^(.+?)([qz])$/.exec(tok);
+  if (mm) { tok = mm[1]; w.contour = mm[2] === 'q' ? 'pred' : 'attr'; }
+  for (const seg of tok.split('-')) {
+    if (!seg) return null;
+    if (/^[A-Z]/.test(seg)) {
+      const syls = syllabify(seg.toLowerCase());
+      if (!syls) return null;
+      syls.forEach(s => { w.units.push({ syl: s, cls: null, name: true, m: mIdx }); mIdx++; });
+    } else {
+      const morphs = COMP[seg] ? COMP[seg] : (LEX[seg] ? [seg] : null);
+      if (morphs) {
+        for (const mo of morphs) {
+          const syls = syllabify(mo, PART[mo] === undefined);
+          if (!syls) return null;
+          syls.forEach((s, i) => w.units.push({ syl: s, cls: i === 0 ? ((LEX[mo] || {}).c || null) : null, name: false, m: mIdx }));
+          mIdx++;
+        }
+      } else {
+        const syls = syllabify(seg);
+        if (!syls) return null;
+        syls.forEach(s => w.units.push({ syl: s, cls: null, name: false, m: mIdx }));
+        mIdx++;
+      }
+    }
+  }
+  return w.units.length ? w : null;
+}
+function gloss(raw) {
+  if (WG[raw]) return WG[raw];
+  if (PART[raw] !== undefined) return PART[raw];
+  const m = /^(.+?)([qz])$/.exec(raw);
+  const base = m ? m[1] : raw;
+  const suf = m ? (m[2] === 'q' ? '（谓）' : '（修）') : '';
+  const morphs = COMP[base] || (LEX[base] ? [base] : null);
+  if (morphs) return morphs.map(x => LEX[x] ? LEX[x].g : (PART[x] || '?')).join('·') + suf;
+  return /^[A-Z]/.test(raw) ? '专名' : '—';
+}
+/*PURE-END*/
+
+/* ============ 字形部件（特征几何） ============ */
+const ST = d => `<path class="st" d="${d}"/>`;
+const FL = (x, y, r = 3.4) => `<circle class="fl" cx="${x}" cy="${y}" r="${r}"/>`;
+const CIRC = '<circle class="st" cx="29" cy="66" r="13"/>';
+const VL = ST('M29,40 V92'), ANG = ST('M16,40 H42 V92'), TBAR = ST('M16,40 H42'), SLASH = ST('M40,46 L18,88');
+const ONSET_P = {
+  p: CIRC, b: CIRC + FL(29, 66), m: CIRC + TBAR, f: CIRC + SLASH,
+  w: '<circle class="st" cx="28" cy="74" r="9"/>' + ST('M34,67 C38,58 42,50 43,42'),
+  t: VL, d: VL + FL(37, 66), n: VL + TBAR, s: VL + SLASH,
+  r: ST('M29,40 V76 C29,88 38,92 44,84'),
+  c: VL + SLASH + ST('M21,40 H37'),
+  l: ST('M29,40 V76 C29,88 38,92 44,84'),
+  k: ANG, g: ANG + FL(29, 72), h: ANG + ST('M38,52 L18,88'),
+  x: ST('M42,42 C16,48 16,84 42,90') + ST('M38,52 L20,84'),
+  y: ST('M39,60 C27,62 27,80 39,82') + ST('M39,56 C41,50 43,45 44,40')
+};
+const NUC_P = {
+  a: ST('M52,58 H84'),
+  e: ST('M52,58 H78') + ST('M78,58 V69'),
+  i: ST('M68,40 V74'),
+  o: '<circle class="st" cx="68" cy="57" r="13"/>',
+  u: ST('M52,44 C52,74 84,74 84,44'),
+  ai: ST('M52,58 H78') + ST('M83,38 V50'),
+  au: ST('M52,58 H76') + ST('M78,40 C78,48 86,48 86,40'),
+  ei: ST('M52,60 H74') + ST('M74,60 V69') + ST('M83,38 V50'),
+  ou: '<circle class="st" cx="64" cy="58" r="11"/>' + ST('M79,40 C79,48 87,48 87,40')
+};
+const CLS_P = {
+  mind: '<path class="cls" d="M17,95 C17,87 27,87 27,92 C27,96 21,97 20,93"/>',
+  matter: '<rect class="fl2" x="17" y="86" width="9" height="9" rx="1.5"/>',
+  life: '<path class="cls" d="M22,98 V86 M22,90 C18,87 17,85 16,83 M22,90 C26,87 27,85 28,83"/>',
+  time: '<path class="cls" d="M16,95 C17,87 27,86 28,91 M28,91 L24,88 M28,91 L25,95"/>',
+  social: '<circle class="fl2" cx="17" cy="94" r="2"/><circle class="fl2" cx="29" cy="94" r="2"/><path class="cls" d="M19,94 H27"/>',
+  speech: '<path class="cls" d="M16,87 H28 M16,92 H26 M16,97 H23"/>',
+  animal: '<circle class="fl2" cx="18" cy="86" r="1.8"/><circle class="fl2" cx="23" cy="84" r="1.8"/><circle class="fl2" cx="28" cy="86" r="1.8"/><path class="cls" d="M17,96 C20,91 26,91 29,96"/>'
+};
+function unitSVG(u) {
+  let s = '<rect class="frame" x="6" y="26" width="84" height="82" rx="10"/>';
+  if (u.syl.on) s += ONSET_P[u.syl.on] || '';
+  s += NUC_P[u.syl.nuc] || '';
+  if (u.syl.coda) s += ST('M52,88 H84');
+  if (u.cls && CLS_P[u.cls]) s += CLS_P[u.cls];
+  if (u.name) s += '<path class="nameline" d="M8,116 H88"/>';
+  return s;
+}
+function glyphSVG(word, px = 46, drawable = false) {
+  const w = typeof word === 'string' ? parseWord(word) : word;
+  if (!w) return null;
+  const n = w.units.length;
+  let x = 4, parts = '';
+  w.units.forEach((u, i) => {
+    const lastM = w.units[w.units.length - 1].m; const s = w.particle ? 0.58 : (u.name ? 1 : (u.m === lastM ? 1 : 0.74));
+    parts += `<g transform="translate(${x.toFixed(1)},${(108 * (1 - s)).toFixed(1)}) scale(${s})">${unitSVG(u)}</g>`;
+    x += 92 * s + 3;
+  });
+  const W = x + 3;
+  let roof = '';
+  if (!w.particle) {
+    const a = 8, b = W - 8;
+    const d = w.contour === 'pred' ? `M${a},7 L${b},20` : w.contour === 'attr' ? `M${a},20 L${b},7` : `M${a},14 L${b},14`;
+    roof = `<path class="roof" d="${d}"/>`;
+  }
+  return `<svg class="gly${drawable ? ' drawable' : ''}" viewBox="0 0 ${W.toFixed(0)} 122" style="height:${px}px;width:${(px * W / 122).toFixed(1)}px"${w.particle ? ' opacity=".82"' : ''} aria-hidden="true">${roof}${parts}</svg>`;
+}
+
+/* ============ 页面装配 ============ */
+function wordButton(core, px) {
+  const svg = glyphSVG(core, px);
+  if (!svg) return null;
+  const b = document.createElement('button');
+  b.className = 'dw'; b.dataset.w = core; b.type = 'button';
+  b.setAttribute('aria-label', core + ' ' + gloss(core) + '，点击发音');
+  b.innerHTML = svg + `<span class="r">${core}</span><span class="g">${gloss(core)}</span>`;
+  return b;
+}
+function buildSent(el) {
+  const px = el.classList.contains('big') ? 56 : 44;
+  el.dataset.sent.trim().split(/\s+/).forEach(t => {
+    const comma = /[,，]$/.test(t);
+    const core = t.replace(/[.,，。]+$/, '');
+    if (core) {
+      const b = wordButton(core, px);
+      if (b) el.appendChild(b);
+    }
+    if (comma) { const g = document.createElement('span'); g.className = 'gap'; el.appendChild(g); }
+  });
+}
+qsa('[data-sent]').forEach(buildSent);
+
+qsa('.card[data-word]').forEach(c => {
+  const wd = c.dataset.word;
+  c.innerHTML = `<div class="glyph"></div><div class="rom">${wd}</div><div class="mean">${c.dataset.mean}</div><div class="ety">${c.dataset.ety}</div>`;
+  const b = wordButton(wd, 62);
+  b.querySelector('.r').remove(); b.querySelector('.g').remove();
+  c.querySelector('.glyph').appendChild(b);
+});
+
+/* 首屏 */
+(function hero() {
+  const h = qs('#heroGlyphs'); if (!h) return;
+  const b = wordButton('datunwen', 108);
+  b.querySelector('.g').textContent = 'da 大 · tun 同 · wen 文　——「大同」之语，语言自名';
+  b.querySelector('svg').classList.add('drawable');
+  h.appendChild(b);
+})();
+
+/* 字块解剖 */
+(function anatomy() {
+  const el = qs('#anatomy'); if (!el) return;
+  const items = [
+    ['var(--dian)', '屋顶＝音高姿态', '整词一条轮廓：平顶＝指称，降顶（如本例 -q）＝谓述，升顶＝修饰，虚词无顶。屋顶的跨度就是词界——听觉轮廓、视觉屋顶、句法词，三位一体。'],
+    ['currentColor', '左格＝声母', 'k 的折角基形＝软腭部位；基形上的修饰笔（心点/顶横/斜劈）标发音方式。'],
+    ['currentColor', '右上格＝韵母', 'a 的长横。复元音在右上角加滑尾小笔。'],
+    ['currentColor', '右下杠＝韵尾 -n', '唯一的韵尾，一道底杠。'],
+    ['var(--zhu)', '左下朱记＝义符', '约 40 个语义类之一（此处「心」类）。渲染器自动补入，口语不发音——纯冗余的语义索引，即形声字部首的工程化。'],
+    ['var(--glyph-frame)', '方框＝蒙学格（非结构）', '不承重的辅助格线，见下方设计裁决。复合词共享一片屋顶：修饰根缩格、中心根满格，语法树画在版面上。']
+  ];
+  el.innerHTML = `<div class="anwrap"><div style="text-align:center">${glyphSVG('kanq', 190)}<div class="figcap" style="text-align:center">kanq「看见」＝ kan（看）＋降调谓述</div></div><ul class="anlegend">${items.map(i => `<li><span class="sw" style="background:${i[0]}"></span><span><b>${i[1]}</b><span class="d">　${i[2]}</span></span></li>`).join('')}</ul></div>`;
+})();
+
+/* 输入法 */
+(function ime() {
+  const inp = qs('#imeIn'), out = qs('#imeOut'); if (!inp) return;
+  function render() {
+    out.innerHTML = '';
+    inp.value.trim().split(/\s+/).forEach(t => {
+      const comma = /[,，]$/.test(t);
+      const core = t.replace(/[.,，。]+$/, '');
+      if (core) {
+        const b = wordButton(core, 52);
+        if (b) out.appendChild(b);
+        else { const e = document.createElement('span'); e.className = 'err'; e.textContent = '✗ ' + core + '（不合音系）'; out.appendChild(e); }
+      }
+      if (comma) { const g = document.createElement('span'); g.className = 'gap'; out.appendChild(g); }
+    });
+  }
+  inp.addEventListener('input', render);
+  qsa('#imeChips button').forEach(b => b.addEventListener('click', () => { inp.value = b.dataset.fill; render(); inp.focus(); }));
+  render();
+})();
+
+/* ============ 共振峰合成器（Klatt 式 · 连续声道） ============ */
+let AC = null, master = null, noiseBuf = null, glottalWave = null;
+function ac() {
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = AC.createDynamicsCompressor();
+    comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 5;
+    const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4800; lp.Q.value = 0.4;
+    const hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 75;
+    const g = AC.createGain(); g.gain.value = 1.25;
+    comp.connect(lp); lp.connect(hp); hp.connect(g); g.connect(AC.destination);
+    master = comp;
+    noiseBuf = AC.createBuffer(1, Math.floor(AC.sampleRate * 1.2), AC.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    /* 声门脉冲：谐波按 1/n^1.55 衰减的软源，比锯齿波接近真嗓 */
+    const N = 48, re = new Float32Array(N + 1), im = new Float32Array(N + 1);
+    for (let n = 1; n <= N; n++) im[n] = 1 / Math.pow(n, 1.55);
+    glottalWave = AC.createPeriodicWave(re, im);
+  }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+/* 元音共振峰目标（F1–F4）与振幅 */
+const VOW = {
+  a: [780, 1240, 2600, 3300], e: [460, 1950, 2600, 3300], i: [300, 2250, 2900, 3400],
+  o: [480, 900, 2500, 3200], u: [320, 780, 2400, 3200]
+};
+const AV = [1, .55, .28, .14], AN = [.9, .22, .12, .08];
+const LOCUS = { lab: 850, alv: 1750, vel: 2250, pal: 2100 };
+const F0C = { ref: [178, 168], pred: [212, 112], attr: [122, 200], low: [108, 104] };
+/* 每音节展开为音素时间线：{d 时长, F 共振峰目标, A 振幅, v 嗓音, n 送气, s 擦音路, burst 爆破} */
+function phonesFor(syl, particle) {
+  const ph = [];
+  const n1 = syl.nuc[0], n2 = syl.nuc.length > 1 ? syl.nuc[1] : null;
+  const on = syl.on;
+  const vdur = (n2 ? .195 : .15) * (particle ? .72 : 1);
+  if (on) {
+    const place = 'pbmfw'.includes(on) ? 'lab' : 'kgh'.includes(on) ? 'vel' : 'xcy'.includes(on) ? 'pal' : 'alv';
+    const locus = [300, LOCUS[place], place === 'vel' ? 2400 : 2600, 3300];
+    if ('ptk'.includes(on)) {
+      ph.push({ d: .058, v: 0, F: locus });
+      ph.push({ d: .012, v: 0, burst: { p: [0, .55], t: [2, .6], k: [1, .65] }[on] });
+      ph.push({ d: .032, v: 0, n: .3, F: VOW[n1], A: AV });
+    } else if ('bdg'.includes(on)) {
+      ph.push({ d: .045, v: .15, F: [170, LOCUS[place], 2500, 3300], A: [1, .12, .05, .03] });
+      ph.push({ d: .012, v: .2, burst: { b: [0, .28], d: [2, .3], g: [1, .33] }[on] });
+    } else if (on === 'm' || on === 'n') {
+      ph.push({ d: .072, v: .55, F: [250, on === 'm' ? 1000 : 1500, 2300, 3300], A: AN });
+    } else if (on === 'r' || on === 'l') {
+      ph.push({ d: .05, v: .7, F: [360, 1150, 2700, 3300], A: [.9, .5, .3, .12] });
+    } else if (on === 'w' || on === 'y') {
+      ph.push({ d: .058, v: .78, F: VOW[on === 'w' ? 'u' : 'i'], A: AV });
+    } else if (on === 'f') { ph.push({ d: .085, v: 0, s: [0, .14], F: locus });
+    } else if (on === 's') { ph.push({ d: .09, v: 0, s: [2, .22], F: locus });
+    } else if (on === 'x') { ph.push({ d: .09, v: 0, s: [1, .24], F: locus });
+    } else if (on === 'h') { ph.push({ d: .07, v: 0, n: .32, F: VOW[n1], A: AV });
+    } else if (on === 'c') {
+      ph.push({ d: .045, v: 0, F: locus });
+      ph.push({ d: .065, v: 0, s: [1, .24] });
+    }
+  }
+  ph.push({ d: n2 ? vdur * .55 : vdur, v: 1, F: VOW[n1], A: AV, vowel: true });
+  if (n2) ph.push({ d: vdur * .45, v: .95, F: VOW[n2], A: AV, glide: .05, vowel: true });
+  if (syl.coda) ph.push({ d: .065, v: .5, F: [250, 1400, 2300, 3300], A: AN });
+  return ph;
+}
+function scheduleWord(raw, t0, f0mul = 1) {
+  const w = parseWord(raw); if (!w) return 0.15;
+  return scheduleParsed(w, t0, f0mul);
+}
+function scheduleParsed(w, t0, f0mul = 1) {
+  ac();
+  const amp = w.particle ? .5 : 1;
+  const phones = [];
+  w.units.forEach((u, ui) => {
+    const ps = phonesFor(u.syl, w.particle);
+    if (ui === w.units.length - 1) for (const p of ps) if (p.vowel) p.d *= 1.12;
+    phones.push(...ps);
+  });
+  const total = phones.reduce((a, p) => a + p.d, 0);
+  const [A, B] = F0C[w.contour];
+  /* 声门源：整词连续发声 + 微颤 */
+  const o = AC.createOscillator(); o.setPeriodicWave(glottalWave);
+  o.frequency.setValueAtTime(A * f0mul, t0);
+  o.frequency.linearRampToValueAtTime(B * f0mul, t0 + total);
+  const lfo = AC.createOscillator(); lfo.frequency.value = 5.2;
+  const lg = AC.createGain(); lg.gain.value = 2.6;
+  lfo.connect(lg); lg.connect(o.frequency);
+  const vG = AC.createGain(); vG.gain.setValueAtTime(0, t0); o.connect(vG);
+  /* 送气噪声（经共振峰塑形） */
+  const asp = AC.createBufferSource(); asp.buffer = noiseBuf; asp.loop = true;
+  const aG = AC.createGain(); aG.gain.setValueAtTime(0, t0); asp.connect(aG);
+  /* 四个共振峰谐振器 */
+  const Fs = [], Gs = [], Qv = [9, 13, 12, 10];
+  for (let k = 0; k < 4; k++) {
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = Qv[k];
+    const g = AC.createGain(); g.gain.setValueAtTime(0, t0);
+    vG.connect(f); aG.connect(f); f.connect(g); g.connect(master);
+    Fs.push(f); Gs.push(g);
+  }
+  /* 三条擦音/爆破谱路：0 唇钝 · 1 腭中 · 2 齿锐 */
+  const fr = AC.createBufferSource(); fr.buffer = noiseBuf; fr.loop = true; fr.playbackRate.value = .97;
+  const frG = [['lowpass', 1400, .7], ['bandpass', 2850, 3.2], ['highpass', 5200, .8]].map(sp => {
+    const f = AC.createBiquadFilter(); f.type = sp[0]; f.frequency.value = sp[1]; f.Q.value = sp[2];
+    const g = AC.createGain(); g.gain.setValueAtTime(0, t0);
+    fr.connect(f); f.connect(g); g.connect(master);
+    return g;
+  });
+  /* 时间线自动化 */
+  const first = phones.find(p => p.F) || { F: VOW.a };
+  for (let k = 0; k < 4; k++) Fs[k].frequency.setValueAtTime(first.F[k], t0);
+  let t = t0;
+  for (const p of phones) {
+    const tc = p.glide || .024;
+    if (p.F) for (let k = 0; k < 4; k++) Fs[k].frequency.setTargetAtTime(p.F[k], t, tc);
+    const A4 = p.A || AV;
+    const open = (p.v || p.n) ? 1 : 0.0001;
+    for (let k = 0; k < 4; k++) Gs[k].gain.setTargetAtTime(A4[k] * open * .9, t, .014);
+    vG.gain.setTargetAtTime((p.v || 0) * .5 * amp, t, .013);
+    aG.gain.setTargetAtTime(((p.n || 0) * .9 + (p.vowel ? .015 : 0)) * amp, t, .015);
+    for (let pi = 0; pi < 3; pi++) {
+      if (p.s && p.s[0] === pi) frG[pi].gain.setTargetAtTime(p.s[1] * amp, t, .02);
+      else if (!(p.burst && p.burst[0] === pi)) frG[pi].gain.setTargetAtTime(0.0001, t, .018);
+    }
+    if (p.burst) {
+      const g = frG[p.burst[0]];
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(p.burst[1] * amp, t + .004);
+      g.gain.linearRampToValueAtTime(0.0001, t + .015);
+    }
+    t += p.d;
+  }
+  vG.gain.setTargetAtTime(0.0001, t, .02);
+  aG.gain.setTargetAtTime(0.0001, t, .02);
+  for (const g of Gs) g.gain.setTargetAtTime(0.0001, t, .025);
+  for (const g of frG) g.gain.setTargetAtTime(0.0001, t, .02);
+  const tEnd = t + .14;
+  o.start(t0); o.stop(tEnd); lfo.start(t0); lfo.stop(tEnd);
+  asp.start(t0); asp.stop(tEnd); fr.start(t0); fr.stop(tEnd);
+  return total;
+}
+function flashWord(el, tRel, dur) {
+  if (!el) return;
+  setTimeout(() => el.classList.add('playing'), tRel * 1000);
+  setTimeout(() => el.classList.remove('playing'), (tRel + dur) * 1000);
+}
+function playWord(raw, el) {
+  const dur = scheduleWord(raw, ac().currentTime + 0.05);
+  flashWord(el, 0.05, dur);
+}
+function playSentence(str) {
+  ac();
+  const esc = str.replace(/"/g, '\\"');
+  const line = document.querySelector(`[data-sent="${esc}"]`);
+  const btns = line ? [...line.querySelectorAll('.dw')] : [];
+  const T0 = AC.currentTime + 0.08;
+  let t = 0, bi = 0, wi = 0;
+  str.trim().split(/\s+/).forEach(tok => {
+    const comma = /[,，]$/.test(tok);
+    const core = tok.replace(/[.,，。]+$/, '');
+    if (core) {
+      const dur = scheduleWord(core, T0 + t, Math.pow(0.986, wi++));
+      flashWord(btns[bi++], 0.08 + t, dur);
+      t += dur + 0.07;
+    }
+    if (comma) t += 0.22;
+  });
+}
+document.addEventListener('click', e => {
+  const dw = e.target.closest('.dw');
+  if (dw) { playWord(dw.dataset.w, dw); return; }
+  const ph = e.target.closest('.phb');
+  if (ph) {
+    ac();
+    const syl = sylParse(ph.dataset.syl, false);
+    if (syl) scheduleParsed({ contour: 'ref', particle: false, units: [{ syl, cls: null, name: false }] }, AC.currentTime + 0.05);
+    return;
+  }
+  const pl = e.target.closest('button.play');
+  if (pl) playSentence(pl.dataset.say);
+});
+
+/* ============ 密度散点图 ============ */
+(function chart() {
+  const el = qs('#densityChart'); if (!el) return;
+  const W = 680, H = 400, L = 54, R = 18, T = 16, B = 48;
+  const x0 = 4.4, x1 = 8.6, y0 = 4, y1 = 10.8;
+  const X = v => L + (v - x0) / (x1 - x0) * (W - L - R);
+  const Y = v => H - B - (v - y0) / (y1 - y0) * (H - T - B);
+  let s = '';
+  for (let gx = 5; gx <= 8; gx++) s += `<line class="grid" x1="${X(gx)}" y1="${Y(y0)}" x2="${X(gx)}" y2="${Y(y1)}"/><text x="${X(gx)}" y="${H - B + 18}" text-anchor="middle">${gx}</text>`;
+  for (let gy = 5; gy <= 10; gy++) s += `<line class="grid" x1="${X(x0)}" y1="${Y(gy)}" x2="${X(x1)}" y2="${Y(gy)}"/><text x="${L - 8}" y="${Y(gy) + 4}" text-anchor="end">${gy}</text>`;
+  s += `<line class="axisln" x1="${X(x0)}" y1="${Y(y0)}" x2="${X(x1)}" y2="${Y(y0)}"/>`;
+  s += `<text class="axt" x="${(L + W - R) / 2}" y="${H - 12}" text-anchor="middle">语速（音节 / 秒）</text>`;
+  s += `<text class="axt" transform="translate(15,${(T + H - B) / 2}) rotate(-90)" text-anchor="middle">信息密度（bits / 音节）</text>`;
+  for (const rate of [39, 60]) {
+    let d = '', started = false;
+    for (let x = x0; x <= x1 + 0.001; x += 0.05) {
+      const y = rate / x;
+      if (y < y0 || y > y1) { continue; }
+      d += (started ? 'L' : 'M') + X(x).toFixed(1) + ',' + Y(y).toFixed(1); started = true;
+    }
+    s += `<path class="iso" d="${d}"/>`;
+  }
+  s += `<text x="${X(4.55)}" y="${Y(39 / 4.55) - 8}">39 bits/s ＝ 自然语言均值</text>`;
+  s += `<text x="${X(6.15)}" y="${Y(60 / 6.15) - 8}">60 bits/s</text>`;
+  const langs = [['日语', 7.84, 4.9, 1, 14], ['西班牙语', 7.82, 5.2, 1, -8], ['意大利语', 6.99, 5.7, 1, -8], ['英语', 6.19, 7.1, 1, -8], ['官话', 5.18, 7.5, 1, -8], ['越南语', 5.30, 8.0, 1, -8]];
+  for (const [nm, x, y, , dy] of langs) {
+    s += `<circle class="natpt" cx="${X(x)}" cy="${Y(y)}" r="4.5"/><circle class="hit" cx="${X(x)}" cy="${Y(y)}" r="13" data-tip="${nm}：约 ${x} 音节/秒 × ${y} bits/音节 ≈ ${(x * y).toFixed(0)} bits/s"/><text class="lbl" x="${X(x) + 9}" y="${Y(y) + dy + 8}">${nm}</text>`;
+  }
+  const star = (cx, cy, r) => { let p = ''; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.46 : r; p += (i ? 'L' : 'M') + (cx + rr * Math.cos(a)).toFixed(1) + ',' + (cy + rr * Math.sin(a)).toFixed(1); } return p + 'Z'; };
+  const dx = 6.3;
+  s += `<line x1="${X(dx)}" y1="${Y(9.7)}" x2="${X(dx)}" y2="${Y(7.15)}" stroke="var(--zhu)" stroke-dasharray="2 5" stroke-width="1.6"/>`;
+  s += `<path d="${star(X(dx), Y(9.7), 9)}" fill="var(--zhu)"/><circle class="hit" cx="${X(dx)}" cy="${Y(9.7)}" r="14" data-tip="大同语 · 理论信道容量：≈8.2 bits 音段熵 + ≈2 bits 音高信道，按 6.3 音节/秒 ≈ 61 bits/s（设计推算）"/>`;
+  s += `<text class="lbl" x="${X(dx) + 13}" y="${Y(9.7) + 4}" fill="var(--zhu)">大同语（信道容量）</text>`;
+  s += `<circle cx="${X(dx)}" cy="${Y(7.15)}" r="5.5" fill="none" stroke="var(--zhu)" stroke-width="2.4"/><circle class="hit" cx="${X(dx)}" cy="${Y(7.15)}" r="13" data-tip="大同语 · 保守实现估计：扣除必要冗余后 ≈45 bits/s，仍越过自然语言的 39 bits/s 收敛线"/>`;
+  s += `<text class="lbl" x="${X(dx) + 13}" y="${Y(7.15) + 4}" fill="var(--zhu)">保守实现（含冗余）</text>`;
+  s += `<g><circle class="natpt" cx="${X(7.55)}" cy="${Y(10.35)}" r="4.5"/><text x="${X(7.55) + 10}" y="${Y(10.35) + 4}">自然语言（实测近似）</text><path d="${star(X(7.55), Y(9.85), 7)}" fill="var(--zhu)"/><text x="${X(7.55) + 10}" y="${Y(9.85) + 4}">大同语（设计推算）</text></g>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="各语言语速与每音节信息密度散点图，大同语的设计位置在自然语言等信息率曲线之外">${s}</svg>`;
+})();
+
+/* 提示浮层 */
+document.addEventListener('mousemove', e => {
+  const tip = qs('#tip'); if (!tip) return;
+  const t = e.target.closest('[data-tip]');
+  if (t) {
+    tip.textContent = t.dataset.tip; tip.style.opacity = 1;
+    tip.style.left = Math.min(window.innerWidth - 280, e.clientX + 14) + 'px';
+    tip.style.top = (e.clientY + 18) + 'px';
+  } else tip.style.opacity = 0;
+});
+
+const DICT = [{"f":"ka","kind":"root","cls":"mind","en":"know; cognition","zh":"知·认知","srcEN":"Latin cognōscere","srcZH":"拉丁 cognōscere 之 /k/","num":false,"layer":"canon"},{"f":"mo","kind":"root","cls":"matter","en":"matter; thing","zh":"物·质料","srcEN":"Latin mōlēs/māteria","srcZH":"拉丁 mōlēs；粤语「物」mat⁶","num":false,"layer":"canon"},{"f":"ten","kind":"root","cls":"time","en":"time; flow","zh":"时·流","srcEN":"Latin tempus","srcZH":"拉丁 tempus；「时间」之韵","num":false,"layer":"canon"},{"f":"lin","kind":"root","cls":null,"en":"link; relation","zh":"连·关系","srcEN":"English link + 连 lián","srcZH":"英 link ＋ 连 lián——双源命中","num":false,"layer":"canon"},{"f":"su","kind":"root","cls":"mind","en":"self","zh":"己·自我","srcEN":"Latin suī (reflexive)","srcZH":"拉丁反身词根 suī","num":false,"layer":"canon"},{"f":"wi","kind":"root","cls":"life","en":"life; alive","zh":"生·活","srcEN":"Latin vīta / French vie","srcZH":"拉丁 vīta／法 vie","num":false,"layer":"canon"},{"f":"mun","kind":"root","cls":"life","en":"death; die","zh":"死","srcEN":"Latin mortuus","srcZH":"拉丁 mortuus；汉「殁」mò","num":false,"layer":"canon"},{"f":"mau","kind":"root","cls":"animal","en":"cat","zh":"猫","srcEN":"māo / meow — universal onomatopoeia","srcZH":"猫 māo／meow——跨语系拟声公约数","num":false,"layer":"canon"},{"f":"kau","kind":"root","cls":null,"en":"cause; make happen","zh":"因·使","srcEN":"Latin causa","srcZH":"拉丁 causa；汉「因果」","num":false,"layer":"canon"},{"f":"xin","kind":"root","cls":"time","en":"new; begin","zh":"新·始","srcEN":"新 xīn","srcZH":"新 xīn","num":false,"layer":"canon"},{"f":"tun","kind":"root","cls":"social","en":"together; same","zh":"同·共","srcEN":"同 tóng","srcZH":"同 tóng","num":false,"layer":"canon"},{"f":"sei","kind":"root","cls":null,"en":"exist; be","zh":"在·是","srcEN":"German sein / Latin esse","srcZH":"德 sein／汉「是」","num":false,"layer":"canon"},{"f":"tai","kind":"root","cls":null,"en":"state; condition","zh":"态·状","srcEN":"态 tài (cf. state)","srcZH":"态 tài","num":false,"layer":"canon"},{"f":"din","kind":"root","cls":"mind","en":"worth; value","zh":"值·尊","srcEN":"Latin dignus","srcZH":"拉丁 dignus（dignity 之源）","num":false,"layer":"canon"},{"f":"pin","kind":"root","cls":null,"en":"equal; level; flat","zh":"平·等","srcEN":"平 píng + Latin plānus","srcZH":"平 píng ＋ 拉丁 plānus——双源命中","num":false,"layer":"canon"},{"f":"da","kind":"root","cls":null,"en":"big; great","zh":"大","srcEN":"大 dà","srcZH":"大 dà","num":false,"layer":"canon"},{"f":"ren","kind":"root","cls":"social","en":"person; human","zh":"人","srcEN":"人 rén","srcZH":"人 rén","num":false,"layer":"canon"},{"f":"wen","kind":"root","cls":"speech","en":"language; writing","zh":"文·语","srcEN":"文 wén","srcZH":"文 wén","num":false,"layer":"canon"},{"f":"cu","kind":"root","cls":null,"en":"be located at; dwell","zh":"处","srcEN":"处 chù","srcZH":"处 chù","num":false,"layer":"canon"},{"f":"kan","kind":"root","cls":"mind","en":"see; look","zh":"看","srcEN":"看 kàn","srcZH":"看 kàn","num":false,"layer":"canon"},{"f":"can","kind":"root","cls":"life","en":"eat","zh":"食·餐","srcEN":"餐 cān (cf. chow)","srcZH":"餐 cān","num":false,"layer":"canon"},{"f":"pei","kind":"root","cls":"animal","en":"fish","zh":"鱼","srcEN":"Spanish pez / Italian pesce","srcZH":"西 pez／意 pesce","num":false,"layer":"canon"},{"f":"di","kind":"root","cls":"time","en":"day","zh":"日·天","srcEN":"Latin diēs","srcZH":"拉丁 diēs","num":false,"layer":"canon"},{"f":"to","kind":"root","cls":null,"en":"that (demonstrative)","zh":"那","srcEN":"that / Slavic to","srcZH":"英 that／斯拉夫 to","num":false,"layer":"canon"},{"f":"mi","kind":"pronoun","cls":null,"en":"I; me","zh":"我","srcEN":"Latin mē / me","srcZH":"拉丁 mē／英 me","num":false,"layer":"canon"},{"f":"yu","kind":"pronoun","cls":null,"en":"you","zh":"你","srcEN":"English you + 汝 rǔ","srcZH":"英 you ＋ 汝 rǔ","num":false,"layer":"canon"},{"f":"ta","kind":"pronoun","cls":null,"en":"he / she / it","zh":"他·她·它","srcEN":"他 tā","srcZH":"他 tā","num":false,"layer":"canon"},{"f":"e","kind":"particle","cls":null,"en":"attributive linker (noun phrase → modifier)","zh":"之·的（短语定语）","srcEN":"的 de / の no / Romance de","srcZH":"的／の／罗曼 de","num":false,"layer":"canon"},{"f":"ye","kind":"particle","cls":null,"en":"clause linker (relativizer)","zh":"者（从句定语）","srcEN":"Classical Chinese 者 zhě","srcZH":"文言「者」","num":false,"layer":"canon"},{"f":"i","kind":"particle","cls":null,"en":"and (∧)","zh":"和","srcEN":"Spanish y / Russian и","srcZH":"西 y／俄 и","num":false,"layer":"canon"},{"f":"o","kind":"particle","cls":null,"en":"or (∨)","zh":"或","srcEN":"Spanish o / Latin aut","srcZH":"西 o／拉丁 aut","num":false,"layer":"canon"},{"f":"io","kind":"particle","cls":null,"en":"both-and (⊕ superpositive)","zh":"叠或","srcEN":"transparent fusion of i + o","srcZH":"i＋o 透明合成","num":false,"layer":"canon"},{"f":"bu","kind":"particle","cls":null,"en":"not (¬)","zh":"不","srcEN":"不 bù","srcZH":"不 bù","num":false,"layer":"canon"},{"f":"mei","kind":"particle","cls":null,"en":"every (∀)","zh":"每","srcEN":"每 měi","srcZH":"每 měi","num":false,"layer":"canon"},{"f":"un","kind":"particle","cls":null,"en":"some; a (∃)","zh":"某·一（不定）","srcEN":"Latin ūnus","srcZH":"拉丁 ūnus","num":false,"layer":"canon"},{"f":"a","kind":"particle","cls":null,"en":"topic pause (as for …)","zh":"话题顿","srcEN":"pause particle 啊","srcZH":"语气「啊」","num":false,"layer":"canon"},{"f":"u","kind":"particle","cls":null,"en":"question marker","zh":"疑问","srcEN":"a priori","srcZH":"先验设计","num":false,"layer":"canon"},{"f":"an","kind":"particle","cls":null,"en":"at (time point)","zh":"于（时点）","srcEN":"a priori","srcZH":"先验设计","num":false,"layer":"canon"},{"f":"lo","kind":"particle","cls":null,"en":"in / at (place, domain)","zh":"于（处所·论域）","srcEN":"Latin locus","srcZH":"拉丁 locus","num":false,"layer":"canon"},{"f":"de","kind":"particle","cls":null,"en":"from (source)","zh":"从","srcEN":"Latin dē","srcZH":"拉丁 dē","num":false,"layer":"canon"},{"f":"en","kind":"particle","cls":null,"en":"proper-name marker","zh":"名引","srcEN":"n- of name / nōmen / 名","srcZH":"name／nōmen／名 的跨语言 n-","num":false,"layer":"canon"},{"f":"ga","kind":"particle","cls":null,"en":"agent marker (non-default order)","zh":"施事标","srcEN":"Japanese が","srcZH":"日语 が","num":false,"layer":"canon"},{"f":"wo","kind":"particle","cls":null,"en":"patient marker (non-default order)","zh":"受事标","srcEN":"Japanese を","srcZH":"日语 を","num":false,"layer":"canon"},{"f":"ni","kind":"particle","cls":null,"en":"dative / goal","zh":"与格","srcEN":"Japanese に","srcZH":"日语 に","num":false,"layer":"canon"},{"f":"nau","kind":"particle","cls":null,"en":"present anchor","zh":"今锚","srcEN":"now / Latin nunc","srcZH":"英 now／拉丁 nunc","num":false,"layer":"canon"},{"f":"tan","kind":"particle","cls":null,"en":"past anchor","zh":"昔锚","srcEN":"French antan (yesteryear)","srcZH":"法 antan（昔年）","num":false,"layer":"canon"},{"f":"fu","kind":"particle","cls":null,"en":"future anchor","zh":"将锚","srcEN":"Latin futūrus","srcZH":"拉丁 futūrus","num":false,"layer":"canon"},{"f":"le","kind":"particle","cls":null,"en":"perfective aspect","zh":"完成体「了」","srcEN":"了 le","srcZH":"了 le","num":false,"layer":"canon"},{"f":"xu","kind":"particle","cls":null,"en":"durative aspect","zh":"持续体「续」","srcEN":"续 xù","srcZH":"续 xù","num":false,"layer":"canon"},{"f":"nen","kind":"particle","cls":null,"en":"can; ability","zh":"能","srcEN":"能 néng","srcZH":"能 néng","num":false,"layer":"canon"},{"f":"suka","kind":"comp","cls":null,"en":"consciousness","zh":"意识","parts":["su","ka"],"just":"self-knowing — parallel to Latin con-scientia","num":false,"layer":"canon"},{"f":"linka","kind":"comp","cls":null,"en":"reason; logic","zh":"理性·逻辑","parts":["lin","ka"],"just":"knowing-of-links — parallel to Greek logos","num":false,"layer":"canon"},{"f":"moka","kind":"comp","cls":null,"en":"physics; natural science","zh":"物理·科学","parts":["mo","ka"],"just":"knowing-of-matter — parallel to physikē","num":false,"layer":"canon"},{"f":"tenlin","kind":"comp","cls":null,"en":"history","zh":"历史","parts":["ten","lin"],"just":"the chain of time","num":false,"layer":"canon"},{"f":"sulin","kind":"comp","cls":null,"en":"society; community","zh":"社会","parts":["su","lin"],"just":"linked selves — parallel to socius","num":false,"layer":"canon"},{"f":"sudin","kind":"comp","cls":null,"en":"dignity","zh":"尊严","parts":["su","din"],"just":"the self's intrinsic worth","num":false,"layer":"canon"},{"f":"sulindin","kind":"comp","cls":null,"en":"rights","zh":"权利","parts":["su","lin","din"],"just":"worth recognized through the web of persons","num":false,"layer":"canon"},{"f":"sukau","kind":"comp","cls":null,"en":"freedom","zh":"自由","parts":["su","kau"],"just":"self-caused — causa sui；「自由」逐字重合","num":false,"layer":"canon"},{"f":"xinwi","kind":"comp","cls":null,"en":"birth","zh":"诞生","parts":["xin","wi"],"just":"life's onset","num":false,"layer":"canon"},{"f":"tunseitai","kind":"comp","cls":null,"en":"superposition","zh":"叠加态","parts":["tun","sei","tai"],"just":"the state of existing together","num":false,"layer":"canon"},{"f":"datunwen","kind":"comp","cls":null,"en":"Datunwen (this language)","zh":"大同语","parts":["da","tun","wen"],"just":"the great-together language — endonym","num":false,"layer":"canon"},{"f":"tandi","kind":"comp","cls":null,"en":"yesterday","zh":"昨日","parts":["tan","di"],"just":"past-anchor + day（虚词锚定型复合）","anchor":true,"num":false,"layer":"canon"},{"f":"nulo","kind":"root","cls":null,"en":"zero","zh":"零","srcEN":"Latin nullus; Romance/Esperanto nul(o)","srcZH":"—（纯欧源，对中文 a-priori）","num":true,"layer":"v0.2-draft"},{"f":"yuno","kind":"root","cls":null,"en":"one","zh":"一","srcEN":"Latin unus → Sp/It uno（加 y- 滑音起首）","srcZH":"幺 yāo（报数之'1'，弱关联）","num":true,"layer":"v0.2-draft"},{"f":"duwa","kind":"root","cls":null,"en":"two","zh":"二","srcEN":"Latin duo；Malay dua 实读 [duwa]","srcZH":"对 duì（成双成对，弱关联）","num":true,"layer":"v0.2-draft"},{"f":"san","kind":"root","cls":null,"en":"three","zh":"三","srcEN":"Japanese san（三，汉字圈通行）","srcZH":"三 sān（直取）","num":true,"layer":"v0.2-draft"},{"f":"sifo","kind":"root","cls":null,"en":"four","zh":"四","srcEN":"English four → -fo","srcZH":"四 sì → si-（四+four 双源拼合）","num":true,"layer":"v0.2-draft"},{"f":"pente","kind":"root","cls":null,"en":"five","zh":"五","srcEN":"Greek pente（pentagon 五边形）","srcZH":"—（对中文 a-priori）","num":true,"layer":"v0.2-draft"},{"f":"lousi","kind":"root","cls":null,"en":"six","zh":"六","srcEN":"English six → -si","srcZH":"六 liù → lou-（六+six 双源拼合）","num":true,"layer":"v0.2-draft"},{"f":"seben","kind":"root","cls":null,"en":"seven","zh":"七","srcEN":"English seven（v→b 修复）","srcZH":"—（对中文 a-priori）","num":true,"layer":"v0.2-draft"},{"f":"bato","kind":"root","cls":null,"en":"eight","zh":"八","srcEN":"八 bā + Latin octō — blend","srcZH":"八 bā ＋ 拉丁 octō 熔合（同 sifo/lousi 模式）","num":true,"layer":"v0.2-draft"},{"f":"nain","kind":"root","cls":null,"en":"nine","zh":"九","srcEN":"English nine /naɪn/ = nain（航空读法 niner）","srcZH":"—（对中文 a-priori）","num":true,"layer":"v0.2-draft"},{"f":"deka","kind":"root","cls":null,"en":"ten","zh":"十","srcEN":"Greek deka（decade、decimal）","srcZH":"—（对中文 a-priori）","num":true,"layer":"v0.2-draft"},{"f":"cento","kind":"root","cls":null,"en":"hundred","zh":"百","srcEN":"Latin centum（percent、century、It cento）","srcZH":"'百分比'＝per-cent（国际词桥）","num":true,"layer":"v0.2-draft"},{"f":"kilo","kind":"root","cls":null,"en":"thousand","zh":"千","srcEN":"Greek/metric kilo- = 1000（kilometer）","srcZH":"千：公制'千米/千克'即 kilo-（经国际单位制双源桥）","num":true,"layer":"v0.2-draft"},{"f":"wa","kind":"root","cls":"matter","en":"water","zh":"水","srcEN":"English WAter / German WAsser 首音节；婴语 wawa","srcZH":"洼 wā（水洼、洼地积水）","num":false,"layer":"v0.2-draft"},{"f":"fogo","kind":"root","cls":"matter","en":"fire","zh":"火","srcEN":"Latin focus → It fuoco / Pt fogo","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"tera","kind":"root","cls":"matter","en":"earth, soil","zh":"土地","srcEN":"Latin terra（terrain、territory）","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"kase","kind":"root","cls":"matter","en":"air, wind","zh":"风","srcEN":"kamikaze 之 kaze（神风）","srcZH":"風＝日语 kaze（かぜ）","num":false,"layer":"v0.2-draft"},{"f":"ri","kind":"root","cls":"matter","en":"sun","zh":"日","srcEN":"English ray（日光之线，弱关联）","srcZH":"日 rì（直取）","num":false,"layer":"v0.2-draft"},{"f":"luna","kind":"root","cls":"matter","en":"moon","zh":"月亮","srcEN":"Latin luna（lunar）","srcZH":"露娜（Luna 通行音译，如动漫角色）","num":false,"layer":"v0.2-draft"},{"f":"sela","kind":"root","cls":"matter","en":"star","zh":"星","srcEN":"Latin stella 脱 t（stellar、constellation）","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"monta","kind":"root","cls":"matter","en":"mountain","zh":"山","srcEN":"Latin mons/montem；English mount(ain)","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"rein","kind":"root","cls":"matter","en":"rain","zh":"雨","srcEN":"English rain /reɪn/ = rein（音位逐一对应）","srcZH":"淋 lín（淋雨；本语 r/l 同音位）","num":false,"layer":"v0.2-draft"},{"f":"moku","kind":"root","cls":"life","en":"tree, wood","zh":"树木","srcEN":"—（对英文 a-priori）","srcZH":"木 mù；日语 moku（木曜日）","num":false,"layer":"v0.2-draft"},{"f":"roka","kind":"root","cls":"matter","en":"stone","zh":"石","srcEN":"English rock；Late Latin rocca","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"ceilo","kind":"root","cls":"matter","en":"sky","zh":"天空","srcEN":"Latin caelum；Italian/Spanish cielo","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"niyan","kind":"root","cls":"time","en":"year","zh":"年","srcEN":"—（对英文 a-priori）","srcZH":"年 nián → niyan（滑音修复）","num":false,"layer":"v0.2-draft"},{"f":"mesi","kind":"root","cls":"time","en":"month","zh":"月份","srcEN":"Latin mensis；Spanish mes、French mois","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"naito","kind":"root","cls":"time","en":"night","zh":"夜","srcEN":"English night /naɪt/（日语借形ナイト naito）","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"cau","kind":"root","cls":"time","en":"morning","zh":"早晨","srcEN":"Italian ciao（清晨互道，弱关联）","srcZH":"早 zǎo → cau（c ≈ 拼音 z）","num":false,"layer":"v0.2-draft"},{"f":"tou","kind":"root","cls":"life","en":"head","zh":"头","srcEN":"—（对英文 a-priori）","srcZH":"头 tóu（直取）","num":false,"layer":"v0.2-draft"},{"f":"xou","kind":"root","cls":"life","en":"hand","zh":"手","srcEN":"—（对英文 a-priori）","srcZH":"手 shǒu（x ≈ sh；与 tou/kou 成 -ou 身体系列）","num":false,"layer":"v0.2-draft"},{"f":"yan","kind":"root","cls":"life","en":"eye","zh":"眼","srcEN":"—（对英文 a-priori）","srcZH":"眼 yǎn（直取）","num":false,"layer":"v0.2-draft"},{"f":"mimi","kind":"root","cls":"life","en":"ear","zh":"耳","srcEN":"—（叠音可爱好记）","srcZH":"耳＝日语 mimi（みみ）","num":false,"layer":"v0.2-draft"},{"f":"kou","kind":"root","cls":"life","en":"mouth","zh":"口","srcEN":"—（对英文 a-priori）","srcZH":"口 kǒu（直取；tou/xou/kou 头手口成系）","num":false,"layer":"v0.2-draft"},{"f":"koro","kind":"root","cls":"life","en":"heart","zh":"心","srcEN":"Latin cor/cordis（cordial）；Esperanto koro","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"heima","kind":"root","cls":"life","en":"blood","zh":"血","srcEN":"Greek haima（hemo-、hemoglobin）","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"pedi","kind":"root","cls":"life","en":"foot","zh":"脚","srcEN":"Latin pes/pedis（pedal、pedestrian）","srcZH":"—（对中文 a-priori）","num":false,"layer":"v0.2-draft"},{"f":"cin","kind":"root","cls":"social","en":"parent","zh":"亲（父母）","srcEN":"English kin（亲属，音义双近）","srcZH":"亲 qīn（母亲/父亲之'亲'）","num":false,"layer":"v0.2-draft"},{"f":"mama","kind":"root","cls":"social","en":"mother","zh":"妈妈","srcEN":"mama（全球婴语）","srcZH":"妈妈 māma","num":false,"layer":"v0.2-draft"},{"f":"papa","kind":"root","cls":"social","en":"father","zh":"爸爸","srcEN":"papa（全球婴语）","srcZH":"爸爸 bàba（p/b 邻近）","num":false,"layer":"v0.2-draft"},{"f":"beibi","kind":"root","cls":"social","en":"child","zh":"孩子","srcEN":"English baby","srcZH":"宝贝 bǎobèi","num":false,"layer":"v0.2-draft"},{"f":"fudi","kind":"comp","parts":["fu","di"],"cls":null,"en":"tomorrow","zh":"明天","just":"将(fu)+日(di)=将来之日，平行于 canon tandi=昨天","anchor":true,"layer":"v0.2-draft"},{"f":"naudi","kind":"comp","parts":["nau","di"],"cls":null,"en":"today","zh":"今天","just":"今(nau)+日(di)=今日，平行 tandi/fudi 系列","anchor":true,"layer":"v0.2-draft"},{"f":"futen","kind":"comp","parts":["fu","ten"],"cls":null,"en":"the future","zh":"未来","just":"将(fu)+时(ten)=将来","anchor":true,"layer":"v0.2-draft"},{"f":"tanten","kind":"comp","parts":["tan","ten"],"cls":null,"en":"the past","zh":"过去","just":"昔(tan)+时(ten)=昔时","anchor":true,"layer":"v0.2-draft"},{"f":"funiyan","kind":"comp","parts":["fu","niyan"],"cls":null,"en":"next year","zh":"明年","just":"将(fu)+年=来年，循 tandi 型词化","anchor":true,"layer":"v0.2-draft"},{"f":"tanniyan","kind":"comp","parts":["tan","niyan"],"cls":null,"en":"last year","zh":"去年","just":"昔(tan)+年=去年，循 tandi 型词化","anchor":true,"layer":"v0.2-draft"},{"f":"dawa","kind":"comp","parts":["da","wa"],"cls":null,"en":"sea","zh":"海","just":"大+水=大水域（题面示例：sea=big water）","anchor":false,"layer":"v0.2-draft"},{"f":"datera","kind":"comp","parts":["da","tera"],"cls":null,"en":"world, the Earth","zh":"世界；大地","just":"大+地=大地/世界，cf. 大地","anchor":false,"layer":"v0.2-draft"},{"f":"fogomonta","kind":"comp","parts":["fogo","monta"],"cls":null,"en":"volcano","zh":"火山","just":"火+山=火山，跨语言同构（volcano/火山/kazan）","anchor":false,"layer":"v0.2-draft"},{"f":"fogomoku","kind":"comp","parts":["fogo","moku"],"cls":null,"en":"firewood","zh":"柴火","just":"火+木=供火之木，cf. 柴火/firewood","anchor":false,"layer":"v0.2-draft"},{"f":"yanwa","kind":"comp","parts":["yan","wa"],"cls":null,"en":"tear(s)","zh":"眼泪","just":"眼+水=眼泪，cf. 泪/韩语 nunmul(眼水)","anchor":false,"layer":"v0.2-draft"},{"f":"reinwa","kind":"comp","parts":["rein","wa"],"cls":null,"en":"rainwater","zh":"雨水","just":"雨+水=雨水（逐字同构）","anchor":false,"layer":"v0.2-draft"},{"f":"reinten","kind":"comp","parts":["rein","ten"],"cls":null,"en":"rainy season","zh":"雨季","just":"雨+时=雨季/汛期","anchor":false,"layer":"v0.2-draft"},{"f":"ceilotai","kind":"comp","parts":["ceilo","tai"],"cls":null,"en":"weather","zh":"天气","just":"天空+状态(tai)=天况，cf. 天气/weather","anchor":false,"layer":"v0.2-draft"},{"f":"xinniyan","kind":"comp","parts":["xin","niyan"],"cls":null,"en":"New Year","zh":"新年","just":"新(xin)+年=新年（逐字同构）","anchor":false,"layer":"v0.2-draft"},{"f":"tunmoku","kind":"comp","parts":["tun","moku"],"cls":null,"en":"forest, grove","zh":"森林","just":"共(tun)+木=群木相聚，cf. 森＝众木","anchor":false,"layer":"v0.2-draft"},{"f":"dinroka","kind":"comp","parts":["din","roka"],"cls":null,"en":"gem, jewel","zh":"宝石","just":"值(din)+石=有价之石，cf. 宝石","anchor":false,"layer":"v0.2-draft"},{"f":"dinmo","kind":"comp","parts":["din","mo"],"cls":null,"en":"treasure, valuable","zh":"宝物","just":"值(din)+物(mo)=宝物（逐字同构）","anchor":false,"layer":"v0.2-draft"},{"f":"cintera","kind":"comp","parts":["cin","tera"],"cls":null,"en":"homeland","zh":"故土；祖国","just":"亲+地=父母之邦，cf. patria/祖国/Vaterland","anchor":false,"layer":"v0.2-draft"},{"f":"wenka","kind":"comp","parts":["wen","ka"],"cls":null,"en":"linguistics","zh":"语言学","just":"语+知(ka)=语言之学，循 canon suka/moka 的 -ka 学科型","anchor":false,"layer":"v0.2-draft"},{"f":"selaka","kind":"comp","parts":["sela","ka"],"cls":null,"en":"astronomy","zh":"天文学","just":"星+知=星学，循 -ka 学科型","anchor":false,"layer":"v0.2-draft"},{"f":"wika","kind":"comp","parts":["wi","ka"],"cls":null,"en":"biology","zh":"生物学","just":"生(wi)+知=生命之学，循 -ka 学科型","anchor":false,"layer":"v0.2-draft"},{"f":"witen","kind":"comp","parts":["wi","ten"],"cls":null,"en":"lifetime","zh":"一生","just":"生+时=在世之时，cf. lifetime/一生","anchor":false,"layer":"v0.2-draft"},{"f":"wimo","kind":"comp","parts":["wi","mo"],"cls":null,"en":"living thing, organism","zh":"生物","just":"生+物=生物（逐字同构）","anchor":false,"layer":"v0.2-draft"},{"f":"mamawen","kind":"comp","parts":["mama","wen"],"cls":null,"en":"mother tongue","zh":"母语","just":"母+语=母语，cf. mother tongue/Muttersprache","anchor":false,"layer":"v0.2-draft"},{"f":"kouwen","kind":"comp","parts":["kou","wen"],"cls":null,"en":"spoken language","zh":"口语","just":"口+语=口语（逐字同构）","anchor":false,"layer":"v0.2-draft"},{"f":"xouwen","kind":"comp","parts":["xou","wen"],"cls":null,"en":"sign language","zh":"手语","just":"手+语=手语（逐字同构）","anchor":false,"layer":"v0.2-draft"},{"f":"xouka","kind":"comp","parts":["xou","ka"],"cls":null,"en":"craft, skill","zh":"手艺","just":"手+知=手上之知，cf. 手艺/know-how","anchor":false,"layer":"v0.2-draft"},{"f":"heimalin","kind":"comp","parts":["heima","lin"],"cls":null,"en":"blood ties, kinship","zh":"血缘","just":"血+连(lin)=血缘（逐字同构）","anchor":false,"layer":"v0.2-draft"},{"f":"touren","kind":"comp","parts":["tou","ren"],"cls":null,"en":"leader, chief","zh":"首领","just":"头+人=头人/首领，cf. chief<caput","anchor":false,"layer":"v0.2-draft"},{"f":"karen","kind":"comp","parts":["ka","ren"],"cls":null,"en":"scholar, sage","zh":"学者","just":"知+人=有知之人，循 canon -ren 施行者型","anchor":false,"layer":"v0.2-draft"},{"f":"pinren","kind":"comp","parts":["pin","ren"],"cls":null,"en":"peer, equal","zh":"同侪","just":"平(pin)+人=平等之人，cf. peer/平辈","anchor":false,"layer":"v0.2-draft"},{"f":"teraka","kind":"comp","parts":["tera","ka"],"cls":null,"en":"geology","zh":"地质学","just":"地+知(ka)=大地之学，循 -ka 学科型","anchor":false,"layer":"v0.2-draft"},{"f":"wan","kind":"root","cls":null,"en":"go","zh":"去","srcEN":"English 'way'/'wander' (set off)","srcZH":"往 wǎng（前往）","num":false,"layer":"v0.2-draft"},{"f":"lai","kind":"root","cls":null,"en":"come","zh":"来","srcEN":"Old Occitan lai 'thither'","srcZH":"来 lái","num":false,"layer":"v0.2-draft"},{"f":"gei","kind":"root","cls":"social","en":"give","zh":"给","srcEN":"give (g- onset)","srcZH":"给 gěi","num":false,"layer":"v0.2-draft"},{"f":"na","kind":"root","cls":"social","en":"take/get","zh":"拿/取","srcEN":"nab 'grab'","srcZH":"拿 ná","num":false,"layer":"v0.2-draft"},{"f":"fa","kind":"root","cls":null,"en":"make/do","zh":"做/制","srcEN":"Latin facere / Italian fare","srcZH":"发 fā（制出、发生）","num":false,"layer":"v0.2-draft"},{"f":"tein","kind":"root","cls":"mind","en":"hear","zh":"听","srcEN":"cf. attune, 'tune in' (weak)","srcZH":"听 tīng","num":false,"layer":"v0.2-draft"},{"f":"yau","kind":"root","cls":"mind","en":"want","zh":"要/想要","srcEN":"yen 'craving', yearn","srcZH":"要 yào","num":false,"layer":"v0.2-draft"},{"f":"min","kind":"root","cls":"life","en":"sleep","zh":"睡","srcEN":"Latin somnus/dormire (m…n)","srcZH":"眠 mián（睡眠）","num":false,"layer":"v0.2-draft"},{"f":"bi","kind":"root","cls":"life","en":"drink","zh":"喝/饮","srcEN":"Latin bibere; imbibe","srcZH":"杯 bēi（举杯而饮）","num":false,"layer":"v0.2-draft"},{"f":"cou","kind":"root","cls":null,"en":"move/walk","zh":"走/移动","srcEN":"French courir / Latin currere 'run, course'","srcZH":"走 zǒu（c≈z）","num":false,"layer":"v0.2-draft"},{"f":"bau","kind":"root","cls":null,"en":"hold/carry","zh":"持/抱/携","srcEN":"Latin baiulare 'carry a load'; bear","srcZH":"抱 bào","num":false,"layer":"v0.2-draft"},{"f":"kai","kind":"root","cls":null,"en":"open","zh":"开","srcEN":"key (it opens; weak)","srcZH":"开 kāi","num":false,"layer":"v0.2-draft"},{"f":"fen","kind":"root","cls":null,"en":"close","zh":"关/封","srcEN":"fasten, fence in","srcZH":"封 fēng（封闭）","num":false,"layer":"v0.2-draft"},{"f":"mai","kind":"root","cls":"social","en":"trade/exchange","zh":"交易/换","srcEN":"Latin mercari; market","srcZH":"买/卖 mǎi–mài","num":false,"layer":"v0.2-draft"},{"f":"xun","kind":"root","cls":"mind","en":"seek/find","zh":"寻找","srcEN":"a-priori (echoes 'hunt')","srcZH":"寻 xún（寻找）","num":false,"layer":"v0.2-draft"},{"f":"hau","kind":"root","cls":null,"en":"good","zh":"好","srcEN":"a-priori","srcZH":"好 hǎo","num":false,"layer":"v0.2-draft"},{"f":"wai","kind":"root","cls":null,"en":"bad","zh":"坏","srcEN":"awry, wayward","srcZH":"坏 huài","num":false,"layer":"v0.2-draft"},{"f":"xau","kind":"root","cls":"matter","en":"small","zh":"小","srcEN":"a-priori","srcZH":"小 xiǎo","num":false,"layer":"v0.2-draft"},{"f":"ho","kind":"root","cls":"matter","en":"hot","zh":"热","srcEN":"hot (h-)","srcZH":"火 huǒ（炎热）","num":false,"layer":"v0.2-draft"},{"f":"han","kind":"root","cls":"matter","en":"cold","zh":"冷/寒","srcEN":"hoar(frost) (weak)","srcZH":"寒 hán","num":false,"layer":"v0.2-draft"},{"f":"lon","kind":"root","cls":"matter","en":"long (spatial)","zh":"长","srcEN":"Latin longus; long","srcZH":"龙 lóng（龙身之长，谐音）","num":false,"layer":"v0.2-draft"},{"f":"kun","kind":"root","cls":"matter","en":"short","zh":"短","srcEN":"German kurz / Latin curtus","srcZH":"a-priori","num":false,"layer":"v0.2-draft"},{"f":"man","kind":"root","cls":null,"en":"many","zh":"多","srcEN":"many, multi-","srcZH":"满 mǎn（满则多）","num":false,"layer":"v0.2-draft"},{"f":"po","kind":"root","cls":null,"en":"few","zh":"少","srcEN":"Italian poco / Latin paucus","srcZH":"薄 báo（微薄，p/b 呼应）","num":false,"layer":"v0.2-draft"},{"f":"fai","kind":"root","cls":null,"en":"fast","zh":"快","srcEN":"fast, fleet","srcZH":"飞 fēi（飞快）","num":false,"layer":"v0.2-draft"},{"f":"ci","kind":"root","cls":null,"en":"slow","zh":"慢","srcEN":"a-priori","srcZH":"迟 chí（迟缓）","num":false,"layer":"v0.2-draft"},{"f":"con","kind":"root","cls":"matter","en":"heavy","zh":"重","srcEN":"a-priori","srcZH":"重 zhòng（c≈zh）","num":false,"layer":"v0.2-draft"},{"f":"gon","kind":"root","cls":"matter","en":"bright","zh":"亮/明","srcEN":"glow, gleam, gold","srcZH":"光 guāng","num":false,"layer":"v0.2-draft"},{"f":"hun","kind":"root","cls":"matter","en":"dark","zh":"暗","srcEN":"a-priori","srcZH":"昏 hūn（昏暗）","num":false,"layer":"v0.2-draft"},{"f":"bai","kind":"root","cls":"matter","en":"white","zh":"白","srcEN":"French blanc (b-)","srcZH":"白 bái","num":false,"layer":"v0.2-draft"},{"f":"hei","kind":"root","cls":"matter","en":"black","zh":"黑","srcEN":"a-priori","srcZH":"黑 hēi","num":false,"layer":"v0.2-draft"},{"f":"rou","kind":"root","cls":"matter","en":"red","zh":"红","srcEN":"Latin ruber / French rouge","srcZH":"肉 ròu（红肉之色，谐音）","num":false,"layer":"v0.2-draft"},{"f":"geimo","kind":"comp","parts":["gei","mo"],"cls":"social","en":"gift","zh":"礼物","just":"give-thing: that which is given = a gift","anchor":false,"layer":"v0.2-draft"},{"f":"canmo","kind":"comp","parts":["can","mo"],"cls":"life","en":"food","zh":"食物","just":"eat-thing: that which is eaten = food","anchor":false,"layer":"v0.2-draft"},{"f":"bimo","kind":"comp","parts":["bi","mo"],"cls":"life","en":"beverage","zh":"饮料","just":"drink-thing: that which is drunk = beverage","anchor":false,"layer":"v0.2-draft"},{"f":"maimo","kind":"comp","parts":["mai","mo"],"cls":"social","en":"ware; merchandise","zh":"货物/商品","just":"trade-thing: that which is traded = ware","anchor":false,"layer":"v0.2-draft"},{"f":"teinmo","kind":"comp","parts":["tein","mo"],"cls":"mind","en":"sound","zh":"声音","just":"hear-thing: that which is heard = sound","anchor":false,"layer":"v0.2-draft"},{"f":"kanmo","kind":"comp","parts":["kan","mo"],"cls":"mind","en":"sight; image","zh":"影像/景象","just":"see-thing: that which is seen = sight, image","anchor":false,"layer":"v0.2-draft"},{"f":"baumo","kind":"comp","parts":["bau","mo"],"cls":"matter","en":"load; luggage","zh":"行李/负载","just":"carry-thing: that which is carried = load","anchor":false,"layer":"v0.2-draft"},{"f":"kaimo","kind":"comp","parts":["kai","mo"],"cls":"matter","en":"opener; key","zh":"钥匙/开具","just":"open-thing: instrument that opens = opener, key (instrumental reading)","anchor":false,"layer":"v0.2-draft"},{"f":"mairen","kind":"comp","parts":["mai","ren"],"cls":"social","en":"merchant","zh":"商人","just":"trade-person: one who trades = merchant","anchor":false,"layer":"v0.2-draft"},{"f":"faren","kind":"comp","parts":["fa","ren"],"cls":"social","en":"maker; craftsman","zh":"工匠/制作者","just":"make-person: one who makes = maker","anchor":false,"layer":"v0.2-draft"},{"f":"xunren","kind":"comp","parts":["xun","ren"],"cls":"social","en":"seeker","zh":"寻觅者","just":"seek-person: one who seeks = seeker","anchor":false,"layer":"v0.2-draft"},{"f":"tunren","kind":"comp","parts":["tun","ren"],"cls":"social","en":"companion; friend","zh":"同伴/朋友","just":"together-person: one who is with you = companion","anchor":false,"layer":"v0.2-draft"},{"f":"xinren","kind":"comp","parts":["xin","ren"],"cls":"social","en":"newcomer","zh":"新人/新来者","just":"new-person = newcomer","anchor":false,"layer":"v0.2-draft"},{"f":"daren","kind":"comp","parts":["da","ren"],"cls":"social","en":"adult","zh":"成人","just":"big-person = adult","anchor":false,"layer":"v0.2-draft"},{"f":"xauren","kind":"comp","parts":["xau","ren"],"cls":"social","en":"child","zh":"小孩","just":"small-person = child","anchor":false,"layer":"v0.2-draft"},{"f":"hauren","kind":"comp","parts":["hau","ren"],"cls":"social","en":"kind person","zh":"好人/善人","just":"good-person = kind, decent person","anchor":false,"layer":"v0.2-draft"},{"f":"wairen","kind":"comp","parts":["wai","ren"],"cls":"social","en":"wrongdoer; villain","zh":"坏人","just":"bad-person = wrongdoer","anchor":false,"layer":"v0.2-draft"},{"f":"cancu","kind":"comp","parts":["can","cu"],"cls":null,"en":"dining place","zh":"食处/食堂","just":"eat-place: place for eating = dining place","anchor":false,"layer":"v0.2-draft"},{"f":"mincu","kind":"comp","parts":["min","cu"],"cls":null,"en":"bedroom; sleeping place","zh":"卧室/睡处","just":"sleep-place = bedroom","anchor":false,"layer":"v0.2-draft"},{"f":"maicu","kind":"comp","parts":["mai","cu"],"cls":"social","en":"market","zh":"市场","just":"trade-place = market","anchor":false,"layer":"v0.2-draft"},{"f":"wicu","kind":"comp","parts":["wi","cu"],"cls":"life","en":"dwelling; habitat","zh":"住所/栖息地","just":"life-place: place where one lives = dwelling","anchor":false,"layer":"v0.2-draft"},{"f":"wancu","kind":"comp","parts":["wan","cu"],"cls":null,"en":"destination","zh":"目的地","just":"go-place: place one goes to = destination","anchor":false,"layer":"v0.2-draft"},{"f":"gonten","kind":"comp","parts":["gon","ten"],"cls":"time","en":"daytime","zh":"白昼","just":"bright-time = daytime","anchor":false,"layer":"v0.2-draft"},{"f":"hunten","kind":"comp","parts":["hun","ten"],"cls":"time","en":"night","zh":"夜晚","just":"dark-time = night","anchor":false,"layer":"v0.2-draft"},{"f":"canten","kind":"comp","parts":["can","ten"],"cls":"time","en":"mealtime","zh":"用餐时间","just":"eat-time = mealtime","anchor":false,"layer":"v0.2-draft"},{"f":"dadin","kind":"comp","parts":["da","din"],"cls":"social","en":"expensive; precious","zh":"昂贵/贵重","just":"big-worth = expensive","anchor":false,"layer":"v0.2-draft"},{"f":"xaudin","kind":"comp","parts":["xau","din"],"cls":"social","en":"cheap","zh":"便宜/廉价","just":"small-worth = cheap","anchor":false,"layer":"v0.2-draft"},{"f":"maidin","kind":"comp","parts":["mai","din"],"cls":"social","en":"price","zh":"价格","just":"trade-worth: worth in exchange = price","anchor":false,"layer":"v0.2-draft"},{"f":"xinka","kind":"comp","parts":["xin","ka"],"cls":"speech","en":"news","zh":"新闻","just":"new-knowledge = news","anchor":false,"layer":"v0.2-draft"},{"f":"xaumau","kind":"comp","parts":["xau","mau"],"cls":"animal","en":"kitten","zh":"小猫","just":"small-cat = kitten","anchor":false,"layer":"v0.2-draft"},{"f":"pinmai","kind":"comp","parts":["pin","mai"],"cls":"social","en":"fair exchange","zh":"公平交易","just":"equal-trade = fair exchange","anchor":false,"layer":"v0.2-draft"},{"f":"sukan","kind":"comp","parts":["su","kan"],"cls":"mind","en":"introspection","zh":"自省/内观","just":"self-see = introspection (parallels canon suka 'self-know')","anchor":false,"layer":"v0.2-draft"},{"f":"tunwan","kind":"comp","parts":["tun","wan"],"cls":null,"en":"accompany","zh":"同行/陪同","just":"together-go = accompany","anchor":false,"layer":"v0.2-draft"},{"f":"domu","kind":"root","cls":"social","en":"house, dwelling","zh":"屋","srcEN":"Latin domus 'house' (domestic, dome)","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"pota","kind":"root","cls":"matter","en":"door, gate","zh":"门","srcEN":"Latin porta 'gate' (portal, port)","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"dau","kind":"root","cls":"matter","en":"road, way","zh":"道，路","srcEN":"Dao/Tao 'the Way', familiar in English","srcZH":"道 dào 'way, road'","num":false,"layer":"v0.2-draft"},{"f":"cen","kind":"root","cls":"social","en":"city, town","zh":"城","srcEN":"Latin centrum, town centre (weak)","srcZH":"城 chéng 'city'","num":false,"layer":"v0.2-draft"},{"f":"pekun","kind":"root","cls":"social","en":"money","zh":"钱","srcEN":"Latin pecūnia (cf. pecuniary)","srcZH":"拉丁 pecūnia（英 pecuniary 之源）","num":false,"layer":"v0.2-draft"},{"f":"lau","kind":"root","cls":"social","en":"work, labor","zh":"劳动","srcEN":"Latin labor (initial la-)","srcZH":"劳 láo 'toil' (劳动)","num":false,"layer":"v0.2-draft"},{"f":"nomi","kind":"root","cls":"speech","en":"name","zh":"名字","srcEN":"Latin nomen 'name' (nominal, nominate)","srcZH":"a-priori for ZH (faint echo of 名 míng)","num":false,"layer":"v0.2-draft"},{"f":"fan","kind":"root","cls":"matter","en":"food, meal","zh":"饭","srcEN":"a-priori for EN","srcZH":"饭 fàn 'meal, cooked food'","num":false,"layer":"v0.2-draft"},{"f":"yifu","kind":"root","cls":"matter","en":"clothing, garment","zh":"衣","srcEN":"衣服 yīfú","srcZH":"汉「衣服」（原单音节 yi 与连词 i 感知过近，加长避险）","num":false,"layer":"v0.2-draft"},{"f":"ki","kind":"root","cls":"matter","en":"tool, implement","zh":"工具","srcEN":"English 'kit'","srcZH":"器 qì 'implement' (器具、机器)","num":false,"layer":"v0.2-draft"},{"f":"lowe","kind":"root","cls":"mind","en":"love","zh":"爱","srcEN":"English 'love' (v→w)","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"pa","kind":"root","cls":"mind","en":"fear","zh":"怕","srcEN":"Latin pavor 'dread'; English 'panic'","srcZH":"怕 pà 'to fear'","num":false,"layer":"v0.2-draft"},{"f":"xi","kind":"root","cls":"mind","en":"joy","zh":"喜","srcEN":"onomatopoeic 'hee-hee' (weak)","srcZH":"喜 xǐ 'joy' (欢喜)","num":false,"layer":"v0.2-draft"},{"f":"gen","kind":"root","cls":"mind","en":"truth, true","zh":"真","srcEN":"English 'genuine'","srcZH":"根 gēn 'root, basis' — the real ground; cf. 真 zhēn","num":false,"layer":"v0.2-draft"},{"f":"pan","kind":"root","cls":"social","en":"friend, companion","zh":"朋友","srcEN":"comPANion; 'pal'","srcZH":"伴 bàn 'companion' (伙伴; b→p)","num":false,"layer":"v0.2-draft"},{"f":"kani","kind":"root","cls":"animal","en":"dog","zh":"狗","srcEN":"Latin canis + 犬 quǎn — dual hit","srcZH":"拉丁 canis ＋ 犬 quǎn——双源命中","num":false,"layer":"v0.2-draft"},{"f":"fou","kind":"root","cls":"animal","en":"bird","zh":"鸟","srcEN":"English 'fowl'; German 'Vogel'","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"maro","kind":"root","cls":"animal","en":"horse","zh":"马","srcEN":"English 'mare'","srcZH":"马 mǎ 'horse' (ma- plus echo -ro)","num":false,"layer":"v0.2-draft"},{"f":"bagu","kind":"root","cls":"animal","en":"insect, bug","zh":"虫","srcEN":"English 'bug' (echo vowel; cf. Japanese loan bagu)","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"xe","kind":"root","cls":"speech","en":"write, mark","zh":"写","srcEN":"a-priori for EN","srcZH":"写 xiě 'write'","num":false,"layer":"v0.2-draft"},{"f":"ge","kind":"root","cls":"speech","en":"song, music","zh":"歌","srcEN":"a-priori for EN","srcZH":"歌 gē 'song'","num":false,"layer":"v0.2-draft"},{"f":"ludo","kind":"root","cls":"social","en":"play, game","zh":"游戏","srcEN":"Latin ludus 'game' (ludicrous; the board game Ludo)","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"maxin","kind":"root","cls":"matter","en":"machine","zh":"机器","srcEN":"English 'machine' /məˈʃiːn/ → ma-xin","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"beru","kind":"root","cls":"social","en":"war","zh":"战争","srcEN":"Latin bellum 'war' (belligerent, rebel)","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"yin","kind":"root","cls":"speech","en":"voice, sound","zh":"音","srcEN":"a-priori for EN","srcZH":"音 yīn 'sound, voice'","num":false,"layer":"v0.2-draft"},{"f":"foto","kind":"root","cls":"speech","en":"picture, drawing","zh":"图画","srcEN":"internationalism photo/foto/фото","srcZH":"国际词 photo／фото／フォト","num":false,"layer":"v0.2-draft"},{"f":"tori","kind":"root","cls":"speech","en":"story, tale","zh":"故事","srcEN":"English 'story'; Latin historia (-tori-)","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"dansu","kind":"root","cls":"social","en":"dance","zh":"舞蹈","srcEN":"English/French 'dance/danse' (Japanese loan dansu)","srcZH":"a-priori for ZH","num":false,"layer":"v0.2-draft"},{"f":"kadomu","kind":"comp","parts":["ka","domu"],"cls":null,"en":"school","zh":"学校","just":"know-house: house where knowing is built = school","anchor":false,"layer":"v0.2-draft"},{"f":"candomu","kind":"comp","parts":["can","domu"],"cls":null,"en":"restaurant","zh":"餐馆","just":"eat-house: house for eating = restaurant","anchor":false,"layer":"v0.2-draft"},{"f":"pekundomu","kind":"comp","parts":["pekun","domu"],"cls":null,"en":"bank","zh":"银行","just":"money-house: house that keeps money = bank","anchor":false,"layer":"v0.2-draft"},{"f":"sudomu","kind":"comp","parts":["su","domu"],"cls":null,"en":"home","zh":"家","just":"self-house: one's own house = home","anchor":false,"layer":"v0.2-draft"},{"f":"mundomu","kind":"comp","parts":["mun","domu"],"cls":null,"en":"tomb, grave","zh":"坟墓","just":"death-house: house of the dead = tomb","anchor":false,"layer":"v0.2-draft"},{"f":"kanidomu","kind":"comp","parts":["kani","domu"],"cls":null,"en":"kennel","zh":"狗窝","just":"dog-house: house for a dog = kennel","anchor":false,"layer":"v0.2-draft"},{"f":"marodomu","kind":"comp","parts":["maro","domu"],"cls":null,"en":"stable","zh":"马厩","just":"horse-house: house for horses = stable","anchor":false,"layer":"v0.2-draft"},{"f":"laudomu","kind":"comp","parts":["lau","domu"],"cls":null,"en":"workplace","zh":"工作场所","just":"work-house: house where one works = workplace","anchor":false,"layer":"v0.2-draft"},{"f":"yifudomu","kind":"comp","parts":["yifu","domu"],"cls":null,"en":"wardrobe, closet","zh":"衣柜","just":"clothing-house: little house for clothes = wardrobe","anchor":false,"layer":"v0.2-draft"},{"f":"gewen","kind":"comp","parts":["ge","wen"],"cls":null,"en":"poem, poetry","zh":"诗","just":"song-language: language shaped as song = poem","anchor":false,"layer":"v0.2-draft"},{"f":"genwen","kind":"comp","parts":["gen","wen"],"cls":null,"en":"fact, true statement","zh":"事实","just":"true-language: statement that holds true = fact","anchor":false,"layer":"v0.2-draft"},{"f":"xeki","kind":"comp","parts":["xe","ki"],"cls":null,"en":"pen","zh":"笔","just":"write-tool: tool for writing = pen","anchor":false,"layer":"v0.2-draft"},{"f":"canki","kind":"comp","parts":["can","ki"],"cls":null,"en":"eating utensil","zh":"餐具","just":"eat-tool: tool for eating = utensil","anchor":false,"layer":"v0.2-draft"},{"f":"beruki","kind":"comp","parts":["beru","ki"],"cls":null,"en":"weapon","zh":"武器","just":"war-tool: tool of war = weapon","anchor":false,"layer":"v0.2-draft"},{"f":"xemo","kind":"comp","parts":["xe","mo"],"cls":null,"en":"document, text","zh":"文件","just":"write-thing: a written thing = document","anchor":false,"layer":"v0.2-draft"},{"f":"ludomo","kind":"comp","parts":["ludo","mo"],"cls":null,"en":"toy","zh":"玩具","just":"play-thing: thing for playing = toy","anchor":false,"layer":"v0.2-draft"},{"f":"lauren","kind":"comp","parts":["lau","ren"],"cls":null,"en":"worker","zh":"工人","just":"work-person: one who works = worker","anchor":false,"layer":"v0.2-draft"},{"f":"peiren","kind":"comp","parts":["pei","ren"],"cls":null,"en":"fisher","zh":"渔民","just":"fish-person: one who fishes = fisher","anchor":false,"layer":"v0.2-draft"},{"f":"beruren","kind":"comp","parts":["beru","ren"],"cls":null,"en":"soldier","zh":"士兵","just":"war-person: person of war = soldier","anchor":false,"layer":"v0.2-draft"},{"f":"dauren","kind":"comp","parts":["dau","ren"],"cls":null,"en":"traveler","zh":"旅人","just":"road-person: person on the way = traveler","anchor":false,"layer":"v0.2-draft"},{"f":"loweren","kind":"comp","parts":["lowe","ren"],"cls":null,"en":"beloved, lover","zh":"爱人","just":"love-person: the person one loves = beloved (cf. 爱人)","anchor":false,"layer":"v0.2-draft"},{"f":"geren","kind":"comp","parts":["ge","ren"],"cls":null,"en":"singer","zh":"歌手","just":"song-person: one who sings = singer (cf. 歌手)","anchor":false,"layer":"v0.2-draft"},{"f":"cendau","kind":"comp","parts":["cen","dau"],"cls":null,"en":"street","zh":"街道","just":"city-road: road inside a city = street","anchor":false,"layer":"v0.2-draft"},{"f":"cenpota","kind":"comp","parts":["cen","pota"],"cls":null,"en":"city gate","zh":"城门","just":"city-gate: gate of the city wall (cf. 城门)","anchor":false,"layer":"v0.2-draft"},{"f":"laudi","kind":"comp","parts":["lau","di"],"cls":null,"en":"workday","zh":"工作日","just":"work-day: day for work = workday","anchor":false,"layer":"v0.2-draft"},{"f":"widi","kind":"comp","parts":["wi","di"],"cls":null,"en":"birthday","zh":"生日","just":"life-day: the day life began = birthday (cf. 生日)","anchor":false,"layer":"v0.2-draft"},{"f":"fouge","kind":"comp","parts":["fou","ge"],"cls":null,"en":"birdsong","zh":"鸟鸣","just":"bird-song: song of birds = birdsong","anchor":false,"layer":"v0.2-draft"},{"f":"kamaxin","kind":"comp","parts":["ka","maxin"],"cls":null,"en":"computer","zh":"电脑","just":"know-machine: machine that computes = computer","anchor":false,"layer":"v0.2-draft"},{"f":"wenmaxin","kind":"comp","parts":["wen","maxin"],"cls":null,"en":"telephone","zh":"电话","just":"language-machine: machine carrying speech = telephone","anchor":false,"layer":"v0.2-draft"},{"f":"pintai","kind":"comp","parts":["pin","tai"],"cls":null,"en":"peace","zh":"和平","just":"equal-state: level, settled relations = peace","anchor":false,"layer":"v0.2-draft"},{"f":"patai","kind":"comp","parts":["pa","tai"],"cls":null,"en":"anxiety, dread","zh":"焦虑","just":"fear-state: standing state of fear = anxiety","anchor":false,"layer":"v0.2-draft"},{"f":"xitai","kind":"comp","parts":["xi","tai"],"cls":null,"en":"happiness","zh":"幸福","just":"joy-state: standing state of joy = happiness","anchor":false,"layer":"v0.2-draft"},{"f":"daufoto","kind":"comp","parts":["dau","foto"],"cls":null,"en":"map","zh":"地图","just":"road-picture: picture of the ways = map","anchor":false,"layer":"v0.2-draft"},{"f":"renfoto","kind":"comp","parts":["ren","foto"],"cls":null,"en":"portrait","zh":"肖像","just":"person-picture: picture of a person = portrait","anchor":false,"layer":"v0.2-draft"}];
+const KINDZH = { root: '词根', pronoun: '代词', particle: '虚词', comp: '复合' };
+const CLSZH = { mind: '义符·心', matter: '义符·物', life: '义符·生', time: '义符·时', social: '义符·众', speech: '义符·言', animal: '义符·兽' };
+function ipa(f) { return '/' + f.replace(/c/g, 't\u0361\u0283').replace(/x/g, '\u0283').replace(/y/g, 'j').replace(/[rl]/g, '\u027e') + '/'; }
+function etyLine(e) {
+  if (e.kind === 'comp') {
+    const tree = e.parts.map(p => p + '\u2009' + ((LEX[p] && LEX[p].g) || PART[p] || '?')).join(' ＋ ');
+    return '〔' + tree + '〕' + (e.just ? '　—— ' + e.just : '') + (e.anchor ? '　·虚词锚定型' : '');
+  }
+  const bits = [];
+  if (e.srcEN) bits.push(e.srcEN);
+  if (e.srcZH && e.srcZH !== e.srcEN) bits.push(e.srcZH);
+  return bits.join('　·　');
+}
+const dictEl = qs('#dict');
+for (const e of DICT) {
+  const row = document.createElement('div');
+  row.className = 'drow'; row.id = 'e-' + e.f;
+  row.dataset.k = e.kind; row.dataset.num = e.num ? '1' : '';
+  row.dataset.s = (e.f + ' ' + e.en + ' ' + e.zh).toLowerCase();
+  const g = document.createElement('div'); g.className = 'dg';
+  const wb = wordButton(e.f, e.kind === 'particle' ? 34 : 46);
+  if (wb) { const r = wb.querySelector('.r'); if (r) r.remove(); const gg = wb.querySelector('.g'); if (gg) gg.remove(); g.appendChild(wb); }
+  row.appendChild(g);
+  const main = document.createElement('div'); main.className = 'dmain';
+  let badges = '<span class="bdg">' + KINDZH[e.kind] + '</span>';
+  badges += '<span class="bdg ' + (e.layer === 'canon' ? 'canon' : '') + '">' + (e.layer === 'canon' ? '正典' : '草案 v0.2') + '</span>';
+  if (e.num) badges += '<span class="bdg numb">数词</span>';
+  if (e.cls) badges += '<span class="bdg">' + CLSZH[e.cls] + '</span>';
+  let h = '<div class="dhead"><span class="drom">' + e.f + '</span><span class="dipa">' + ipa(e.f) + '</span>' + badges + '</div>';
+  h += '<div class="dgl"><b>' + e.en + '</b><span class="zh">' + e.zh + '</span></div>';
+  h += '<div class="dety">' + etyLine(e) + '</div>';
+  if (e.kind !== 'particle') {
+    h += '<div class="dforms">';
+    h += '<button class="cbtn" data-w="' + e.f + '">' + e.f + '<small>指称·平</small></button>';
+    h += '<button class="cbtn" data-w="' + e.f + 'q">' + e.f + 'q<small>谓述·降</small></button>';
+    h += '<button class="cbtn" data-w="' + e.f + 'z">' + e.f + 'z<small>修饰·升</small></button>';
+    h += '</div>';
+  }
+  main.innerHTML = h; row.appendChild(main); dictEl.appendChild(row);
+}
+document.addEventListener('click', function (ev) {
+  const b = ev.target.closest('.cbtn');
+  if (b) playWord(b.dataset.w, null);
+});
+const rows = qsa('.drow');
+let kf = 'all';
+function applyFilter() {
+  const q = qs('#q').value.trim().toLowerCase();
+  let shown = 0;
+  for (const r of rows) {
+    const okK = kf === 'all' || (kf === 'num' ? r.dataset.num === '1' : (kf === 'root' ? (r.dataset.k === 'root' || r.dataset.k === 'pronoun') : r.dataset.k === kf));
+    const okQ = !q || r.dataset.s.indexOf(q) >= 0;
+    const on = okK && okQ; r.style.display = on ? '' : 'none'; if (on) shown++;
+  }
+  qs('#shownN').textContent = shown;
+}
+qs('#q').addEventListener('input', applyFilter);
+qsa('#kchips button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    kf = b.dataset.k;
+    qsa('#kchips button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    applyFilter();
+  });
+});
+function mkIndex(el, keyFn, sortFn) {
+  const items = DICT.slice().sort(sortFn);
+  el.innerHTML = items.map(function (e) {
+    return '<a class="ixa" href="#e-' + e.f + '"><b>' + keyFn(e) + '</b><span class="rm">' + e.f + '</span></a>';
+  }).join('');
+  el.addEventListener('click', function () { qs('#q').value = ''; kf = 'all'; qsa('#kchips button').forEach(function (x) { x.classList.toggle('on', x.dataset.k === 'all'); }); applyFilter(); });
+}
+mkIndex(qs('#idxEN'), function (e) { return e.en; }, function (a, b) { return a.en.toLowerCase() < b.en.toLowerCase() ? -1 : 1; });
+var zhColl; try { zhColl = new Intl.Collator('zh-Hans-CN-u-co-pinyin'); } catch (err) { zhColl = { compare: function (a, b) { return a < b ? -1 : 1; } }; }
+mkIndex(qs('#idxZH'), function (e) { return e.zh; }, function (a, b) { return zhColl.compare(a.zh, b.zh); });
+applyFilter();
+</script>
+</body>
+</html>
